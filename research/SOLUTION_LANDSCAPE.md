@@ -47,19 +47,22 @@ Do not rebuild specialty treatment management or clinical tools. Investigate tra
 
 ### NCG Virtual Tumor Board
 
-Evidence: `EV-0020`; [official page](https://www.ncgindia.org/key-initiatives/virtual-tumor-board).
+Evidence: `EV-0020`, `EV-0036`–`EV-0040`; [official NCG page](https://www.ncgindia.org/key-initiatives/virtual-tumor-board), [blank presentation template](https://www.ncgindia.org/assets/ncg-key-initiatives/virtual-tumor-board/vtb-template.pptx), and [iECHO case-submission help](https://help.iecho.org/submitcase).
 
 Existing capabilities/direction:
 
 - recurring cross-centre expert sessions;
 - a host-and-centre model;
-- case submission before scheduled discussion;
-- a presentation template;
+- deadline-based case submission and an established six-slide presentation template;
+- programme coordination and disease-management-group review;
+- iECHO presenter assignment, case-content upload, review status, PII/PHI check, approval/rejection, notifications, re-upload, and controlled sharing;
 - videoconferencing and an existing NCG expert network.
+
+The current NCG page still describes email and Zoom, while an NCG 2022 account says the programme moved to iECHO. The exact current NCG configuration must be verified.
 
 Implication:
 
-“Connect oncologists” is already an operating programme. A candidate must address case readiness, permissioned source collection, documentation, or follow-through without replacing the board.
+“Connect oncologists,” generic board scheduling, presentation templates, and pre-board file review are already served. Validate only a post-board handoff from an existing clinician-authored decision to authorised treating-unit acknowledgement and operational disposition. Public omission is not proof of a local gap.
 
 ### ABDM and NRCeS FHIR guide
 

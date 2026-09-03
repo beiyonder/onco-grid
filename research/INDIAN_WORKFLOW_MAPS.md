@@ -161,18 +161,23 @@ The NCG module establishes a materially different specialty workflow (`EV-0013`)
 
 ```text
 Case selected
-  → question for board stated
-  → history and prior treatment assembled
-  → pathology, imaging, and other evidence attached
-  → specialty review/comments
+  → presenter assigned
+  → NCG template completed with history, investigations, imaging, and board question
+  → programme/organisation team reviews content and PII/PHI
+  → approved content shared for the session
   → human multidisciplinary discussion
-  → human decision recorded
-  → communication and follow-up
+  → human decision recorded in the local/MDT workflow
+  → [publicly undocumented intermediate handoff]
+  → subsequent MDT may record whether the earlier decision was followed
 ```
 
 ### National operating context
 
 The NCG already operates a Virtual Tumor Board using scheduled host-and-centre sessions, a case template, and videoconferencing (`EV-0020`). Therefore, “connect oncologists” is not a sufficiently differentiated product statement.
+
+Public P5 validation adds that NCG already publishes a six-slide presentation template, while iECHO supports presenter assignment, upload, review state, approval/rejection, correction notification, re-upload, and controlled sharing (`EV-0036`–`EV-0040`). The NCG/KCDO MDT module already contains final-decision fields and a later follow-up review (`EV-0014`).
+
+The current NCG page describes email and Zoom, while an NCG 2022 account says VTB moved to iECHO. Treat the exact current platform configuration as unverified.
 
 ### Observed Indian gaps
 
@@ -186,7 +191,7 @@ The 2026 NCRP hospital survey (`EV-0019`) found among 137 reported boards:
 - only 52.5% had a designated secretariat;
 - 47.4% met weekly.
 
-This directly supports documentation, follow-up, and cross-hospital access gaps. It does not measure case-preparation time.
+This directly supports heterogeneous documentation and follow-up mechanisms. It does not measure case-preparation time, identify the post-board owner, or prove that public documentation reflects the local workflow.
 
 ### Transfer evidence
 
@@ -194,12 +199,13 @@ A small Roche-funded Spanish pilot found integrated preparation reduced clinical
 
 ### Open workflow questions
 
-- Who owns case preparation in Indian boards?
-- What makes a case incomplete or postponed?
-- How many person-minutes are spent by each role?
-- Does a standard packet reduce work or move it to a coordinator?
-- How are decisions signed, communicated, and followed without creating another record silo?
-- Can the NCG VTB submission and follow-up path be improved rather than replaced?
+- Who finalises or signs the existing human-authored decision?
+- Which authorised treating unit receives it, and how is receipt acknowledged?
+- Is a designated secretariat or nodal operations person responsible after the session?
+- Which non-clinical actions have owners, due states, completion, or escalation?
+- Does the local EMR already cover the handoff?
+- What does “follow-up system” mean in the surveyed institutions?
+- Would a new status layer remove work or create duplicate documentation?
 
 ## Cross-institution referral and patient-carried records
 
@@ -301,7 +307,7 @@ A registry-abstraction product has measurable evidence, but TMC already built on
 | Medical oncology → nursing/day care | Protocol/order, labs, administration instructions | NCG medical module | Existing deep requirements; no local burden measure | Status/verification only after workflow evidence |
 | Surgery → pathology/next specialty | Operative note, specimen, pathology/addendum, discharge | NCG surgical module | Cross-specialty burden unmeasured | Correct version and handoff completeness |
 | Radiation → referring team | consultation, plan status, delivery/completion summary | NCG radiation module and specialised systems | Cross-system burden unmeasured | Reviewed completion handoff |
-| Sources → tumour board | history, question, pathology, imaging, prior treatment | NCG MDT module and VTB | Physical documentation, weak follow-up, little cross-hospital review | Case readiness, decision documentation, follow-up |
+| Human board decision → treating unit | Existing decision record, authorised recipient, acknowledgement, assigned operational item, status | NCG MDT decision and later review; local EMR/registry | Heterogeneous communication; 48.2% report no follow-up system; intermediate owner/status unverified | Reference the human decision and validate acknowledgement plus operational disposition |
 | Encounter → registry/reporting | structured modules plus manual abstraction | Onco-Insight and NCG dashboards | Diagnostic/outside/follow-up data remain manual | Source retrieval and validation for a different underserved workflow |
 | Scheduled milestone → completed follow-up | appointment, contact, barrier, outcome | local trackers and messaging | Structural barriers; SMS reply does not ensure attendance | Owned barrier-aware coordination |
 
@@ -309,8 +315,8 @@ A registry-abstraction product has measurable evidence, but TMC already built on
 
 Three operational wedges remain plausible:
 
-1. **Outside-record intake and consultation readiness** — strongest fragmentation alignment, but the exact preparer, time burden, and incremental value over EMR/ABDM remain unmeasured.
-2. **Tumour-board case readiness and follow-through** — strong India documentation/follow-up evidence and a clear bounded case packet, but NCG already provides formal modules and VTB access; differentiation must be last-mile and measurable.
-3. **Barrier-aware follow-up coordination** — strongest direct evidence of an important India problem, but many causes are not solvable by reminders or software and the primary user/workflow still needs confirmation.
+1. **Tumour-board decision handoff and operational disposition** — owner-selected P5 lane, narrowed to the intermediate step after a human decision and before later clinical review; exact local actor, system, and baseline remain unverified.
+2. **Outside-record intake and consultation readiness** — strongest fallback and fragmentation alignment, but the exact preparer, time burden, and incremental value over EMR/ABDM remain unmeasured.
+3. **Barrier-aware follow-up coordination** — strong direct evidence of an important India problem, but many causes are not solvable by reminders or software and the primary user/workflow still needs confirmation.
 
 No map justifies a generic oncology dashboard, autonomous summary, clinical interpretation, or treatment assistant.

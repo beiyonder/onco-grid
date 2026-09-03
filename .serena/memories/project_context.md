@@ -15,8 +15,10 @@ Consultation readiness was the strongest starting hypothesis. The completed desk
 - `P2` evidence reports: `.harness/reports/20260903T100755Z-P2-first-evidence-slice.md` and `.harness/reports/20260903T100845Z-P2-evidence-integration.md`.
 - `P3` synthesis gate: `.harness/reports/20260903T101252Z-P3-synthesis-gate.md`.
 - `P4` owner decision: `.harness/reports/20260903T102128Z-P4-owner-decision.md`.
+- `P5` public-workflow validation: `.harness/reports/20260903T110322Z-P5-public-workflow-validation.md`.
 - Governance and phase authority: `PROJECT_GOVERNANCE.md`.
-- Next work: identify the board-workflow owner and choose one broken post-board step from documentation, authorised communication, operational ownership, or completion tracking.
+- P5 narrowed Candidate B to the handoff from an existing clinician-authored decision to authorised treating-unit acknowledgement and non-clinical operational disposition.
+- Next work: obtain a blank local decision/follow-up artifact or a process-only account from a secretariat, nodal operations person, programme administrator, HBCR investigator, or registry staff member; establish the actual owner and aggregate baseline.
 
 ## Hard constraints and supported environments
 
@@ -94,6 +96,8 @@ Owner sign-off is required for changes to goal, scope, non-goals, acceptance thr
 - `.harness/reports/20260903T100845Z-P2-evidence-integration.md`
 - `.harness/reports/20260903T101252Z-P3-synthesis-gate.md`
 - `.harness/reports/20260903T102128Z-P4-owner-decision.md`
+- `.harness/reports/20260903T110322Z-P5-public-workflow-validation.md`
+- `research/P5_TUMOUR_BOARD_VALIDATION.md`
 - `RESEARCH_SYNTHESIS.md`
 - `research/evidence.jsonl`
 - `research/OPPORTUNITY_MATRIX.md`

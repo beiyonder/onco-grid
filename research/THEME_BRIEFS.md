@@ -6,9 +6,9 @@
 |---|---:|---:|---:|---:|---|
 | Find | Mixed | Weak for search time; strong for trial inventory/geography | High | General retrieval fits; patient-specific ranking does not | Supporting capability, not a primary wedge |
 | Contextualise | Mixed | Weak | High standards/modelling coverage | High ambiguity | Use only as record organisation |
-| Synthesise | Strong | Strong for registry abstraction; missing for consultation preparation | High for generic EMR/summary | Fits only with literal provenance and human review | Leading discovery lane, still unvalidated at the exact job |
+| Synthesise | Strong | Strong for registry abstraction; missing for consultation preparation | High for generic EMR/summary | Fits only with literal provenance and human review | Serious fallback; exact job remains unvalidated |
 | Act | Clinician-derived need plus existing India requirements | No safe product measure | Very high | Mostly prohibited | Reject patient-specific Act lane |
-| Connect | Strong for Indian tumour-board operations | Weak locally; transferable preparation studies exist | High; NCG VTB and commercial platforms exist | Fits for operations, not generated advice | Narrow to readiness/documentation/follow-through |
+| Connect | Strong for Indian board documentation/follow-up variation | Weak locally; no post-board actor or person-time baseline | High; NCG MDT/VTB and iECHO already cover substantial workflow | Fits only for human-decision handoff operations | Owner selected post-board acknowledgement and operational disposition for P5 validation |
 | Outside: continuity | Strong | Strong barrier measures; limited staff-workflow measures | Medium | Operational coordination can fit | Serious candidate if narrowed beyond reminders |
 | Outside: documentation/re-entry | Moderate India; strong transfer evidence | Strong internationally | High EMR/ambient-tool activity | Operational if workflow-specific | Cross-cutting burden, not yet a bounded job |
 | Outside: navigation/referral | Strong patient/caregiver evidence | Mostly qualitative | Medium | Care-team coordination can fit | Serious problem; Doctor/Care Team wedge still unclear |
@@ -136,12 +136,15 @@ The supplied notes contain explicit requests for dose changes, toxicity grading,
 - In the 2026 NCRP survey, 79.7% of 172 responding hospitals reported a tumour board. Among the 137 boards, 63.5% used physical documentation, 48.2% lacked recommendation follow-up, only 16.8% communicated via EMR notes, and 5.1% always held cross-hospital discussions (`EV-0019`).
 - NCG already runs a recurring Virtual Tumor Board with an expert network, template, submission process, and videoconferencing (`EV-0020`).
 - A small Spanish vendor-funded pilot demonstrates how to measure task and role time; it found lower preparation time for several roles but unchanged pathology/radiology review and unchanged task count (`EV-0021`).
+- Public P5 review shows the NCG presentation template and iECHO already cover substantial pre-board structure, presenter assignment, content review, correction, notification, and sharing (`EV-0036`–`EV-0040`).
+- The NCG/KCDO MDT model already includes a human final decision and later review of whether it was followed (`EV-0014`).
 
 ### What is not supported
 
-- No retained Indian study measures person-minutes spent preparing a board case.
-- The NCRP survey does not identify who prepares the case, why documentation remains physical, or which cases are postponed for incomplete evidence.
-- No evidence supports building a new general expert network instead of improving NCG or local board workflow.
+- No retained Indian study measures person-minutes spent preparing a board case or handing off the final decision.
+- Public evidence identifies pre-board programme roles, but not who owns acknowledgement and operational disposition after the meeting.
+- No public source proves that the intermediate handoff is absent locally; NCG/local systems may already solve it.
+- No evidence supports building a new general expert network, pre-board upload workflow, or clinical recommendation system.
 
 ### Existing alternatives
 
@@ -153,20 +156,17 @@ The supplied notes contain explicit requests for dose changes, toxicity grading,
 
 ### Narrow opportunity
 
-Potentially valid operational jobs are:
+The owner-selected P5 job is:
 
-- case-readiness checklist and source packet;
-- permissioned evidence collection;
-- decision documentation and sign-off;
-- recommendation communication;
-- operational follow-through;
-- cross-hospital submission readiness.
+> Reference the existing clinician-authored decision, make it available to the authorised treating unit, record acknowledgement, and track explicitly human-assigned non-clinical operational disposition.
 
-The human board must make the clinical decision.
+The local tumour-board operational owner is the primary-user hypothesis. A designated secretariat exists in only 52.5% of surveyed boards, so the actual role may instead be a nodal operations person, programme team, or treating unit.
+
+The product must not create the clinical decision, determine whether treatment was correctly followed, or duplicate the existing NCG/iECHO pre-board workflow.
 
 ### Judgment
 
-**Connect is evidence-backed only after narrowing.** “Connect oncologists” is already served. “Make a case complete, traceable, and followed through” has stronger direct India evidence but lacks local time and adoption measurement.
+**Continue P5 validation; do not lock the product.** Public evidence narrows the gap but cannot establish the local actor, current system, baseline, or whether the problem is software rather than staffing/governance.
 
 ## Outside theme — follow-up and continuity
 
@@ -275,8 +275,8 @@ One supplied doctor account supports it, but frequency, burden, current alternat
 
 Current evidence does not justify the original all-in-one workspace. Three bounded directions survive:
 
-1. source-linked outside-record intake for a specific consultation or referral;
-2. tumour-board case readiness plus documentation/follow-through;
-3. barrier-aware care-team follow-up coordination.
+1. owner-selected P5: post-board human-decision acknowledgement and operational disposition;
+2. fallback: source-linked outside-record intake for a specific consultation or referral;
+3. fallback: barrier-aware care-team follow-up coordination.
 
-The next decision must compare these against existing products, integration cost, safe scope, measurable workflow outcome, and the missing local actor/baseline evidence.
+Candidate B remains contingent on a named local actor, current-system gap, and aggregate baseline. If those fail, return to Candidate A rather than building from public-document absence.

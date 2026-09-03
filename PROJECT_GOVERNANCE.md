@@ -141,6 +141,7 @@ On 2026-09-03 the owner authorised the first non-sensitive publication with `cha
 | `C3` | `P2` | `.harness/reports/20260903T100845Z-P2-evidence-integration.md` | Complete; owner sign-off pending |
 | `C4` | `P3` | `.harness/reports/20260903T101252Z-P3-synthesis-gate.md` | Complete; owner decision pending |
 | `C5` | `P4` | `.harness/reports/20260903T102128Z-P4-owner-decision.md` | Complete; Candidate B selected |
+| `C5` | `P5` | `.harness/reports/20260903T110322Z-P5-public-workflow-validation.md` | Complete; local actor and baseline gap remains open |
 
 ## References
 
@@ -150,6 +151,7 @@ On 2026-09-03 the owner authorised the first non-sensitive publication with `cha
 - `HEALTHATHON_OFFICIAL.md`
 - `ONCOLOGIST_INTERVIEW_FIELD_GUIDE.md`
 - `Oncologist Pain Points.md`
+- `research/P5_TUMOUR_BOARD_VALIDATION.md`
 - `.serena/memories/core.md`
 - `.serena/memories/project_context.md`
 - `.harness/reports/20260903T093943Z-P0-bootstrap.md`
@@ -158,3 +160,4 @@ On 2026-09-03 the owner authorised the first non-sensitive publication with `cha
 - `.harness/reports/20260903T100845Z-P2-evidence-integration.md`
 - `.harness/reports/20260903T101252Z-P3-synthesis-gate.md`
 - `.harness/reports/20260903T102128Z-P4-owner-decision.md`
+- `.harness/reports/20260903T110322Z-P5-public-workflow-validation.md`

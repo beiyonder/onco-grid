@@ -310,3 +310,13 @@ This does not authorise product implementation. `P5` must first confirm the exac
 Candidates A and C remain explicit fallbacks if current NCG/local boards already handle the selected step reliably or no role owns it.
 
 Decision evidence: `.harness/reports/20260903T102128Z-P4-owner-decision.md`.
+
+### P5 public validation update
+
+Public NCG and iECHO artifacts show that presenter assignment, case-template preparation, content review, correction, notification, and controlled pre-session sharing already exist. The NCG/KCDO MDT model also defines a human-entered final decision and a later yes/no review of whether it was followed.
+
+Candidate B is therefore narrowed to **the handoff from the existing clinician-authored decision to authorised treating-unit acknowledgement and operational disposition**. It must not recreate the board, pre-board upload, clinical recommendation, or later clinical adherence assessment.
+
+The primary user remains a role hypothesis: the local tumour-board operational owner, such as a designated secretariat or nodal operations person. Public evidence does not identify the actual local owner, current system, or baseline.
+
+Detailed evidence and falsifiers: `research/P5_TUMOUR_BOARD_VALIDATION.md`.

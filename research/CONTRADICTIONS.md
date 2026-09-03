@@ -91,6 +91,7 @@ Reject patient-specific Act. Do not disguise it as “information assistance.”
 - Supplied doctor preference supports human discussion (`EV-0007`).
 - Indian NCRP survey shows physical documentation, weak follow-up, and little regular cross-hospital discussion (`EV-0019`).
 - NCG defines a detailed MDT case packet (`EV-0014`).
+- Public NCG/iECHO artifacts leave the intermediate post-meeting acknowledgement, operational ownership, and completion path undocumented (`EV-0036`–`EV-0040`); this is a research gap, not proof of absence.
 
 ### Contradictions
 
@@ -100,10 +101,14 @@ Reject patient-specific Act. Do not disguise it as “information assistance.”
 4. Indian case-preparation person-time is not measured.
 5. The transferable NAVIFY pilot had eight clinicians, one breast board, fixed method order, and Roche funding; pathology/radiology time and task count did not improve (`EV-0021`).
 6. Identity, institutional authorisation, patient consent, source disclosure, moderation, and clinical responsibility create high adoption cost.
+7. The NCG VTB presentation template and iECHO already cover pre-board structure, presenter assignment, review, correction, notification, and sharing (`EV-0037`–`EV-0039`).
+8. The NCG/KCDO MDT module already contains human final-decision fields and a later review of whether the decision was followed (`EV-0014`).
+9. Public documentation may omit an adequate internal workflow; absence from the public page is not prevalence evidence (`EV-0036`).
+10. Formal coordinator responsibility elsewhere suggests that staffing and governance—not missing software—may be the actual intervention (`EV-0041`).
 
 ### Decision
 
-Reject generic expert connection. Retain only bounded case readiness, documentation, or follow-through as candidates.
+Reject generic expert connection and pre-board workflow duplication. Validate only the handoff from an existing clinician-authored decision to authorised treating-unit acknowledgement and operational disposition; return to Candidate A if no local actor or material gap is established.
 
 ## Follow-up and continuity
 

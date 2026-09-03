@@ -4,11 +4,12 @@
 
 - Research access date: 2026-09-03.
 - Current output: evidence-backed discovery priorities, not a final product selection.
-- Evidence ledger: 35 validated records from 28 independent source groups.
-- Direct India relevance: 26 records.
-- Official or peer-reviewed evidence: 26 records.
-- Public repository: created but intentionally empty pending sanitisation approval.
+- Evidence ledger: 41 validated records from 32 independent source groups.
+- Direct India relevance: 29 records.
+- Official or peer-reviewed evidence: 32 records.
+- Public repository: the empty `main` base and PR branch exist; `chatroom_notes.md` remains ignored and all project changes require PR review.
 - Owner decision: Candidate B—tumour-board human-decision documentation and operational follow-through—was selected on 2026-09-03 as the next discovery lane, not as product lock.
+- P5 public validation narrowed Candidate B to the handoff from an existing clinician-authored decision to authorised treating-unit acknowledgement and operational disposition. The actual local owner and baseline remain unverified.
 
 ## Hard boundary
 
@@ -301,6 +302,8 @@ The choice retains the documented constraints:
 
 Decision evidence: `.harness/reports/20260903T102128Z-P4-owner-decision.md`.
 
+Public-workflow validation: `research/P5_TUMOUR_BOARD_VALIDATION.md`.
+
 ## Repository artifacts
 
 - `research/RESEARCH_PROTOCOL.md`
@@ -313,6 +316,8 @@ Decision evidence: `.harness/reports/20260903T102128Z-P4-owner-decision.md`.
 - `research/SOLUTION_LANDSCAPE.md`
 - `research/CONTRADICTIONS.md`
 - `research/OPPORTUNITY_MATRIX.md`
+- `research/P5_TUMOUR_BOARD_VALIDATION.md`
+- `.harness/reports/20260903T102128Z-P4-owner-decision.md`
 - `.harness/reports/20260903T094928Z-P1-research-protocol.md`
 - `.harness/reports/20260903T100755Z-P2-first-evidence-slice.md`
 - `.harness/reports/20260903T100845Z-P2-evidence-integration.md`
@@ -324,4 +329,4 @@ Decision evidence: `.harness/reports/20260903T102128Z-P4-owner-decision.md`.
 - every external measurement remains attached to its original setting and method;
 - every candidate states its strongest contradictory evidence;
 - no candidate crosses the explicit clinical boundary;
-- no local artifact is authorised for public push pending sanitisation review.
+- `chatroom_notes.md` and private/local material remain ignored; publication occurs only through pull requests.
