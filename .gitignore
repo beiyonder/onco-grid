@@ -1,0 +1,22 @@
+# Sensitive source material; never publish without an approved sanitized replacement
+chatroom_notes.md
+
+# Private research inputs and recordings
+.private/
+research/private/
+research/raw-identifiable/
+research/recordings/
+
+# Local secrets and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+credentials/
+
+# Local OS metadata
+.DS_Store
