@@ -177,18 +177,19 @@ This is a public-evidence gap, not proof of an operational absence.
 | Nodal person responsible for board operations | 28.5% of survey respondents held this role | Direct India survey-method evidence | Respondent status does not prove task ownership |
 | MDT coordinator | Elsewhere, formal policy assigns meeting lists, evidence, minutes, distribution, action plans, milestones, and escalation | Transfer evidence only | Cannot be assumed for India |
 | Patient care coordinator | In one Eastern India hospital audit, collected treatment and follow-up data after the board, traced patients, and completed the master chart | Direct single-centre India workflow evidence (`EV-0043`) | Historical 2020–2021 audit; decision entry and treating-unit acknowledgement ownership remain unknown |
+| Treating oncologist and downstream palliative-care team | In one 2023–2025 Chennai QI project, MDT identification triggered oncologist initiation/referral and palliative-team discussion/documentation | Direct recent India single-centre evidence (`EV-0044`) | Sensitive goals-of-care workflow; not a general board owner or product scope |
 
 ## Primary user conclusion
 
-The evidence does **not** justify naming “the oncologist” as the primary user.
+The evidence does **not** justify naming “the oncologist,” a secretariat, or a patient care coordinator as the universal primary user.
 
-The current actor hypothesis is:
+Observed Indian ownership varies:
 
-> **Tumour-board operational owner**—the designated secretariat where one exists, otherwise the locally assigned nodal or programme operations role.
+- one historical board audit used a patient care coordinator for later treatment/follow-up data collection (`EV-0043`);
+- one recent post-MDT quality-improvement workflow divided ownership between the treating oncologist and a downstream palliative-care team (`EV-0044`);
+- the national survey reports secretariats and nodal respondents but does not assign the post-board handoff (`EV-0019`).
 
-This is an interface role, not a claim that every hospital uses the same job title.
-
-The role remains unconfirmed until a current Indian workflow source says who records, distributes, and follows the decision.
+The remaining interface-role hypothesis is a **locally named operational or downstream-service owner**. Product lock requires a current target workflow to identify that role and show material burden.
 
 ## Exact broken-step decision
 
@@ -202,6 +203,8 @@ Why:
 - NCG/ECHO coordination already receives and reviews cases;
 - iECHO already supports presenter assignment, review states, approve/reject, re-upload, notification, and controlled sharing;
 - no Indian preparation-time or rejection baseline has been found.
+
+Recent Indian QI evidence further weakens a generic software proposal: one post-MDT referral/documentation gap improved from 0% to 92% documentation through role clarity, an SOP, resident education, and one colour-coded paper form (`EV-0044`). The content was a sensitive clinical goals-of-care workflow and is not this project's scope, but the operational lesson is direct: test a simpler process/form intervention before adding software.
 
 ### Select post-board operational disposition for validation
 
@@ -355,13 +358,19 @@ This is the first retained direct Indian source to name a post-board operational
 
 The source changes the actor hypothesis from purely speculative to **supported in one site but not generalisable**. It also strengthens the contradiction: a coordinator plus spreadsheet may already perform the job, so software must remove a demonstrated burden rather than digitise an adequate manual process.
 
+### Recent Chennai post-MDT quality-improvement workflow
+
+A 2023–2025 NCG EQuIP-India project (`EV-0044`) identified eligible cases during MDT meetings, assigned the treating oncologist to initiate and refer, and assigned the downstream palliative-care team to complete and document a sensitive goals-of-care workflow. Unreliable verbal/telephone handoff was replaced by an SOP and one shared colour-coded paper form; target-cohort documentation rose from 0% to 92%.
+
+This is not a product candidate because eligibility, prognosis, and the discussion are clinical. It supplies two operational lessons: the downstream service may own the handoff rather than a board secretariat, and role clarity plus one standard artifact may solve the problem without software.
+
 ## Decision
 
-P5 has narrowed Candidate B from a broad tumour-board workflow to **post-board human-decision handoff and operational disposition**.
+P5 has narrowed Candidate B from a broad tumour-board workflow to **post-board human-decision handoff and operational disposition** and completed the reachable public-evidence work.
 
-Public evidence identifies pre-board owners and artifacts, but does not establish the actual Indian post-board owner or baseline. The candidate therefore remains unvalidated for product lock.
+Recent evidence shows that ownership can sit with a patient care coordinator or with the treating and downstream clinical teams, and that an SOP plus one shared form can outperform an unreliable verbal handoff. It does not establish a universal board operator or a current target-site baseline.
 
-Continue targeted non-sensitive validation. If it cannot establish an actor and material gap, return to Candidate A rather than building from absence of public documentation.
+The product gate therefore remains open. Use the operator kit with the current NCG VTB support route or another explicitly approved target. If no current non-clinical actor and material gap can be established, return to Candidate A rather than building from absence of documentation.
 
 ## References
 
@@ -376,6 +385,7 @@ Continue targeted non-sensitive validation. If it cannot establish an actor and 
 - `EV-0041` — transferable formal MDT coordinator role.
 - `EV-0042` — draft NABH oncology HIS/EMR tumour-board requirements.
 - `EV-0043` — Eastern India single-centre Excel and patient-care-coordinator workflow.
+- `EV-0044` — recent Indian post-MDT referral/documentation QI with split downstream ownership and a process/form intervention.
 - [NCG Virtual Tumor Board](https://www.ncgindia.org/key-initiatives/virtual-tumor-board)
 - [NCG VTB blank presentation template](https://www.ncgindia.org/assets/ncg-key-initiatives/virtual-tumor-board/vtb-template.pptx)
 - [NCG/KCDO MDT Module v2.0](https://www.kcdo.in/src/docx/ner-multi-disciplinary-tumor-board-module-2.0.pdf)
@@ -385,4 +395,5 @@ Continue targeted non-sensitive validation. If it cannot establish an actor and 
 - [NCG 2022 VTB programme account](https://www.ncgindia.org/uploads/newsletter/pdf/file-3DE79E10-B469-47F9-9E9F-DEC4A5F29B6C.pdf)
 - [Draft NABH Cancer Care and Management Annexure](https://portal.nabh.co/Announcement/Draft%20Cancer%20Care%20and%20Management%20Annexure.pdf)
 - [Eastern India tumour-board audit](https://doi.org/10.31557/apjcc.2024.9.1.97-102)
+- [Recent Indian post-MDT documentation quality-improvement project](https://pmc.ncbi.nlm.nih.gov/articles/PMC12670709/)
 - [Transfer reference: formal MDT coordinator responsibilities](https://www.england.nhs.uk/mids-east/wp-content/uploads/sites/7/2018/08/investigation-diagnosis-mgmnt-mou-and-cup-v2.pdf)

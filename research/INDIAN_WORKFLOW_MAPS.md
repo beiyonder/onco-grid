@@ -196,6 +196,21 @@ Case details entered into preformed Excel list
 
 The audit recorded 800 discussions in 12 months, including 227 repeat discussions. It identifies a patient care coordinator as a post-board data-collection role, but does not identify who entered the decision, whether the treating unit acknowledged it, or the person-time burden.
 
+### Recent downstream-service handoff workflow
+
+A 2023–2025 Chennai QI project supplies a second, materially different post-MDT pattern (`EV-0044`):
+
+```text
+Eligible case identified during MDT
+  → treating oncologist initiates discussion and referral
+  → downstream palliative-care team completes and documents discussion
+  → shared colour-coded paper form remains in chart
+  → patient-handbook sticker points other clinicians to the record
+  → resident rotation triggers repeated workflow education
+```
+
+Verbal/telephone handoff failed because teams worked in different buildings and were not always reachable. An SOP and combined checklist-style paper form raised target-cohort documentation from 0% to 92%. This is a sensitive clinical goals-of-care workflow, not product scope. Operationally, it shows that ownership can sit with the treating and downstream teams, and that process plus one artifact may solve a handoff without software.
+
 ### Observed Indian gaps
 
 The 2026 NCRP hospital survey (`EV-0019`) found among 137 reported boards:

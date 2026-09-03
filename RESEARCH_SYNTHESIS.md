@@ -4,12 +4,12 @@
 
 - Research access date: 2026-09-03.
 - Current output: evidence-backed discovery priorities, not a final product selection.
-- Evidence ledger: 43 validated records from 34 independent source groups.
-- Direct India relevance: 31 records.
-- Official or peer-reviewed evidence: 34 records.
+- Evidence ledger: 44 validated records from 35 independent source groups.
+- Direct India relevance: 32 records.
+- Official or peer-reviewed evidence: 35 records.
 - Public repository: the empty `main` base and PR branch exist; `chatroom_notes.md` remains ignored and all project changes require PR review.
 - Owner decision: Candidate B—tumour-board human-decision documentation and operational follow-through—was selected on 2026-09-03 as the next discovery lane, not as product lock.
-- P5 public validation narrowed Candidate B to the handoff from an existing clinician-authored decision to authorised treating-unit acknowledgement and operational disposition. The actual local owner and baseline remain unverified.
+- P5 public validation narrowed Candidate B to the handoff from an existing clinician-authored decision to authorised treating-unit acknowledgement and operational disposition. Public examples show that ownership varies and that role clarity, an SOP, and one shared form may solve a handoff without software. The actual target-site owner and baseline remain unverified.
 
 ## Hard boundary
 
@@ -204,7 +204,7 @@ Consequence: measure the actual task. Do not assume that summarisation attacks t
 
 ### Candidate 1 — Tumour-board documentation and operational follow-through
 
-**Provisional actor:** board secretariat, coordinator, or presenting team.
+**Provisional actor:** a locally named operational or downstream-service owner; Indian examples include a patient care coordinator and a split treating-oncologist/palliative-care handoff, not one universal role.
 
 **Trigger:** a human board discusses a submitted case.
 
@@ -216,9 +216,9 @@ Consequence: measure the actual task. Do not assume that summarisation attacks t
 
 **Best KPI:** percentage of discussed cases with a signed decision, assigned owner, and recorded operational disposition within an agreed period.
 
-**Evidence:** direct Indian survey shows 48.2% lacked a follow-up system and only 16.8% used EMR notes for recommendation communication.
+**Evidence:** direct Indian survey evidence shows 48.2% lacked a follow-up system and only 16.8% used EMR notes for recommendation communication. One historical site used a patient care coordinator and spreadsheets (`EV-0043`); one recent post-MDT workflow assigned treating and downstream teams and improved documentation with an SOP and paper form (`EV-0044`).
 
-**Main contradiction:** NCG MDT requirements and VTB already exist; current local follow-through tools and actor burden are unknown.
+**Main contradiction:** NCG MDT, VTB, iECHO, and draft NABH capabilities already cover much of the workflow; a local process/form intervention may be sufficient; current target-site follow-through, actor burden, and acknowledgement remain unknown.
 
 **Integration:** begin with an existing board template/decision export, not a new expert network or EMR.
 
@@ -262,7 +262,7 @@ Consequence: measure the actual task. Do not assume that summarisation attacks t
 
 This contract remains provisional:
 
-> When an oncology tumour board completes and clinicians author the final decision, the local tumour-board operational owner needs to place or reference that decision in the authorised treating workflow and keep its operational disposition visible. A 2026 Indian hospital survey reports heterogeneous physical and electronic documentation and that 48.2% of reported boards lacked a follow-up system. NCG, iECHO, and draft NABH standards already cover substantial board selection, scheduling, review, attendance, decision, and follow-up documentation. One 2020–2021 Eastern India audit identifies a concrete local pattern—weekly Excel case lists, post-meeting decision entry, and a patient care coordinator collecting later treatment and follow-up data—but does not report treating-unit acknowledgement or staff time. The remaining hypothesis is narrower: a material gap in acknowledgement, non-clinical ownership, status, or escalation between the existing human decision and later review.
+> When an oncology tumour board completes and clinicians author the final decision, a locally named operational or downstream-service owner may need to place or reference that decision in the authorised treating workflow and keep its operational disposition visible. A 2026 Indian hospital survey reports heterogeneous physical and electronic documentation and that 48.2% of reported boards lacked a follow-up system. NCG, iECHO, and draft NABH standards already cover substantial board selection, scheduling, review, attendance, decision, and follow-up documentation. One 2020–2021 Eastern India audit used Excel lists and a patient care coordinator for later data collection, while a 2023–2025 Chennai workflow divided ownership between treating oncologists and palliative care and improved documentation from 0% to 92% through an SOP and shared paper form. Neither source reports treating-unit acknowledgement or staff time for a general board workflow. The remaining hypothesis is narrower: a material non-clinical gap in acknowledgement, ownership, status, or escalation that existing roles, process, and artifacts do not already solve.
 
 ### Unresolved before product lock
 

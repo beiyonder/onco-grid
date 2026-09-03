@@ -64,7 +64,7 @@ Exactly one coordinate must be `CURRENT`.
 | `P2` | Evidence collection | Agent | `P1` protocol and schema frozen | Indian workflow maps, theme research, open problem scan, solution landscape, operational measurements, contradiction review | Every retained data point passes the frozen schema; claims retain provenance and transfer limits; each leading theme includes disconfirming evidence | `READY-FOR-SIGNOFF` | Owner reviews the `C2` and `C3` evidence reports. |
 | `P3` | Synthesis | Agent | Evidence-collection threshold is met | Cross-theme evidence matrix and approximately three serious opportunity candidates | Each candidate names actor, trigger, job, burden, workaround, alternative, safety boundary, KPI, uncertainty, and contrary evidence | `READY-FOR-SIGNOFF` | Owner reviews `.harness/reports/20260903T101252Z-P3-synthesis-gate.md`. |
 | `P4` | Problem selection and build readiness | Repository owner | `P3` candidate evidence | One selected discovery lane or a documented decision to continue discovery | Owner accepts the lane, safe boundary, contrary evidence, and remaining local-validation risk | `DONE` | Candidate B selected on 2026-09-03; decision recorded in `.harness/reports/20260903T102128Z-P4-owner-decision.md`. |
-| `P5` | Tumour-board workflow validation | Agent; owner signs product lock | Candidate B selected at `P4` | Evidence-backed problem contract for one exact post-board operational step | Named actor; current system and handoff; exact documentation/communication/ownership/completion failure; non-sensitive aggregate baseline; safe output; human boundary; contradiction update; `C4` gate report | `CURRENT` | Use `research/P5_OPERATOR_VALIDATION_KIT.md` with one current operational owner; obtain aggregate counts and an approved blank artifact only. |
+| `P5` | Tumour-board workflow validation | Agent; owner signs product lock | Candidate B selected at `P4` | Evidence-backed problem contract for one exact post-board operational step | Named actor; current system and handoff; exact documentation/communication/ownership/completion failure; non-sensitive aggregate baseline; safe output; human boundary; contradiction update; `C4` gate report | `CURRENT` | Obtain owner confirmation, then send the process-only request to the current NCG VTB support route; request aggregate counts and an approved blank artifact only. |
 
 ## Current-coordinate acceptance contract
 
@@ -129,7 +129,8 @@ On 2026-09-03 the owner authorised the first non-sensitive publication with `cha
 | `GAP-MCP-ACTIVATION` | Open | `.omp/mcp.json` is present, but OMP loads project MCP at session startup | Owner or next session | Launch OMP from the repository root, then run `/mcp list` and `/mcp test serena`. |
 | `GAP-PUBLICATION-SANITIZATION` | Mitigated for the approved PR; open for raw-source publication | Root `.gitignore` excludes `chatroom_notes.md`, private research inputs/recordings, local secrets, credentials, and key material; pre-push scanning is required | Repository owner | Publish only the reviewed non-sensitive set by PR. Create and approve a sanitized replacement before ever publishing the raw chat source. |
 | `GAP-DIRECT-WORKFLOW-OBSERVATION` | Accepted research limitation | Direct oncologist access has proven difficult; current phase uses independent research | Repository owner | Keep transfer limits visible and do not claim desk research proves local workflow prevalence. |
-| `GAP-TUMOUR-BOARD-LOCAL-WORKFLOW` | Narrowed, open | One 2020–2021 Eastern India audit identifies a patient care coordinator and Excel/master-chart workflow, but the current target-site actor, decision acknowledgement, person-time, and baseline remain unknown | Agent and repository owner | Use the process-only operator kit with a coordinator, secretariat, nodal operator, registry/quality staff member, or administrator; collect aggregate counts only. |
+| `GAP-TUMOUR-BOARD-LOCAL-WORKFLOW` | Narrowed, externally blocked | Indian examples now identify a historical patient care coordinator and a recent split treating-oncologist/downstream-team workflow; neither establishes a current general target-site owner, acknowledgement, person-time, or baseline | Agent and repository owner | Send the approved operator-kit request through the current NCG VTB support route. Reject Candidate B or return to Candidate A if no current non-clinical actor and material gap emerge. |
+| `GAP-OUTREACH-AUTHORITY` | Awaiting point-of-risk confirmation | The official NCG VTB page provides a current support/inquiry contact and the exact process-only message is prepared; no message has been sent | Repository owner | Confirm the exact current recipient and email channel immediately before sending. |
 
 ## Report index
 
@@ -143,6 +144,7 @@ On 2026-09-03 the owner authorised the first non-sensitive publication with `cha
 | `C5` | `P4` | `.harness/reports/20260903T102128Z-P4-owner-decision.md` | Complete; Candidate B selected |
 | `C5` | `P5` | `.harness/reports/20260903T110322Z-P5-public-workflow-validation.md` | Complete; local actor and baseline gap remains open |
 | `C5` | `P5` | `.harness/reports/20260903T112712Z-P5-operator-validation-ready.md` | Complete; operator kit ready, external process account still required |
+| `C5` | `P5` | `.harness/reports/20260903T114127Z-P5-outreach-authority.md` | Complete; all non-contact work exhausted, outreach approval required |
 
 ## References
 
@@ -164,3 +166,4 @@ On 2026-09-03 the owner authorised the first non-sensitive publication with `cha
 - `.harness/reports/20260903T102128Z-P4-owner-decision.md`
 - `.harness/reports/20260903T110322Z-P5-public-workflow-validation.md`
 - `.harness/reports/20260903T112712Z-P5-operator-validation-ready.md`
+- `.harness/reports/20260903T114127Z-P5-outreach-authority.md`

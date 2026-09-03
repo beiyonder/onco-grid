@@ -38,6 +38,16 @@ Seek one person who performs or directly supervises the workflow. Priority order
 
 Do not assume these titles are interchangeable. Record the local title and actual work.
 
+## Current public routing path
+
+The recommended first route is the official [NCG Virtual Tumor Board support and inquiry page](https://www.ncgindia.org/key-initiatives/virtual-tumor-board). It currently describes recurring host-centre sessions and publishes a VTB support contact.
+
+Ask that contact to route the process-only request to the person who handles post-session records or programme operations. Do not assume the public support contact personally owns the handoff.
+
+Alternative institutional routes are the programme offices for the currently listed host centres, Tata Memorial Hospital and Max Hospital Saket. Request an operations, secretariat, registry, records, or quality role—not a clinical opinion.
+
+Do not commit a person's email address or phone number. Resolve the current contact from the live official page immediately before outreach. Sending requires owner confirmation for the exact recipient, channel, and final message.
+
 ## Participation screen
 
 Continue only if the person can describe at least one of these without patient details:

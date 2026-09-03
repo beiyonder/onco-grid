@@ -84,6 +84,16 @@ Implication:
 
 Spreadsheet plus staffing is a real existing alternative. A product must demonstrate reduced missing data, duplicate entry, or staff burden rather than assume the absence of ownership. The audit does not measure acknowledgement or person-time and cannot be generalised beyond the site.
 
+### Role/SOP/shared-form intervention
+
+Evidence: `EV-0044`; [recent Chennai quality-improvement project](https://pmc.ncbi.nlm.nih.gov/articles/PMC12670709/).
+
+One post-MDT clinical handoff assigned initiation/referral to treating oncologists and completion/documentation to a downstream palliative-care team. Verbal/telephone referral was unreliable; a shared colour-coded paper form, SOP, eligibility criteria, and repeated education raised target-cohort documentation from 0% to 92%.
+
+Implication:
+
+A lightweight process intervention is a serious alternative to software. The clinical content is outside this project's scope, but Candidate B must show that a current non-clinical handoff cannot be solved adequately through named responsibility, a standard artifact, and training.
+
 ### ABDM and NRCeS FHIR guide
 
 Evidence: `EV-0010`; [FHIR Implementation Guide for ABDM v7 draft](https://www.nrces.in/preview/ndhm/fhir/r4/index.html).
@@ -224,11 +234,11 @@ KCDO reports referral-history upload/access gaps, and Onco-Insight still needs m
 
 Possible gap:
 
-A local tumour-board operational owner needs to make or reference the existing clinician-authored decision in the authorised treating workflow, record acknowledgement, and keep explicitly assigned non-clinical ownership and status visible.
+A locally named operational or downstream-service owner may need to make or reference the existing clinician-authored decision in the authorised treating workflow, record acknowledgement, and keep explicitly assigned non-clinical ownership and status visible.
 
 Why still open:
 
-Indian boards use heterogeneous documentation and nearly half report no follow-up system. One direct Indian site used Excel and a patient care coordinator, while NCG/KCDO and draft NABH standards already define broad board and follow-up documentation. The exact target-site owner, meaning of follow-up, acknowledgement path, burden, and incremental value remain unknown.
+Indian boards use heterogeneous documentation and nearly half report no follow-up system. One historical site used Excel and a patient care coordinator; one recent downstream workflow used role clarity, an SOP, and a paper form. NCG/KCDO and draft NABH standards already define broad board and follow-up documentation. The exact target-site owner, meaning of follow-up, acknowledgement path, burden, and incremental value over a simpler process fix remain unknown.
 
 ### 3. Barrier-aware follow-up operations
 

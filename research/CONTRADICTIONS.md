@@ -93,6 +93,7 @@ Reject patient-specific Act. Do not disguise it as “information assistance.”
 - NCG defines a detailed MDT case packet (`EV-0014`).
 - Public NCG/iECHO artifacts leave the intermediate post-meeting acknowledgement, operational ownership, and completion path undocumented (`EV-0036`–`EV-0040`); this is a research gap, not proof of absence.
 - One Eastern India audit names a patient care coordinator and preformed Excel/master-chart workflow after weekly board discussions, while reporting substantial missing or unknown follow-up data (`EV-0043`).
+- A recent Chennai post-MDT QI project names a split downstream handoff from treating oncologists to palliative care and reports a measurable documentation improvement after an SOP and shared paper form (`EV-0044`).
 
 ### Contradictions
 
@@ -109,6 +110,7 @@ Reject patient-specific Act. Do not disguise it as “information assistance.”
 11. A draft NABH oncology HIS/EMR standard already expects broad electronic tumour-board selection, review, attendance, recommendation, and follow-up documentation (`EV-0042`).
 12. One Indian hospital already assigned later data collection to a patient care coordinator using spreadsheets; the remaining problem may be local data governance, staffing, or follow-up access rather than software (`EV-0043`).
 13. The single-centre audit does not measure treating-unit acknowledgement or staff burden, so it cannot validate the selected handoff.
+14. The recent QI result weakens a universal software/secretariat theory: a locally specific downstream team owned the work, and process, training, and one paper artifact—not a new platform—produced the reported improvement (`EV-0044`).
 
 ### Decision
 

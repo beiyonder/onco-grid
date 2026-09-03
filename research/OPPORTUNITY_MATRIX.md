@@ -119,7 +119,7 @@ A synthetic time-and-task comparison with representative artifact sets plus at l
 
 ### Primary user
 
-Provisional: local tumour-board operational owner. A designated secretariat exists in some surveyed hospitals; one Eastern India audit directly identifies a patient care coordinator collecting post-board treatment and follow-up data. The actual target-site role remains unconfirmed.
+Provisional: a locally named operational or downstream-service owner. A designated secretariat exists in some surveyed hospitals; one historical Eastern India audit used a patient care coordinator, while one recent Chennai post-MDT workflow split responsibility between treating oncologists and palliative care. The actual target-site role remains unconfirmed.
 
 ### Trigger
 
@@ -139,8 +139,9 @@ Public evidence shows several patterns:
 - NCG/iECHO submission, review, approval, notification, and sharing before the board;
 - draft NABH requirements for electronic board IDs, scheduling, integrated review, attendance, recommendations, and follow-ups;
 - at one Eastern India hospital, preformed Excel case lists, post-meeting decision entry, and patient-care-coordinator collection of later treatment and follow-up data.
+- in one 2023–2025 Chennai QI workflow, MDT identification triggered oncologist initiation/referral and downstream palliative-team documentation; an SOP and shared paper form replaced unreliable verbal handoff.
 
-Evidence: `EV-0014`, `EV-0019`, `EV-0020`, `EV-0036`–`EV-0043`.
+Evidence: `EV-0014`, `EV-0019`, `EV-0020`, `EV-0036`–`EV-0044`.
 
 ### Evidence of frequency and burden
 
@@ -150,12 +151,13 @@ Evidence: `EV-0014`, `EV-0019`, `EV-0020`, `EV-0036`–`EV-0043`.
 - 48.2% had no recommendation follow-up system;
 - 16.8% used EMR notes for recommendation communication;
 - the Eastern India audit recorded 800 discussions in 12 months, including 227 repeat discussions, and retained more than 20% missing or unknown data in several measures.
+- the Chennai target cohort improved documentation from 0% to 92% using role clarity, an SOP, education, and one colour-coded form, but the clinical workflow is outside this product scope.
 
-No Indian source measures treating-unit acknowledgement, decision-to-disposition time, duplicate-entry count, or coordinator person-minutes.
+No Indian source measures generic treating-unit acknowledgement, decision-to-disposition time, duplicate-entry count, or coordinator person-minutes.
 
 ### Current workaround
 
-Paper or written summaries, EMR notes, direct communication, preformed Excel case lists and master charts, programme coordination, patient-care-coordinator tracing, and later board review.
+Paper or written summaries, EMR notes, direct communication, preformed Excel case lists and master charts, programme coordination, patient-care-coordinator tracing, role-specific SOPs and shared forms, and later board review.
 
 ### Existing alternatives
 
@@ -194,6 +196,7 @@ Use a reference or export from the existing decision record plus authorised reci
 - NCG/KCDO and draft NABH requirements already cover broad electronic board workflow;
 - iECHO already covers substantial pre-board governance;
 - one Indian hospital already used a coordinator and spreadsheet for post-board data collection;
+- a recent Indian post-MDT workflow improved documentation through role clarity, training, an SOP, and a shared paper artifact rather than new software;
 - absence of public acknowledgement fields does not prove operational absence;
 - “follow-up system” may mean later clinical outcome capture rather than this handoff;
 - another layer may duplicate the EMR or shift work to a coordinator;
@@ -201,7 +204,7 @@ Use a reference or export from the existing decision record plus authorised reci
 
 ### Required next evidence
 
-Use `research/P5_OPERATOR_VALIDATION_KIT.md` with one current operational owner. Obtain a process map and aggregate baseline, determine what “follow-up” means locally, and review only an approved blank artifact or field list. Return to Candidate A if the existing process is adequate or no material operational gap exists.
+Use `research/P5_OPERATOR_VALIDATION_KIT.md` with one current operational or downstream-service owner. Obtain a process map and aggregate baseline, determine what “follow-up” means locally, compare software against a simpler role/SOP/form intervention, and review only an approved blank artifact or field list. Return to Candidate A if the existing process is adequate or no material non-clinical gap exists.
 
 ## Candidate C — Barrier-aware care-team follow-up
 

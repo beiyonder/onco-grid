@@ -17,10 +17,11 @@ Consultation readiness was the strongest starting hypothesis. The completed desk
 - `P4` owner decision: `.harness/reports/20260903T102128Z-P4-owner-decision.md`.
 - `P5` public-workflow validation: `.harness/reports/20260903T110322Z-P5-public-workflow-validation.md`.
 - `P5` operator-readiness evidence: `.harness/reports/20260903T112712Z-P5-operator-validation-ready.md`.
+- `P5` outreach authority boundary: `.harness/reports/20260903T114127Z-P5-outreach-authority.md`.
 - Governance and phase authority: `PROJECT_GOVERNANCE.md`.
 - P5 narrowed Candidate B to the handoff from an existing clinician-authored decision to authorised treating-unit acknowledgement and non-clinical operational disposition.
-- New public evidence: a draft NABH oncology HIS/EMR annexure already covers broad electronic board workflow, while one 2020–2021 Eastern India audit identifies a patient care coordinator and Excel/master-chart post-board process. This is one-site evidence, not a current general owner.
-- Next work: use `research/P5_OPERATOR_VALIDATION_KIT.md` with one current operational owner; obtain aggregate counts and an approved blank artifact only.
+- Public evidence shows materially different ownership: a historical patient care coordinator, and a recent split treating-oncologist/downstream-palliative-team workflow that improved documentation with an SOP and shared paper form. No universal current owner or software need is established.
+- Next work requires owner confirmation immediately before sending the prepared process-only request through the current official NCG VTB support route.
 
 ## Hard constraints and supported environments
 
@@ -82,7 +83,8 @@ Owner sign-off is required for changes to goal, scope, non-goals, acceptance thr
 - `GAP-MCP-ACTIVATION`: project MCP must be tested after OMP starts from this repository.
 - `GAP-PUBLICATION-SANITIZATION` is mitigated for the approved PR by `.gitignore` and pre-push scanning, but remains open for any raw-source publication. All project changes must reach the default branch through pull requests.
 - `GAP-DIRECT-WORKFLOW-OBSERVATION`: desk research cannot prove local workflow prevalence; this is an accepted limitation, not a hidden assumption.
-- `GAP-TUMOUR-BOARD-LOCAL-WORKFLOW` is narrowed but open: one historical Indian site identifies a patient care coordinator, while the current target actor, acknowledgement path, staff person-time, and baseline remain unknown.
+- `GAP-TUMOUR-BOARD-LOCAL-WORKFLOW` is externally blocked: Indian examples identify different owners and process artifacts, but no current target-site non-clinical owner, acknowledgement path, person-time, or baseline.
+- `GAP-OUTREACH-AUTHORITY`: all non-contact public research is complete; the exact NCG VTB support recipient, email channel, and prepared message require point-of-risk owner confirmation before sending.
 - `RESEARCH_SYNTHESIS.md` ranked tumour-board documentation and operational follow-through first; the repository owner selected it as the `P5` discovery lane. Outside-record consultation readiness and barrier-aware care-team follow-up remain alternatives if the local workflow evidence contradicts Candidate B.
 
 ## References
@@ -100,6 +102,7 @@ Owner sign-off is required for changes to goal, scope, non-goals, acceptance thr
 - `.harness/reports/20260903T102128Z-P4-owner-decision.md`
 - `.harness/reports/20260903T110322Z-P5-public-workflow-validation.md`
 - `.harness/reports/20260903T112712Z-P5-operator-validation-ready.md`
+- `.harness/reports/20260903T114127Z-P5-outreach-authority.md`
 - `research/P5_TUMOUR_BOARD_VALIDATION.md`
 - `research/P5_OPERATOR_VALIDATION_KIT.md`
 - `RESEARCH_SYNTHESIS.md`

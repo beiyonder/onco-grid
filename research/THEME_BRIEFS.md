@@ -140,11 +140,12 @@ The supplied notes contain explicit requests for dose changes, toxicity grading,
 - The NCG/KCDO MDT model already includes a human final decision and later review of whether it was followed (`EV-0014`).
 - A draft NABH oncology HIS/EMR annexure already expects electronic board selection, IDs, scheduling, review, attendance, recommendations, and follow-up documentation (`EV-0042`).
 - One Eastern India audit used preformed Excel lists, entered the board decision after weekly meetings, and assigned later treatment/follow-up data collection and patient tracing to a patient care coordinator (`EV-0043`).
+- One recent Chennai post-MDT workflow split ownership between treating oncologists and a downstream palliative-care team; an SOP, education, and a shared paper form raised target-cohort documentation from 0% to 92% (`EV-0044`).
 
 ### What is not supported
 
 - No retained Indian study measures person-minutes spent preparing a board case or handing off the final decision.
-- Public evidence now names a patient care coordinator for later data collection in one historical site, but not the current target-site owner of decision entry, treating-unit acknowledgement, or operational disposition.
+- Public evidence names a patient care coordinator in one historical site and treating/downstream teams in one recent sensitive clinical workflow, but not the current target-site owner of a general non-clinical decision handoff.
 - No public source proves that the intermediate handoff is absent locally; NCG/local systems may already solve it.
 - No evidence supports building a new general expert network, pre-board upload workflow, or clinical recommendation system.
 
@@ -157,6 +158,7 @@ The supplied notes contain explicit requests for dose changes, toxicity grading,
 - navify and other commercial tumour-board products.
 - draft NABH oncology HIS/EMR requirements;
 - preformed Excel/master-chart workflows plus patient care coordinators.
+- role-specific SOP and shared-form workflows that may remove the need for new software.
 
 ### Narrow opportunity
 
@@ -164,13 +166,13 @@ The owner-selected P5 job is:
 
 > Reference the existing clinician-authored decision, make it available to the authorised treating unit, record acknowledgement, and track explicitly human-assigned non-clinical operational disposition.
 
-The local tumour-board operational owner is the primary-user hypothesis. Survey evidence shows designated secretariats in 52.5% of reported boards, while one historical single-centre audit assigns later data collection to a patient care coordinator. The current target role may instead be a secretariat, nodal operations person, programme team, registry/quality operator, patient care coordinator, or treating unit.
+The primary-user hypothesis is now a locally named operational or downstream-service owner. Indian examples vary between a patient care coordinator and a split treating-oncologist/downstream-team handoff; survey evidence also reports designated secretariats. The current target role may be a secretariat, nodal operations person, programme team, registry/quality operator, patient care coordinator, treating unit, or downstream service.
 
 The product must not create the clinical decision, determine whether treatment was correctly followed, or duplicate the existing NCG/iECHO pre-board workflow.
 
 ### Judgment
 
-**Continue P5 validation; do not lock the product.** Public evidence narrows the gap and supports a coordinator role in one site, but cannot establish the current target actor, acknowledgement path, person-time baseline, or whether the remaining problem is software rather than staffing, governance, or follow-up access.
+**Continue P5 validation; do not lock the product.** Public evidence narrows the gap but cannot establish the current target actor, acknowledgement path, person-time baseline, or whether the remaining problem needs software rather than role clarity, an SOP, one shared artifact, staffing, governance, or follow-up access.
 
 ## Outside theme — follow-up and continuity
 
