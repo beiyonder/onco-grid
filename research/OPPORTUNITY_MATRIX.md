@@ -2,7 +2,7 @@
 
 ## Decision boundary
 
-This matrix ranks **discovery priorities**, not final products. Desk research cannot close the local actor, workflow, adoption, and baseline gaps. The repository owner controls the P4 selection gate.
+This matrix ranks **discovery priorities**, not final products. Desk research cannot close the local actor, workflow, adoption, and baseline gaps. The repository owner controls product lock after `P5`.
 
 Scores are 0 = weak, 1 = mixed, 2 = strong. Hard safety or evidence failures override totals.
 
@@ -15,6 +15,8 @@ Scores are 0 = weak, 1 = mixed, 2 = strong. Hard safety or evidence failures ove
 | C. Barrier-aware care-team follow-up | 2 | 2 | 1 | 2 | 0 | 2 | 1 | 2 | 1 | 1 | 1 | 15 |
 
 The totals aid comparison; they do not prove a decision.
+
+The expanded private pain-point source adds four weak records from one three-account source group (`EV-0045`–`EV-0048`). It strengthens questions about multi-provider portability and caregiver work but does not change a score: no actor, frequency, person-time, or independent confirmation was added.
 
 ## Recommended discovery priority
 
@@ -33,7 +35,7 @@ The same existing NCG infrastructure is also the main novelty risk. The candidat
 
 ### Condition that changes the recommendation
 
-If current NCG/local boards already have reliable case-readiness, electronic decision documentation, and owned follow-up—or if no named coordinator/secretariat role can own the workflow—Candidate B should fall behind Candidate A. Candidate A becomes first when direct evidence identifies a recurring preparer and shows that source-linked outside-record review saves total person-minutes after verification.
+If current NCG/local boards already have reliable decision handoff and owned follow-through—or if no named operational role can own the workflow—Candidate B should fall behind Candidate A. Candidate A becomes first when direct evidence identifies a recurring preparer and shows that source-linked outside-record review saves total person-minutes after verification. External P5 outreach is paused until the internal analyst clarifies the expanded source.
 
 ## Candidate A — Outside-record consultation readiness
 
@@ -59,18 +61,19 @@ Reported components include:
 - manual review of outside and cross-centre treatment;
 - duplicate offline/online documentation;
 - clinician verification.
+- selected caregiver accounts involving cross-city referral, additional opinions, multiple providers, and caregiver record handling, treated as weak evidence from one source group.
 
-Evidence: `EV-0002`, `EV-0005`, `EV-0008`, `EV-0016`, `EV-0018`.
+Evidence: `EV-0002`, `EV-0005`, `EV-0008`, `EV-0016`, `EV-0018`, `EV-0046`, `EV-0047`.
 
 ### Evidence of burden
 
 - KCDO field research reports time constraints and duplicate/manual entry, but no oncology-specific duration.
 - Onco-Insight reduced registry abstraction by 12.42 minutes per case, but this is a different role and job (`EV-0017`).
-- Exact consultation-preparation frequency and person-minutes remain unknown.
+- Exact consultation-preparation frequency and person-minutes remain unknown; the expanded source adds journeys but no measurement.
 
 ### Current workaround
 
-Manual sorting, patient narration, scanning/upload, broad notes, duplicate entry, and direct source review.
+Manual sorting, patient or caregiver record carrying and narration, scanning/upload, broad notes, duplicate entry, and direct source review.
 
 ### Existing alternatives
 
@@ -113,7 +116,7 @@ Initial synthetic file upload or a single export adapter. No HIS/EMR replacement
 
 ### Required next evidence
 
-A synthetic time-and-task comparison with representative artifact sets plus at least one workflow owner who confirms the trigger, responsibility, and current baseline.
+First ask the internal analyst whether the expanded-source questionnaires produced direct workflow answers and whether a resident, coordinator, caregiver, or records role was actually observed. Candidate A still requires a synthetic time-and-task comparison plus one workflow owner who confirms the trigger, responsibility, verification cost, and baseline.
 
 ## Candidate B — Post-board decision handoff and operational disposition
 
@@ -303,6 +306,7 @@ Identify one institution-level follow-up list, staff owner, reachable patient co
 | Registry abstraction tool for mature centres | Defer | Strong measured value but Onco-Insight already demonstrates an institution-specific solution |
 | Research/presentation generator | Defer | Single weak clinician signal and strong general-tool alternatives; burden unmeasured |
 | Clinic flow optimisation | Keep open | Official fit but insufficient India oncology baseline in this evidence slice |
+| Caregiver/family psychosocial-support coordination | Research hypothesis | Two of three selected caregiver accounts report a support gap, but one weak source group cannot establish role, prevalence, safe intervention, or Doctor/Care Team fit |
 
 ## Owner decision
 
@@ -323,3 +327,7 @@ Candidate B is therefore narrowed to **the handoff from the existing clinician-a
 The primary user remains a role hypothesis: the local tumour-board operational owner, such as a designated secretariat or nodal operations person. Public evidence does not identify the actual local owner, current system, or baseline.
 
 Detailed evidence and falsifiers: `research/P5_TUMOUR_BOARD_VALIDATION.md`.
+
+### Expanded-source reassessment
+
+The private V2 source contains no answered tumour-board workflow and does not overturn Candidate B. It adds caregiver/family support as a hypothesis and makes Candidate A a more credible fallback by weakening the blanket rare-switching assumption. External NCG outreach is paused; the internal analyst should first clarify provenance, whether the proposed questionnaires were administered, and whether direct clinician answers exist.

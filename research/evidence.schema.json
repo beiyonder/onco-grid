@@ -112,6 +112,7 @@
         "peer_reviewed",
         "professional_body",
         "clinician_account",
+        "participant_account",
         "public_discussion",
         "vendor_claim",
         "derived_synthesis"

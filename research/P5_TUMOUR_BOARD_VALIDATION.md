@@ -6,6 +6,7 @@
 - Research date: 2026-09-03.
 - Evidence boundary: public, non-sensitive artifacts only.
 - Result: public evidence identifies one historical Eastern India patient-care-coordinator/Excel workflow and substantial NCG, iECHO, and draft NABH standards coverage, but does not establish the actual current target-site owner or acknowledgement baseline.
+- Expanded-source reassessment: the private V2 pain-point document contains no answered tumour-board workflow. External outreach is paused while the internal analyst clarifies provenance and any unshared questionnaire answers.
 - Product lock: not reached.
 
 ## Research question
@@ -300,9 +301,24 @@ Stop or return to Candidate A if any of the following is established:
 5. “follow-up system” in the Indian survey refers only to clinical-outcome research rather than an operational workflow;
 6. the proposed layer would require duplicate entry rather than removing work;
 7. the workflow cannot be evaluated without patient-specific clinical judgement;
+
 8. the local baseline leaves no meaningful improvement to measure;
 9. confidentiality or institutional policy prevents the minimum information flow;
 10. the actual unmet burden is pre-board evidence preparation rather than post-board handoff.
+
+## Expanded-source impact
+
+The fully reviewed private V2 document adds four weak, de-identified records from one source group (`EV-0045`–`EV-0048`). It introduces family/caregiver support and multi-provider portability signals, but no completed oncologist or operator account of tumour-board documentation, acknowledgement, ownership, or follow-through.
+
+It therefore does not close or overturn P5. It changes validation order:
+
+1. ask the internal analyst which sections are completed findings versus proposed research;
+2. determine whether the clinician questionnaires were administered and whether answers exist separately;
+3. ask whether direct conversations identified a tumour-board post-decision owner or workflow;
+4. test the new caregiver-support, portability, resident/junior, and clinic-flow claims;
+5. resume external NCG/ECHO outreach only if internal evidence remains insufficient.
+
+No unsupported statistic, user-role assumption, clinical-risk framing, or sensitive caregiver narrative may enter the product contract.
 
 ## Minimum evidence still required
 
@@ -338,7 +354,7 @@ Request aggregate counts and blank artifacts only. Do not request a filled case,
 
 ## Additional public validation
 
-### Draft NABH oncology HIS/EMR standard
+Continue targeted non-sensitive validation through the internal analyst first. If that cannot establish an actor and material gap, resume the separately approved external operator route or return to Candidate A rather than building from absence of documentation.
 
 The public draft NABH cancer-care annexure (`EV-0042`) expects an electronic tumour-board workflow covering patient selection, a unique board ID, scheduling, clinician notification, a central case list, integrated record review, attendance, and standardised documentation of multidisciplinary inputs, recommendations, and follow-ups.
 

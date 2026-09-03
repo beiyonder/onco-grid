@@ -44,7 +44,9 @@ No identifiable patient or participant data may enter the ledger, notes, prompts
 - clinic and treatment-day operations;
 - investigation/report tracking;
 - cross-department handoffs;
-- patient/caregiver communication and language;
+- patient/caregiver communication, language, counselling, and psychosocial-support coordination;
+- caregiver operational work and permission boundaries;
+- referral, additional-opinion, cross-city, and multi-provider record portability;
 - financial or administrative navigation;
 - registry, reporting, and research-data burden;
 - survivorship, supportive-care, and palliative handoffs;
@@ -56,10 +58,13 @@ No identifiable patient or participant data may enter the ledger, notes, prompts
 2. Peer-reviewed primary research and systematic reviews.
 3. Recognised professional organisations and cancer centres.
 4. Named clinician talks, panels, and articles.
-5. Vendor documentation, used only for product-capability claims.
-6. Public discussions, used only for hypothesis generation.
+5. De-identified participant or caregiver accounts, used as bounded source claims rather than prevalence evidence.
+6. Vendor documentation, used only for product-capability claims.
+7. Public discussions, used only for hypothesis generation.
 
 A source can support more than one atomic claim, but syndicated copies share one `independent_source_group` and cannot count as independent confirmation.
+
+Several narratives inside one supplied document share one `independent_source_group` unless the collection method establishes genuinely independent recruitment and provenance. Sensitive raw narratives remain private; public ledger records use de-identified paraphrases, sample counts, limitations, and a safe repository analysis locator.
 
 ## Search method
 
@@ -113,8 +118,8 @@ Every retained record must include:
 
 - **Strong:** authoritative rule/standard for the stated jurisdiction, or well-designed direct evidence with a clear method and directly relevant population/setting.
 - **Moderate:** credible direct or synthesised evidence with some transfer, sample, recency, or method limitation.
-- **Weak:** small or poorly described sample, indirect measure, non-Indian transfer, or incomplete method.
-- **Hypothesis only:** anecdote, vendor framing, public discussion, or team inference without independent support.
+- **Weak:** small or poorly described sample, selected participant account, indirect measure, non-Indian transfer, or incomplete method.
+- **Hypothesis only:** anecdote without a described method, vendor framing, public discussion, proposed questionnaire, or team inference without independent support.
 
 Strength does not equal importance. A strong standard may say nothing about prevalence; a weak account may expose a valuable question.
 
@@ -182,6 +187,7 @@ The validator checks JSON syntax, required fields, allowed values, stable unique
 ## Phase outputs
 
 - `research/CLAIMS.md` — falsifiable claims derived from supplied pain points and outside scan.
+- `research/PAIN_POINTS_V2_ANALYSIS.md` — de-identified structure, source limits, new hypotheses, rejected assumptions, and plan delta from the private expanded source.
 - `research/evidence.schema.json` — machine-readable record contract.
 - `research/evidence.jsonl` — atomic evidence ledger.
 - `research/validate_ledger.py` — dependency-free structural and leakage check.

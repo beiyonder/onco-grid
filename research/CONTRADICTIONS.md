@@ -156,6 +156,29 @@ A barrier-aware owned worklist is plausible. A reminder bot is not.
 
 Measure one job end-to-end. Never claim productivity from generation speed alone.
 
+## Expanded private-source signals
+
+### Evidence for further research
+
+- Two of three selected caregiver accounts describe absent or inadequate family counselling or psychosocial support (`EV-0045`).
+- The small account set includes cross-city referral, additional opinions, and multiple providers (`EV-0046`).
+- Caregivers perform record, scheduling, navigation, communication, and travel work in some described journeys (`EV-0047`).
+- Digital booking, reminders, or retained records coexist with queues or missing support in selected accounts (`EV-0048`).
+
+### Contradictions and limits
+
+1. All four records derive from one private document and one three-account convenience source; they are not independent confirmations.
+2. The source does not report recruitment, interview method, participant selection, contemporaneous notes, or whether the proposed questionnaires were administered.
+3. It cannot support broad claims that caregivers usually own operations, residents are the primary user, public clinics exceed a stated volume, or corporate doctors have more time.
+4. It contains no actor, person-time, denominator, or controlled comparison for the new signals.
+5. Counselling quality, psychological assessment, clinical risk, and treatment response are clinical; only permissioned coordination to human support can fit.
+6. Digital-feature presence and queue friction may concern different institutions or workflow steps and do not establish causality.
+7. Multi-provider examples weaken the rare-switching assumption but do not validate Candidate A.
+
+### Decision
+
+Add caregiver/family support coordination as a hypothesis, strengthen Candidate A as the first fallback, and keep clinic flow and resident chart assembly open. Pause external P5 outreach while the internal analyst clarifies provenance and whether completed clinician answers exist. Do not promote any unsupported numerical, causal, clinical-risk, or user-role assertion.
+
 ## Evidence-base biases
 
 ### Availability bias
@@ -200,6 +223,12 @@ Most evidence speaks about oncologists, patients, or registrars; hidden work by 
 
 Control: do not name a primary user without direct role evidence.
 
+### Participant-account and provenance bias
+
+Sensitive narratives can feel vivid and specific while still having an unknown collection method and selected sample.
+
+Control: publish only de-identified paraphrases, count all accounts from one document as one source group, separate proposed questionnaires from answers, and ask the source owner to distinguish direct, repeated, impression, and unknown claims.
+
 ### Recency bias
 
 Current product pages may be recent but are still marketing; older workflow studies may not reflect 2026 systems.
@@ -222,5 +251,9 @@ Control: classify every capability under the explicit scope taxonomy before prom
 6. Which continuity barriers a care team can act on with existing resources.
 7. Whether any candidate removes work rather than adding another interface.
 8. Which institution could provide a synthetic or fully anonymised workflow pilot and baseline.
+9. Expanded-source provenance, participant selection, and whether the proposed clinician questionnaire produced answers.
+10. Named care-team owner, recurring trigger, and measurable burden for caregiver/family counselling or psychosocial-support coordination.
+11. Whether a resident or junior fellow actually performs recurring chart assembly in the target setting.
+12. Whether referral/additional-opinion portability or clinic flow has a measurable Doctor/Care Team Facing job.
 
 These unknowns prevent a final product lock. They do not prevent ranking candidates for owner review.

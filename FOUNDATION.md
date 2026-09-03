@@ -87,6 +87,12 @@ Evidence limitations:
 - The discussion mixes record synthesis, second opinions, peer discussion, and clinical decisions; those are different workflows.
 - No real patient data from the chat should be moved into future fixtures, memories, demos, or prompts.
 
+### Expanded private-source reassessment
+
+The owner-supplied expanded pain-point DOCX was fully reviewed after this initial foundation. Its first section duplicates the original synthesis; its questionnaires and solution heuristics are proposed research rather than findings; its three caregiver narratives are sensitive and remain private; and its care-team primer is uncited.
+
+The safe new signals are weak: family/caregiver counselling or psychosocial-support coordination appears in two selected accounts; multi-provider, additional-opinion, and cross-city journeys weaken the earlier rare-switching assumption; caregivers perform operational work in some accounts; and digital touchpoints can coexist with queues or missing support. These signals create research questions, not prevalence claims or product requirements. See `research/PAIN_POINTS_V2_ANALYSIS.md`.
+
 ## Source hierarchy
 
 Use this precedence when sources disagree:
@@ -172,7 +178,7 @@ The proposed value comes from synthesis, while the notes signal distrust. The pr
 
 ### Portability versus continuity
 
-The chat suggests patients rarely change oncologists, weakening a pitch based only on doctor switching or second opinions. Consultation preparation within the same long-running relationship, cross-department handoffs, and tumour-board review may be more frequent. This must be measured.
+The initial chat suggested patients rarely change oncologists. The expanded private source contains selected counterexamples involving referrals, additional opinions, multiple providers, and cross-city care. Neither source establishes frequency. Portability cannot be dismissed, but Candidate A still requires a named preparer and measured total burden after verification.
 
 ### Interoperability versus hackathon feasibility
 
@@ -502,6 +508,7 @@ Do not create this structure until Gate 5 is passed. The smallest durable struct
 - `hackathon_constraints_general_info.md`
 - `Oncologist Pain Points.md`
 - `chatroom_notes.md`
+- `research/PAIN_POINTS_V2_ANALYSIS.md` — de-identified analysis; the raw expanded DOCX remains private and ignored
 - `HEALTHATHON_OFFICIAL.md`
 - `CONTEXT.md`
 

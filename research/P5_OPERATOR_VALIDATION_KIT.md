@@ -21,6 +21,7 @@ Public evidence has narrowed but not closed the gap:
 - NCG and iECHO already support substantial pre-board submission, review, correction, notification, and sharing (`EV-0036`–`EV-0040`).
 - A draft NABH oncology HIS/EMR annexure already expects selection, board IDs, scheduling, notifications, integrated review, attendance, and documentation of multidisciplinary inputs and follow-ups (`EV-0042`).
 - One Eastern India hospital used preformed Excel lists, entered the board decision after the meeting, and used a patient care coordinator to collect treatment and follow-up data (`EV-0043`).
+- One recent Chennai post-MDT workflow improved documentation through named downstream roles, an SOP, education, and a shared paper form rather than new software (`EV-0044`).
 
 These sources show that a broad tumour-board product would duplicate existing capability. They do not establish whether acknowledgement and operational disposition are absent or burdensome in a current target setting.
 
@@ -38,15 +39,28 @@ Seek one person who performs or directly supervises the workflow. Priority order
 
 Do not assume these titles are interchangeable. Record the local title and actual work.
 
-## Current public routing path
+## Validation order after the expanded source
 
-The recommended first route is the official [NCG Virtual Tumor Board support and inquiry page](https://www.ncgindia.org/key-initiatives/virtual-tumor-board). It currently describes recurring host-centre sessions and publishes a VTB support contact.
+### First route — internal analyst
 
-Ask that contact to route the process-only request to the person who handles post-session records or programme operations. Do not assume the public support contact personally owns the handoff.
+The expanded private pain-point document contains proposed clinician questionnaires, cohort assumptions, and three sensitive caregiver accounts, but it does not clearly distinguish completed research from planned research. Ask the internal analyst first:
 
-Alternative institutional routes are the programme offices for the currently listed host centres, Tata Memorial Hospital and Max Hospital Saket. Request an operations, secretariat, registry, records, or quality role—not a clinical opinion.
+1. which sections came from completed conversations;
+2. how many oncologists and caregivers contributed;
+3. which specialties and settings were represented;
+4. whether the proposed questionnaires were administered;
+5. whether answers or source notes exist separately;
+6. whether anyone directly described post-tumour-board decision handoff;
+7. whether a resident, junior fellow, coordinator, caregiver, or records role was actually observed doing the stated work;
+8. whether caregiver-support, additional-opinion, clinic-flow, or record-portability signals repeated across independent conversations.
 
-Do not commit a person's email address or phone number. Resolve the current contact from the live official page immediately before outreach. Sending requires owner confirmation for the exact recipient, channel, and final message.
+Require each response to be labelled `DIRECT`, `REPEATED`, `IMPRESSION`, or `UNKNOWN`. Do not request or accept patient details, raw narratives, filled forms, screenshots, or identifiable notes.
+
+### Second route — external operator
+
+Resume external outreach only if internal evidence cannot close the workflow gap. The first external route is the official [NCG Virtual Tumor Board support and inquiry page](https://www.ncgindia.org/key-initiatives/virtual-tumor-board), followed by programme offices for the currently listed host centres. Request routing to an operations, secretariat, registry, records, or quality role—not a clinical opinion.
+
+Do not commit a person's email address or phone number. Resolve any current contact from the live official page immediately before outreach. Sending requires fresh owner confirmation for the exact recipient, channel, and final message.
 
 ## Participation screen
 
@@ -61,9 +75,9 @@ Continue only if the person can describe at least one of these without patient d
 
 Do not treat general familiarity with tumour boards as workflow evidence.
 
-## Initial outreach draft
+## External outreach draft
 
-Sending this message requires owner approval for the exact recipient and channel.
+Sending this fallback message requires fresh owner approval for the exact recipient and channel after internal clarification is exhausted.
 
 > Hello. We are studying the operational workflow around oncology tumour boards—not the clinical decision itself.
 >

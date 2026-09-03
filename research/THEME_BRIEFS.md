@@ -200,11 +200,11 @@ A care-team tool could maintain authorised worklists, record staff-entered barri
 
 ### What is supported
 
-The 148-participant Tata Medical Center qualitative study describes multi-provider pathways, communication and referral gaps, travel, finance, and uneven access (`EV-0027`). The default study reports that 59.3% of its 172 participants were from outside the state and mean travel was 143 km (`EV-0025`). KCDO UX research reports that previous referral details may not be viewable or uploadable in audited systems (`EV-0016`).
+The 148-participant Tata Medical Center qualitative study describes multi-provider pathways, communication and referral gaps, travel, finance, and uneven access (`EV-0027`). The default study reports that 59.3% of its 172 participants were from outside the state and mean travel was 143 km (`EV-0025`). KCDO UX research reports that previous referral details may not be viewable or uploadable in audited systems (`EV-0016`). The expanded private pain-point source adds weak de-identified examples of cross-city referral, additional opinions, and multiple providers (`EV-0046`).
 
 ### Evidence limit
 
-Most retained evidence is from patients and caregivers. The Doctor/Care Team Facing actor, operational job, baseline, and controllable output are not established.
+Most stronger retained evidence is from patients and caregivers; the new V2 accounts are also a selected three-account source with unclear method. The Doctor/Care Team Facing actor, operational job, baseline, and controllable output remain unestablished.
 
 ### Judgment
 
@@ -244,15 +244,29 @@ Tata Memorial already built the solution for its architecture, and NCG publishes
 
 **Use as proof that source integration and deterministic validation can save time. Do not select generic registry abstraction unless a distinct underserved setting and adoption gap are established.**
 
+## Outside theme — caregiver and family support coordination
+
+### What is supported
+
+Two of three informal caregiver accounts in the expanded private source describe absent or inadequate family counselling or psychosocial support (`EV-0045`). The same source describes caregivers performing record, scheduling, navigation, communication, and travel work in some journeys (`EV-0047`).
+
+### Evidence limit and boundary
+
+These are selected, sensitive, unstructured accounts sharing one source group. They do not establish prevalence, the responsible role, available services, or measurable burden. Psychological assessment and advice are clinical; only permissioned access to human support services or clinician-approved general information could fit this project.
+
+### Judgment
+
+**New research hypothesis, not a candidate.** Ask the internal analyst to clarify provenance and test whether a named care-team role repeatedly coordinates family support. Do not infer caregiver authority from family relationship.
+
 ## Outside themes with insufficient evidence in this pass
 
 ### Clinic and treatment-day flow
 
-Official programme fit is high, but retained sources do not provide an India-specific oncology flow baseline or named bottleneck. Keep open.
+Official programme fit is high. One weak private-source signal shows digital booking or reminders coexisting with queues or other friction (`EV-0048`), but no India-specific oncology flow baseline, named bottleneck, or causal mechanism is established. Keep open.
 
 ### Patient/caregiver education and language
 
-India access studies show literacy, counselling, caregiver, and language relevance. The selected stream and safe boundary require a clinician-approved operational communication job; no specific candidate is yet defined.
+India access studies show literacy, counselling, caregiver, and language relevance. The expanded source adds weak family-support and caregiver-work signals (`EV-0045`, `EV-0047`). The selected stream and safe boundary require a clinician-approved operational communication or service-access job; no specific candidate is yet defined.
 
 ### Financial and administrative navigation
 
@@ -284,5 +298,7 @@ Current evidence does not justify the original all-in-one workspace. Three bound
 1. owner-selected P5: post-board human-decision acknowledgement and operational disposition;
 2. fallback: source-linked outside-record intake for a specific consultation or referral;
 3. fallback: barrier-aware care-team follow-up coordination.
+
+The expanded V2 source does not change the owner-selected P5 ranking. It strengthens Candidate A as a fallback and adds caregiver/family support as a hypothesis. External NCG outreach is paused while the internal analyst clarifies source provenance, whether the proposed questionnaires were administered, and whether direct workflow answers exist.
 
 Candidate B remains contingent on a named local actor, current-system gap, and aggregate baseline. If those fail, return to Candidate A rather than building from public-document absence.

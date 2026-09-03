@@ -335,13 +335,14 @@ A registry-abstraction product has measurable evidence, but TMC already built on
 
 | Transition | Typical artifacts | Existing system direction | Evidence-backed failure or limit | Safe research opportunity |
 |---|---|---|---|---|
-| Outside provider → cancer centre | Referral, pathology, imaging, prior notes, treatment records | ABDM/FHIR, EMR upload, patient-carried file | Referral detail/upload gaps; outside treatment needs manual review | Provenance-preserving intake and review |
+| Outside provider → cancer centre | Referral, pathology, imaging, prior notes, treatment records | ABDM/FHIR, EMR upload, patient-carried file | Referral detail/upload gaps; outside treatment needs manual review; selected V2 accounts add cross-city/additional-opinion journeys (`EV-0046`) | Provenance-preserving intake and review |
 | Medical oncology → nursing/day care | Protocol/order, labs, administration instructions | NCG medical module | Existing deep requirements; no local burden measure | Status/verification only after workflow evidence |
 | Surgery → pathology/next specialty | Operative note, specimen, pathology/addendum, discharge | NCG surgical module | Cross-specialty burden unmeasured | Correct version and handoff completeness |
 | Radiation → referring team | consultation, plan status, delivery/completion summary | NCG radiation module and specialised systems | Cross-system burden unmeasured | Reviewed completion handoff |
 | Human board decision → treating unit | Existing decision record, authorised recipient, acknowledgement, assigned operational item, status | NCG MDT decision and later review; local EMR/registry | Heterogeneous communication; 48.2% report no follow-up system; intermediate owner/status unverified | Reference the human decision and validate acknowledgement plus operational disposition |
 | Encounter → registry/reporting | structured modules plus manual abstraction | Onco-Insight and NCG dashboards | Diagnostic/outside/follow-up data remain manual | Source retrieval and validation for a different underserved workflow |
 | Scheduled milestone → completed follow-up | appointment, contact, barrier, outcome | local trackers and messaging | Structural barriers; SMS reply does not ensure attendance | Owned barrier-aware coordination |
+| Caregiver/family → human support service | permission, referral, approved information, appointment/status | local counselling, navigation, psychosocial or support services | Two of three selected V2 accounts report absent/inadequate family support, but role and workflow are unknown (`EV-0045`, `EV-0047`) | Research permissioned service-access coordination; never automated assessment or advice |
 
 ## Current workflow conclusion
 
@@ -350,5 +351,7 @@ Three operational wedges remain plausible:
 1. **Tumour-board decision handoff and operational disposition** — owner-selected P5 lane, narrowed to the intermediate step after a human decision and before later clinical review; exact local actor, system, and baseline remain unverified.
 2. **Outside-record intake and consultation readiness** — strongest fallback and fragmentation alignment, but the exact preparer, time burden, and incremental value over EMR/ABDM remain unmeasured.
 3. **Barrier-aware follow-up coordination** — strong direct evidence of an important India problem, but many causes are not solvable by reminders or software and the primary user/workflow still needs confirmation.
+
+The expanded V2 source also adds caregiver/family support as a research hypothesis and weakens the assumption that multi-provider journeys are rare. It provides no complete workflow map. Internal analyst clarification now precedes any external P5 outreach.
 
 No map justifies a generic oncology dashboard, autonomous summary, clinical interpretation, or treatment assistant.

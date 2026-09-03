@@ -228,7 +228,7 @@ A patient or referring institution supplies heterogeneous material that must be 
 
 Why still open:
 
-KCDO reports referral-history upload/access gaps, and Onco-Insight still needs manual outside-care review. ABDM and NCG interoperability are moving toward the same problem, so the candidate must prove a specific pre-consultation step and light adapter.
+KCDO reports referral-history upload/access gaps, and Onco-Insight still needs manual outside-care review. The expanded private source adds weak de-identified multi-provider and additional-opinion journeys (`EV-0046`) but no workflow measurement. ABDM and NCG interoperability are moving toward the same problem, so the candidate must prove a specific pre-consultation step and light adapter.
 
 ### 2. Post-board decision handoff and operational disposition
 
@@ -259,6 +259,16 @@ A specific role re-enters or reconciles the same source data in multiple systems
 Why still open:
 
 India UX evidence supports duplication, and international oncology measurements show burden. The exact Indian oncology task and alternative—fixing the source system versus adding a companion—are unknown.
+
+### 5. Caregiver/family support-service coordination
+
+Possible gap:
+
+A named care-team role may need to connect families or caregivers to human counselling or psychosocial-support services and make the permissioned operational state visible.
+
+Why still open:
+
+Two of three selected accounts in one private source report absent or inadequate support (`EV-0045`), and caregivers perform operational work in some journeys (`EV-0047`). No service inventory, role, prevalence, baseline, or solution comparison exists. Psychological assessment and advice remain clinical; this lane is not a candidate until a safe service-access workflow is evidenced.
 
 ## Differentiation bar
 

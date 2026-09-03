@@ -4,12 +4,13 @@
 
 - Research access date: 2026-09-03.
 - Current output: evidence-backed discovery priorities, not a final product selection.
-- Evidence ledger: 44 validated records from 35 independent source groups.
-- Direct India relevance: 32 records.
+- Evidence ledger: 48 validated records from 36 independent source groups.
+- Direct India relevance: 36 records.
 - Official or peer-reviewed evidence: 35 records.
-- Public repository: the empty `main` base and PR branch exist; `chatroom_notes.md` remains ignored and all project changes require PR review.
+- Public repository: the empty `main` base and PR branch exist; `chatroom_notes.md` and the raw expanded DOCX remain ignored, and all project changes require PR review.
 - Owner decision: Candidate B—tumour-board human-decision documentation and operational follow-through—was selected on 2026-09-03 as the next discovery lane, not as product lock.
 - P5 public validation narrowed Candidate B to the handoff from an existing clinician-authored decision to authorised treating-unit acknowledgement and operational disposition. Public examples show that ownership varies and that role clarity, an SOP, and one shared form may solve a handoff without software. The actual target-site owner and baseline remain unverified.
+- Expanded-source review: four weak de-identified participant-account records were added from one private three-account source group. They change validation order and hypotheses, not the current candidate ranking.
 
 ## Hard boundary
 
@@ -29,6 +30,7 @@ The original five themes are not equally suitable:
 The open scan found a serious additional direction:
 
 - **Follow-up and continuity:** strong direct Indian evidence of social, financial, travel, illness, counselling, and coordination barriers. A reminder-only product is insufficient.
+- **Caregiver/family psychosocial-support coordination:** repeated in two of three selected private-source accounts, but currently only a weak hypothesis with no named role, prevalence, baseline, or proven software need.
 
 Three bounded candidates survive:
 
@@ -52,7 +54,7 @@ This is not permission to build a broad tumour-board platform. NCG already has a
 - **pre-board case readiness**, where local burden remains unmeasured; or
 - **post-board human decision documentation and operational follow-through**, where the survey shows a direct gap.
 
-The stronger currently evidenced starting point is **post-board documentation and operational follow-through**. The original consultation-readiness direction remains the stronger alternative if evidence later shows that current boards already handle follow-through or lack an owning role.
+The stronger currently evidenced starting point remains **post-board documentation and operational follow-through**. The expanded source makes outside-record consultation readiness a more credible fallback by weakening the rare-switching assumption, but it adds no actor or time baseline. External P5 outreach is paused while the internal analyst clarifies source provenance and any completed clinician answers.
 
 ## Decision that would change this recommendation
 
@@ -71,6 +73,7 @@ Move Candidate C—barrier-aware follow-up—to first place when one care-team r
 - `Oncologist Pain Points.md`;
 - informal team notes, used only for hypotheses;
 - project foundation and controlled vocabulary.
+- de-identified structural analysis of the expanded private pain-point source; raw caregiver narratives remain excluded;
 
 ### Indian primary and peer-reviewed sources
 
@@ -199,6 +202,7 @@ Consequence: measure the actual task. Do not assume that summarisation attacks t
 | Registry/reporting | Use as proof pattern | Measured value; existing TMC solution weakens novelty |
 | Clinic flow | Open, insufficient evidence | Official fit but no retained India oncology baseline |
 | Research/presentations | Defer | One weak supplied signal and many general alternatives |
+| Caregiver/family support | New research hypothesis | Two of three selected accounts report counselling/support gaps, but one weak source group cannot establish prevalence, role, safe intervention, or product fit |
 
 ## Candidate comparison
 
@@ -234,7 +238,7 @@ Consequence: measure the actual task. Do not assume that summarisation attacks t
 
 **Best KPI:** total person-minutes to prepare and review the packet, plus unsupported-assertion and correction rates.
 
-**Evidence:** strong fragmentation, referral-upload, outside-care manual review, and structured-retrieval evidence.
+**Evidence:** strong fragmentation, referral-upload, outside-care manual review, and structured-retrieval evidence, plus weak selected-account examples of cross-city referral, additional opinions, multiple providers, and caregiver record handling (`EV-0046`, `EV-0047`).
 
 **Main contradiction:** no direct Indian consultation-preparation measurement; NCG/ABDM target the same space; verification may erase time savings.
 
@@ -278,15 +282,15 @@ This contract remains provisional:
 
 ## Minimum next evidence
 
-Direct oncologist interviews remain unnecessary for this operational question. Before product build:
+The expanded source changes the validation order. Before product build:
 
-1. use `research/P5_OPERATOR_VALIDATION_KIT.md` with one coordinator, secretariat member, patient care coordinator, nodal operator, registry investigator, administrator, records officer, or quality officer;
-2. obtain only a completely blank local decision/minutes/follow-up field list or template when institutionally approved;
-3. capture one process map beginning at the final clinician-authored decision;
-4. determine who records, distributes, acknowledges, assigns, and closes each operational state;
-5. collect aggregate counts and estimated staff person-time with explicit denominators;
-6. test whether the existing EMR, spreadsheet, or coordinator process is already adequate;
-7. if no actor or material gap is established, return to Candidate A rather than building from missing public documentation.
+1. ask the internal analyst which V2 sections came from completed conversations, how participants were selected, and whether the proposed questionnaires were administered;
+2. request any existing de-identified answer set or direct workflow summary, not raw narratives;
+3. determine whether earlier clinician conversations identify a post-board owner, current system, or handoff;
+4. test the new caregiver-support, multi-provider portability, resident/junior, and clinic-flow signals;
+5. if internal evidence cannot close P5, resume the separately approved external operator route using `research/P5_OPERATOR_VALIDATION_KIT.md`;
+6. obtain only a completely blank approved artifact and aggregate process measures;
+7. if no actor or material gap is established, return to Candidate A rather than building from missing documentation.
 
 ## Owner decision
 
@@ -308,6 +312,7 @@ Public-workflow validation: `research/P5_TUMOUR_BOARD_VALIDATION.md`.
 ## Repository artifacts
 
 - `research/RESEARCH_PROTOCOL.md`
+- `research/PAIN_POINTS_V2_ANALYSIS.md`
 - `research/CLAIMS.md`
 - `research/evidence.schema.json`
 - `research/evidence.jsonl`
@@ -324,6 +329,8 @@ Public-workflow validation: `research/P5_TUMOUR_BOARD_VALIDATION.md`.
 - `.harness/reports/20260903T094928Z-P1-research-protocol.md`
 - `.harness/reports/20260903T100755Z-P2-first-evidence-slice.md`
 - `.harness/reports/20260903T100845Z-P2-evidence-integration.md`
+- `.harness/reports/20260903T112712Z-P5-operator-validation-ready.md`
+- `.harness/reports/20260903T114127Z-P5-outreach-authority.md`
 
 ## Verification
 
@@ -332,4 +339,4 @@ Public-workflow validation: `research/P5_TUMOUR_BOARD_VALIDATION.md`.
 - every external measurement remains attached to its original setting and method;
 - every candidate states its strongest contradictory evidence;
 - no candidate crosses the explicit clinical boundary;
-- `chatroom_notes.md` and private/local material remain ignored; publication occurs only through pull requests.
+- `chatroom_notes.md`, the raw expanded DOCX, and private/local material remain ignored; publication occurs only through pull requests.

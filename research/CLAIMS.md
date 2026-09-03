@@ -160,6 +160,15 @@ For every claim promoted into the final synthesis, the ledger must show the acto
 - `CL-O16`: Existing NCG/KCDO reporting requirements and EMR capabilities reduce the novelty of a generic dashboard.
 - `CL-O17`: A remaining gap may exist in source provenance, data quality review, or cross-system preparation rather than dashboard display.
 
+### Caregiver, psychosocial support, portability, and role assumptions
+
+- `CL-O18`: In some oncology journeys, a caregiver performs material operational work across records, appointments, navigation, communication, and travel.
+- `CL-O19`: Families or caregivers experience a repeated service-access or coordination gap around counselling and psychosocial support.
+- `CL-O20`: Existing digital booking, reminders, or stored records can coexist with queues, missing support, or incomplete end-to-end workflow.
+- `CL-O21`: Referral, additional-opinion, cross-city, or multi-provider journeys create a recurring record-portability and reconciliation job.
+- `CL-O22`: A resident or junior fellow performs recurring chart assembly in the target setting and is a better primary user than the oncologist or coordinator.
+- `CL-O23`: A safe caregiver-support workflow can coordinate access to human services or clinician-approved general information without assessing psychological state or generating clinical advice.
+
 ## Cross-cutting falsifiers
 
 Any candidate is weakened or rejected when evidence shows:

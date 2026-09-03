@@ -64,7 +64,7 @@ Exactly one coordinate must be `CURRENT`.
 | `P2` | Evidence collection | Agent | `P1` protocol and schema frozen | Indian workflow maps, theme research, open problem scan, solution landscape, operational measurements, contradiction review | Every retained data point passes the frozen schema; claims retain provenance and transfer limits; each leading theme includes disconfirming evidence | `READY-FOR-SIGNOFF` | Owner reviews the `C2` and `C3` evidence reports. |
 | `P3` | Synthesis | Agent | Evidence-collection threshold is met | Cross-theme evidence matrix and approximately three serious opportunity candidates | Each candidate names actor, trigger, job, burden, workaround, alternative, safety boundary, KPI, uncertainty, and contrary evidence | `READY-FOR-SIGNOFF` | Owner reviews `.harness/reports/20260903T101252Z-P3-synthesis-gate.md`. |
 | `P4` | Problem selection and build readiness | Repository owner | `P3` candidate evidence | One selected discovery lane or a documented decision to continue discovery | Owner accepts the lane, safe boundary, contrary evidence, and remaining local-validation risk | `DONE` | Candidate B selected on 2026-09-03; decision recorded in `.harness/reports/20260903T102128Z-P4-owner-decision.md`. |
-| `P5` | Tumour-board workflow validation | Agent; owner signs product lock | Candidate B selected at `P4` | Evidence-backed problem contract for one exact post-board operational step | Named actor; current system and handoff; exact documentation/communication/ownership/completion failure; non-sensitive aggregate baseline; safe output; human boundary; contradiction update; `C4` gate report | `CURRENT` | Obtain owner confirmation, then send the process-only request to the current NCG VTB support route; request aggregate counts and an approved blank artifact only. |
+| `P5` | Tumour-board workflow validation | Agent; owner signs product lock | Candidate B selected at `P4` | Evidence-backed problem contract for one exact post-board operational step | Named actor; current system and handoff; exact documentation/communication/ownership/completion failure; non-sensitive aggregate baseline; safe output; human boundary; contradiction update; `C4` gate report | `CURRENT` | Ask the internal clinical analyst to clarify V2 provenance, whether questionnaires produced answers, and whether direct clinician conversations identify the post-board actor or a more pressing workflow. Keep external outreach paused. |
 
 ## Current-coordinate acceptance contract
 
@@ -77,6 +77,7 @@ Exactly one coordinate must be `CURRENT`.
 - the proposed output records a human decision and never generates, ranks, or interprets clinical recommendations;
 - confidentiality, access, retention, and audit boundaries are explicit;
 - existing NCG/local capabilities and strongest contrary evidence are updated;
+- the expanded private-source provenance and any completed questionnaire answers are classified before external outreach resumes;
 - the owner accepts the resulting problem contract before product architecture begins.
 
 ## Checkpoint and report policy
@@ -127,10 +128,11 @@ On 2026-09-03 the owner authorised the first non-sensitive publication with `cha
 | `GAP-SERENA-LANGUAGE` | Closed | `research/validate_ledger.py` became the first real source file; Python was configured, one file indexed, and Serena health-check passed | Agent | Re-index after future source-language changes. |
 | `GAP-SETUP` | Closed for research phase | `python3 research/validate_ledger.py` is the canonical deterministic research check; no application surface exists | Owner and agent | Define product setup, test, build, and smoke commands only after owner-approved stack selection. |
 | `GAP-MCP-ACTIVATION` | Open | `.omp/mcp.json` is present, but OMP loads project MCP at session startup | Owner or next session | Launch OMP from the repository root, then run `/mcp list` and `/mcp test serena`. |
-| `GAP-PUBLICATION-SANITIZATION` | Mitigated for the approved PR; open for raw-source publication | Root `.gitignore` excludes `chatroom_notes.md`, private research inputs/recordings, local secrets, credentials, and key material; pre-push scanning is required | Repository owner | Publish only the reviewed non-sensitive set by PR. Create and approve a sanitized replacement before ever publishing the raw chat source. |
-| `GAP-DIRECT-WORKFLOW-OBSERVATION` | Accepted research limitation | Direct oncologist access has proven difficult; current phase uses independent research | Repository owner | Keep transfer limits visible and do not claim desk research proves local workflow prevalence. |
-| `GAP-TUMOUR-BOARD-LOCAL-WORKFLOW` | Narrowed, externally blocked | Indian examples now identify a historical patient care coordinator and a recent split treating-oncologist/downstream-team workflow; neither establishes a current general target-site owner, acknowledgement, person-time, or baseline | Agent and repository owner | Send the approved operator-kit request through the current NCG VTB support route. Reject Candidate B or return to Candidate A if no current non-clinical actor and material gap emerge. |
-| `GAP-OUTREACH-AUTHORITY` | Awaiting point-of-risk confirmation | The official NCG VTB page provides a current support/inquiry contact and the exact process-only message is prepared; no message has been sent | Repository owner | Confirm the exact current recipient and email channel immediately before sending. |
+| `GAP-PUBLICATION-SANITIZATION` | Mitigated for the approved PR; open for raw-source publication | Root `.gitignore` excludes `chatroom_notes.md`, `Oncologist Pain Points_v2.docx`, private research inputs/recordings, local secrets, credentials, and key material; pre-push scanning is required | Repository owner | Publish only de-identified analysis by PR. Never publish the raw expanded DOCX or chat source without a separately approved sanitized replacement. |
+| `GAP-DIRECT-WORKFLOW-OBSERVATION` | Accepted research limitation | Direct oncologist access has proven difficult; current phase uses independent research and internal analyst clarification | Repository owner | Keep transfer limits visible and do not claim desk research or selected accounts prove local workflow prevalence. |
+| `GAP-TUMOUR-BOARD-LOCAL-WORKFLOW` | Narrowed, internally routed | V2 contains no answered tumour-board workflow; existing Indian examples still do not establish a current general target-site owner, acknowledgement, person-time, or baseline | Agent and repository owner | Ask the internal analyst first. Resume a separately approved external operator request only if internal evidence remains insufficient. |
+| `GAP-OUTREACH-AUTHORITY` | Paused by owner | An external email was prepared but not sent; the owner redirected validation to the internal analyst after providing the expanded source | Repository owner | Do not send externally. Require fresh point-of-risk confirmation for the exact recipient, channel, and message if external outreach later resumes. |
+| `GAP-V2-PROVENANCE` | Open | The expanded source mixes duplicate synthesis, proposed questionnaires, author assumptions, three sensitive caregiver accounts, and an uncited primer | Internal analyst and repository owner | Clarify authorship, sample, method, whether questionnaires were administered, and whether de-identified answer notes exist. |
 
 ## Report index
 
@@ -145,6 +147,7 @@ On 2026-09-03 the owner authorised the first non-sensitive publication with `cha
 | `C5` | `P5` | `.harness/reports/20260903T110322Z-P5-public-workflow-validation.md` | Complete; local actor and baseline gap remains open |
 | `C5` | `P5` | `.harness/reports/20260903T112712Z-P5-operator-validation-ready.md` | Complete; operator kit ready, external process account still required |
 | `C5` | `P5` | `.harness/reports/20260903T114127Z-P5-outreach-authority.md` | Complete; all non-contact work exhausted, outreach approval required |
+| `C5` | `P5` | `.harness/reports/20260903T123318Z-P5-v2-source-reassessment.md` | Complete; internal provenance clarification now precedes external outreach |
 
 ## References
 
@@ -156,6 +159,7 @@ On 2026-09-03 the owner authorised the first non-sensitive publication with `cha
 - `Oncologist Pain Points.md`
 - `research/P5_TUMOUR_BOARD_VALIDATION.md`
 - `research/P5_OPERATOR_VALIDATION_KIT.md`
+- `research/PAIN_POINTS_V2_ANALYSIS.md`
 - `.serena/memories/core.md`
 - `.serena/memories/project_context.md`
 - `.harness/reports/20260903T093943Z-P0-bootstrap.md`
@@ -167,3 +171,4 @@ On 2026-09-03 the owner authorised the first non-sensitive publication with `cha
 - `.harness/reports/20260903T110322Z-P5-public-workflow-validation.md`
 - `.harness/reports/20260903T112712Z-P5-operator-validation-ready.md`
 - `.harness/reports/20260903T114127Z-P5-outreach-authority.md`
+- `.harness/reports/20260903T123318Z-P5-v2-source-reassessment.md`
