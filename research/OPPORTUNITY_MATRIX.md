@@ -115,32 +115,32 @@ Initial synthetic file upload or a single export adapter. No HIS/EMR replacement
 
 A synthetic time-and-task comparison with representative artifact sets plus at least one workflow owner who confirms the trigger, responsibility, and current baseline.
 
-## Candidate B — Tumour-board case readiness and follow-through
+## Candidate B — Post-board decision handoff and operational disposition
 
 ### Primary user
 
-Provisional: tumour-board secretariat, coordinator, or presenting clinical team. Only 52.5% of surveyed boards reported a designated secretariat, so ownership must remain configurable and verified.
+Provisional: local tumour-board operational owner. A designated secretariat exists in some surveyed hospitals; one Eastern India audit directly identifies a patient care coordinator collecting post-board treatment and follow-up data. The actual target-site role remains unconfirmed.
 
 ### Trigger
 
-A case is selected for a local or NCG virtual multidisciplinary discussion.
+Clinicians complete the board discussion and author or finalise the human decision.
 
 ### Job
 
-Prepare a permissioned, source-linked case packet; show operational readiness and missing artifacts; capture the final human decision; route and track authorised follow-through.
+Make or reference the signed human decision in the authorised treating workflow, record receipt or review, assign any explicitly stated non-clinical coordination item, and keep completion or unresolved status visible.
 
 ### Current process
 
-- board-specific case selection;
-- history and prior-treatment assembly;
-- pathology and imaging collection;
-- question formulation;
-- physical, hybrid, or electronic documentation;
-- written or direct recommendation communication;
-- inconsistent follow-up;
-- cross-hospital submission through NCG VTB.
+Public evidence shows several patterns:
 
-Evidence: `EV-0014`, `EV-0019`, `EV-0020`.
+- physical, hybrid, and electronic decision documentation;
+- EMR notes, written summaries, direct communication, and other routes;
+- NCG/KCDO final-decision fields and later yes/no follow-up review;
+- NCG/iECHO submission, review, approval, notification, and sharing before the board;
+- draft NABH requirements for electronic board IDs, scheduling, integrated review, attendance, recommendations, and follow-ups;
+- at one Eastern India hospital, preformed Excel case lists, post-meeting decision entry, and patient-care-coordinator collection of later treatment and follow-up data.
+
+Evidence: `EV-0014`, `EV-0019`, `EV-0020`, `EV-0036`–`EV-0043`.
 
 ### Evidence of frequency and burden
 
@@ -149,59 +149,59 @@ Evidence: `EV-0014`, `EV-0019`, `EV-0020`.
 - 63.5% used physical documentation;
 - 48.2% had no recommendation follow-up system;
 - 16.8% used EMR notes for recommendation communication;
-- 5.1% always conducted cross-hospital discussion.
+- the Eastern India audit recorded 800 discussions in 12 months, including 227 repeat discussions, and retained more than 20% missing or unknown data in several measures.
 
-Person-minutes per case were not measured in India. A small Spanish pilot supports the measurement method but not an Indian effect size (`EV-0021`).
+No Indian source measures treating-unit acknowledgement, decision-to-disposition time, duplicate-entry count, or coordinator person-minutes.
 
 ### Current workaround
 
-Paper records, written summaries, direct communication, email/template submission, videoconferencing, local EMR notes, and manual follow-up.
+Paper or written summaries, EMR notes, direct communication, preformed Excel case lists and master charts, programme coordination, patient-care-coordinator tracing, and later board review.
 
 ### Existing alternatives
 
-NCG/KCDO MDT module, NCG VTB, local boards, hospital EMRs, videoconference tools, presentation templates, and commercial navify-class platforms.
+NCG/KCDO MDT requirements, NCG VTB, iECHO workflow, NABH draft oncology HIS/EMR requirements, local boards and EMRs, spreadsheets, patient care coordinators, and commercial tumour-board platforms.
 
 ### Safe output
 
-- a stated human-authored board question;
-- source-linked packet and completeness status;
-- operational missing-item list;
-- named reviewers and readiness state;
-- meeting metadata;
-- clinician-authored/signed decision record;
-- non-clinical follow-through assignment and status;
+- reference to an existing clinician-authored/signed decision;
+- authorised recipient role or treating unit;
+- available/sent and acknowledgement timestamps;
+- non-clinical coordination item copied from the authorised human record;
+- operational owner and human-assigned due date;
+- status: pending, completed, deferred, rejected, or unresolved;
+- human-entered reason and authorised escalation;
 - audit trail.
 
 ### Human-review boundary
 
-Clinicians select the case, define the question, decide which evidence is adequate, make the decision, and authorise follow-through. The system does not rank treatment, interpret reports, or generate the board recommendation.
+Clinicians author and sign the decision and determine every clinical action. The system may track the operational handoff but must not rewrite the decision, rank treatment, interpret reports, decide urgency, or determine whether treatment was clinically followed correctly.
 
 ### Light integration boundary
 
-Start with the NCG/local case template plus synthetic files and exportable decision/follow-up record. Later adapters may link existing EMR artifacts; no new expert network.
+Use a reference or export from the existing decision record plus authorised recipient, owner, status, and audit metadata. Do not create another clinical source of truth, board network, or pre-board upload system.
 
 ### Candidate KPI
 
-- percentage of cases ready at agenda lock;
-- active preparation person-minutes by role;
-- cases postponed for missing information;
-- time from case submission to discussion;
-- percentage with signed decision recorded within the agreed period;
-- percentage with an assigned and completed operational follow-through item.
+- percentage of discussed cases whose existing human decision is available to and acknowledged by the authorised treating unit within a locally agreed interval;
+- time from board close to decision availability;
+- percentage of explicitly assigned non-clinical items with a named owner;
+- percentage with visible completed or unresolved status;
+- duplicate entries and clarification contacts per case;
+- coordinator person-minutes per case.
 
 ### Main evidence against
 
-- existing NCG MDT and VTB capabilities;
-- existing commercial end-to-end platforms;
-- no Indian preparation-time baseline;
-- confidentiality and institutional access complexity;
-- board workflows vary substantially;
-- a digital packet may shift work to a coordinator;
-- clinical decision quality is outside the product evaluation.
+- NCG/KCDO and draft NABH requirements already cover broad electronic board workflow;
+- iECHO already covers substantial pre-board governance;
+- one Indian hospital already used a coordinator and spreadsheet for post-board data collection;
+- absence of public acknowledgement fields does not prove operational absence;
+- “follow-up system” may mean later clinical outcome capture rather than this handoff;
+- another layer may duplicate the EMR or shift work to a coordinator;
+- the target actor, baseline, and material burden remain unknown.
 
 ### Required next evidence
 
-Confirm one current NCG/local case-submission path, identify the preparer, and determine whether the direct gap is readiness, documentation, communication, or follow-through. Only one should be the initial job.
+Use `research/P5_OPERATOR_VALIDATION_KIT.md` with one current operational owner. Obtain a process map and aggregate baseline, determine what “follow-up” means locally, and review only an approved blank artifact or field list. Return to Candidate A if the existing process is adequate or no material operational gap exists.
 
 ## Candidate C — Barrier-aware care-team follow-up
 

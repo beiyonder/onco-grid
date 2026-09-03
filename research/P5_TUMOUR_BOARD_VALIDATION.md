@@ -5,7 +5,7 @@
 - Owner-selected discovery lane: tumour-board human-decision documentation and operational follow-through.
 - Research date: 2026-09-03.
 - Evidence boundary: public, non-sensitive artifacts only.
-- Result: public evidence narrows the candidate to one post-board handoff, but does not yet identify the actual local owner or baseline.
+- Result: public evidence identifies one historical Eastern India patient-care-coordinator/Excel workflow and substantial NCG, iECHO, and draft NABH standards coverage, but does not establish the actual current target-site owner or acknowledgement baseline.
 - Product lock: not reached.
 
 ## Research question
@@ -176,6 +176,7 @@ This is a public-evidence gap, not proof of an operational absence.
 | Designated tumour-board secretariat | Present at 52.5% of boards in the Indian NCRP survey | Direct India survey evidence | Duties and software use not reported |
 | Nodal person responsible for board operations | 28.5% of survey respondents held this role | Direct India survey-method evidence | Respondent status does not prove task ownership |
 | MDT coordinator | Elsewhere, formal policy assigns meeting lists, evidence, minutes, distribution, action plans, milestones, and escalation | Transfer evidence only | Cannot be assumed for India |
+| Patient care coordinator | In one Eastern India hospital audit, collected treatment and follow-up data after the board, traced patients, and completed the master chart | Direct single-centre India workflow evidence (`EV-0043`) | Historical 2020–2021 audit; decision entry and treating-unit acknowledgement ownership remain unknown |
 
 ## Primary user conclusion
 
@@ -304,7 +305,7 @@ Stop or return to Candidate A if any of the following is established:
 
 Public research cannot close these items:
 
-1. exact owning role at one current Indian board;
+1. exact owning role at one current target board; one 2020–2021 Eastern India audit identifies a patient care coordinator for later data collection but not the full handoff;
 2. current decision artifact and system;
 3. how the treating unit receives the decision;
 4. whether receipt is acknowledged;
@@ -332,6 +333,28 @@ Ask one board coordinator, secretariat member, HBCR principal investigator, noda
 
 Request aggregate counts and blank artifacts only. Do not request a filled case, screenshot, meeting recording, recommendation, patient identifier, or clinical outcome.
 
+## Additional public validation
+
+### Draft NABH oncology HIS/EMR standard
+
+The public draft NABH cancer-care annexure (`EV-0042`) expects an electronic tumour-board workflow covering patient selection, a unique board ID, scheduling, clinician notification, a central case list, integrated record review, attendance, and standardised documentation of multidisciplinary inputs, recommendations, and follow-ups.
+
+This further weakens any broad product claim. The draft does not specify acknowledgement by the treating unit, a non-clinical action owner, due dates, or intermediate status. It is a requirements document, not implementation or burden evidence, and its referenced sample summary remains an `XXX` placeholder.
+
+### Eastern India single-centre audit
+
+A one-year audit of 800 tumour-board discussions (`EV-0043`) describes a concrete Indian workflow:
+
+1. case lists were prepared before weekly meetings on preformed Excel sheets;
+2. the recommended management decision was entered after the meeting;
+3. treatment and follow-up data were collected from hospital records;
+4. a patient care coordinator attempted to trace patients and complete the master chart;
+5. substantial missing, unknown, and lost-follow-up data remained.
+
+This is the first retained direct Indian source to name a post-board operational role and tool. It does **not** show who entered the decision, whether the treating unit acknowledged it, how much staff time the work took, or whether the current workflow still operates this way.
+
+The source changes the actor hypothesis from purely speculative to **supported in one site but not generalisable**. It also strengthens the contradiction: a coordinator plus spreadsheet may already perform the job, so software must remove a demonstrated burden rather than digitise an adequate manual process.
+
 ## Decision
 
 P5 has narrowed Candidate B from a broad tumour-board workflow to **post-board human-decision handoff and operational disposition**.
@@ -351,6 +374,8 @@ Continue targeted non-sensitive validation. If it cannot establish an actor and 
 - `EV-0039` — iECHO organisation-team case governance.
 - `EV-0040` — NCG VTB coordinator and iECHO migration account.
 - `EV-0041` — transferable formal MDT coordinator role.
+- `EV-0042` — draft NABH oncology HIS/EMR tumour-board requirements.
+- `EV-0043` — Eastern India single-centre Excel and patient-care-coordinator workflow.
 - [NCG Virtual Tumor Board](https://www.ncgindia.org/key-initiatives/virtual-tumor-board)
 - [NCG VTB blank presentation template](https://www.ncgindia.org/assets/ncg-key-initiatives/virtual-tumor-board/vtb-template.pptx)
 - [NCG/KCDO MDT Module v2.0](https://www.kcdo.in/src/docx/ner-multi-disciplinary-tumor-board-module-2.0.pdf)
@@ -358,4 +383,6 @@ Continue targeted non-sensitive validation. If it cannot establish an actor and 
 - [iECHO participant case submission](https://help.iecho.org/submitcase)
 - [iECHO organisation-team presenter and review workflow](https://help.iecho.org/How-to-add-a-Case-presenter-cf2d6d13daea4599ade15de0f630dff6)
 - [NCG 2022 VTB programme account](https://www.ncgindia.org/uploads/newsletter/pdf/file-3DE79E10-B469-47F9-9E9F-DEC4A5F29B6C.pdf)
+- [Draft NABH Cancer Care and Management Annexure](https://portal.nabh.co/Announcement/Draft%20Cancer%20Care%20and%20Management%20Annexure.pdf)
+- [Eastern India tumour-board audit](https://doi.org/10.31557/apjcc.2024.9.1.97-102)
 - [Transfer reference: formal MDT coordinator responsibilities](https://www.england.nhs.uk/mids-east/wp-content/uploads/sites/7/2018/08/investigation-diagnosis-mgmnt-mou-and-cup-v2.pdf)

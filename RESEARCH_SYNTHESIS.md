@@ -4,9 +4,9 @@
 
 - Research access date: 2026-09-03.
 - Current output: evidence-backed discovery priorities, not a final product selection.
-- Evidence ledger: 41 validated records from 32 independent source groups.
-- Direct India relevance: 29 records.
-- Official or peer-reviewed evidence: 32 records.
+- Evidence ledger: 43 validated records from 34 independent source groups.
+- Direct India relevance: 31 records.
+- Official or peer-reviewed evidence: 34 records.
 - Public repository: the empty `main` base and PR branch exist; `chatroom_notes.md` remains ignored and all project changes require PR review.
 - Owner decision: Candidate B—tumour-board human-decision documentation and operational follow-through—was selected on 2026-09-03 as the next discovery lane, not as product lock.
 - P5 public validation narrowed Candidate B to the handoff from an existing clinician-authored decision to authorised treating-unit acknowledgement and operational disposition. The actual local owner and baseline remain unverified.
@@ -258,34 +258,35 @@ Consequence: measure the actual task. Do not assume that summarisation attacks t
 
 **Integration:** one appointment/follow-up export and approved communication channel.
 
-## Proposed problem contract for owner review
+## Current P5 problem contract
 
-This contract is a proposal, not yet validated or approved:
+This contract remains provisional:
 
-> When a multidisciplinary oncology board completes a case discussion, the board secretariat or presenting care team needs to preserve the human-authored decision, communicate it to authorised participants, assign non-clinical follow-through, and see whether it was completed. In the 2026 NCRP hospital survey, 48.2% of reported boards lacked a follow-up system and only 16.8% communicated recommendations through EMR notes, while physical documentation dominated. Existing NCG VTB and MDT infrastructure provide the board and case model but public evidence does not show a consistently owned electronic follow-through path. A safe first concept would record—not generate—the human decision, named owner, authorised communication, operational status, and audit history. It would not interpret records, recommend treatment, or score urgency. The primary pilot measure would be the percentage of discussed cases with a signed human decision, assigned owner, and recorded operational disposition within an agreed period.
+> When an oncology tumour board completes and clinicians author the final decision, the local tumour-board operational owner needs to place or reference that decision in the authorised treating workflow and keep its operational disposition visible. A 2026 Indian hospital survey reports heterogeneous physical and electronic documentation and that 48.2% of reported boards lacked a follow-up system. NCG, iECHO, and draft NABH standards already cover substantial board selection, scheduling, review, attendance, decision, and follow-up documentation. One 2020–2021 Eastern India audit identifies a concrete local pattern—weekly Excel case lists, post-meeting decision entry, and a patient care coordinator collecting later treatment and follow-up data—but does not report treating-unit acknowledgement or staff time. The remaining hypothesis is narrower: a material gap in acknowledgement, non-clinical ownership, status, or escalation between the existing human decision and later review.
 
 ### Unresolved before product lock
 
-- exact owning role;
-- whether the surveyed gap persists in the intended pilot site;
-- current NCG/local decision-record and follow-up system;
-- which follow-through states are operational rather than clinical;
-- baseline number of eligible board cases;
-- institutional authorisation, consent, retention, and disclosure rules;
-- whether a narrow export/import avoids duplicate documentation;
-- whether the workflow is more valuable than outside-record consultation preparation.
+- exact owning role in one current target setting;
+- whether the initial broken step is decision entry, treating-unit acknowledgement, operational assignment, status, or later data collection;
+- current NCG/local decision record, spreadsheet, EMR, or other system;
+- local meaning of “follow-up system”;
+- aggregate denominator, completion baseline, and staff person-time;
+- institutional authorisation, access, retention, and escalation rules;
+- whether a narrow reference/export removes rather than duplicates documentation;
+- whether current NABH-aligned or local systems already solve the step;
+- whether Candidate A is more valuable after total verification time is measured.
 
 ## Minimum next evidence
 
-Direct oncologist interviews remain difficult. Before product build, use the cheapest non-sensitive evidence available:
+Direct oncologist interviews remain unnecessary for this operational question. Before product build:
 
-1. obtain a blank current NCG or local tumour-board submission/decision template;
-2. document the public NCG VTB submission and post-meeting path without patient data;
-3. identify one board coordinator, administrator, registry principal investigator, or care-team operator rather than requiring an oncologist;
-4. request only a process walkthrough and aggregate counts—never patient records;
-5. determine who records the decision, where it is stored, who receives it, and what “follow-up system” means locally;
-6. establish one aggregate baseline: eligible cases, signed decisions, assigned owners, or recorded disposition;
-7. if this route fails, run a synthetic workflow comparison for Candidate A and keep the result labelled experimental rather than local validation.
+1. use `research/P5_OPERATOR_VALIDATION_KIT.md` with one coordinator, secretariat member, patient care coordinator, nodal operator, registry investigator, administrator, records officer, or quality officer;
+2. obtain only a completely blank local decision/minutes/follow-up field list or template when institutionally approved;
+3. capture one process map beginning at the final clinician-authored decision;
+4. determine who records, distributes, acknowledges, assigns, and closes each operational state;
+5. collect aggregate counts and estimated staff person-time with explicit denominators;
+6. test whether the existing EMR, spreadsheet, or coordinator process is already adequate;
+7. if no actor or material gap is established, return to Candidate A rather than building from missing public documentation.
 
 ## Owner decision
 
@@ -317,6 +318,8 @@ Public-workflow validation: `research/P5_TUMOUR_BOARD_VALIDATION.md`.
 - `research/CONTRADICTIONS.md`
 - `research/OPPORTUNITY_MATRIX.md`
 - `research/P5_TUMOUR_BOARD_VALIDATION.md`
+- `research/P5_OPERATOR_VALIDATION_KIT.md`
+- `.harness/reports/20260903T110322Z-P5-public-workflow-validation.md`
 - `.harness/reports/20260903T102128Z-P4-owner-decision.md`
 - `.harness/reports/20260903T094928Z-P1-research-protocol.md`
 - `.harness/reports/20260903T100755Z-P2-first-evidence-slice.md`

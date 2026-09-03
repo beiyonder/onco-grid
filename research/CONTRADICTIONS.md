@@ -92,6 +92,7 @@ Reject patient-specific Act. Do not disguise it as “information assistance.”
 - Indian NCRP survey shows physical documentation, weak follow-up, and little regular cross-hospital discussion (`EV-0019`).
 - NCG defines a detailed MDT case packet (`EV-0014`).
 - Public NCG/iECHO artifacts leave the intermediate post-meeting acknowledgement, operational ownership, and completion path undocumented (`EV-0036`–`EV-0040`); this is a research gap, not proof of absence.
+- One Eastern India audit names a patient care coordinator and preformed Excel/master-chart workflow after weekly board discussions, while reporting substantial missing or unknown follow-up data (`EV-0043`).
 
 ### Contradictions
 
@@ -105,6 +106,9 @@ Reject patient-specific Act. Do not disguise it as “information assistance.”
 8. The NCG/KCDO MDT module already contains human final-decision fields and a later review of whether the decision was followed (`EV-0014`).
 9. Public documentation may omit an adequate internal workflow; absence from the public page is not prevalence evidence (`EV-0036`).
 10. Formal coordinator responsibility elsewhere suggests that staffing and governance—not missing software—may be the actual intervention (`EV-0041`).
+11. A draft NABH oncology HIS/EMR standard already expects broad electronic tumour-board selection, review, attendance, recommendation, and follow-up documentation (`EV-0042`).
+12. One Indian hospital already assigned later data collection to a patient care coordinator using spreadsheets; the remaining problem may be local data governance, staffing, or follow-up access rather than software (`EV-0043`).
+13. The single-centre audit does not measure treating-unit acknowledgement or staff burden, so it cannot validate the selected handoff.
 
 ### Decision
 

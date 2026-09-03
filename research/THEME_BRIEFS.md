@@ -8,7 +8,7 @@
 | Contextualise | Mixed | Weak | High standards/modelling coverage | High ambiguity | Use only as record organisation |
 | Synthesise | Strong | Strong for registry abstraction; missing for consultation preparation | High for generic EMR/summary | Fits only with literal provenance and human review | Serious fallback; exact job remains unvalidated |
 | Act | Clinician-derived need plus existing India requirements | No safe product measure | Very high | Mostly prohibited | Reject patient-specific Act lane |
-| Connect | Strong for Indian board documentation/follow-up variation | Weak locally; no post-board actor or person-time baseline | High; NCG MDT/VTB and iECHO already cover substantial workflow | Fits only for human-decision handoff operations | Owner selected post-board acknowledgement and operational disposition for P5 validation |
+| Connect | Strong for Indian board documentation/follow-up variation; one single-centre coordinator/Excel workflow | Weak locally; no current target-site acknowledgement or person-time baseline | High; NCG MDT/VTB, iECHO, draft NABH requirements, and local spreadsheets already cover substantial workflow | Fits only for human-decision handoff operations | Owner selected post-board acknowledgement and operational disposition for P5 validation |
 | Outside: continuity | Strong | Strong barrier measures; limited staff-workflow measures | Medium | Operational coordination can fit | Serious candidate if narrowed beyond reminders |
 | Outside: documentation/re-entry | Moderate India; strong transfer evidence | Strong internationally | High EMR/ambient-tool activity | Operational if workflow-specific | Cross-cutting burden, not yet a bounded job |
 | Outside: navigation/referral | Strong patient/caregiver evidence | Mostly qualitative | Medium | Care-team coordination can fit | Serious problem; Doctor/Care Team wedge still unclear |
@@ -138,11 +138,13 @@ The supplied notes contain explicit requests for dose changes, toxicity grading,
 - A small Spanish vendor-funded pilot demonstrates how to measure task and role time; it found lower preparation time for several roles but unchanged pathology/radiology review and unchanged task count (`EV-0021`).
 - Public P5 review shows the NCG presentation template and iECHO already cover substantial pre-board structure, presenter assignment, content review, correction, notification, and sharing (`EV-0036`–`EV-0040`).
 - The NCG/KCDO MDT model already includes a human final decision and later review of whether it was followed (`EV-0014`).
+- A draft NABH oncology HIS/EMR annexure already expects electronic board selection, IDs, scheduling, review, attendance, recommendations, and follow-up documentation (`EV-0042`).
+- One Eastern India audit used preformed Excel lists, entered the board decision after weekly meetings, and assigned later treatment/follow-up data collection and patient tracing to a patient care coordinator (`EV-0043`).
 
 ### What is not supported
 
 - No retained Indian study measures person-minutes spent preparing a board case or handing off the final decision.
-- Public evidence identifies pre-board programme roles, but not who owns acknowledgement and operational disposition after the meeting.
+- Public evidence now names a patient care coordinator for later data collection in one historical site, but not the current target-site owner of decision entry, treating-unit acknowledgement, or operational disposition.
 - No public source proves that the intermediate handoff is absent locally; NCG/local systems may already solve it.
 - No evidence supports building a new general expert network, pre-board upload workflow, or clinical recommendation system.
 
@@ -153,6 +155,8 @@ The supplied notes contain explicit requests for dose changes, toxicity grading,
 - NCG/KCDO MDT module;
 - email/template/video workflows;
 - navify and other commercial tumour-board products.
+- draft NABH oncology HIS/EMR requirements;
+- preformed Excel/master-chart workflows plus patient care coordinators.
 
 ### Narrow opportunity
 
@@ -160,13 +164,13 @@ The owner-selected P5 job is:
 
 > Reference the existing clinician-authored decision, make it available to the authorised treating unit, record acknowledgement, and track explicitly human-assigned non-clinical operational disposition.
 
-The local tumour-board operational owner is the primary-user hypothesis. A designated secretariat exists in only 52.5% of surveyed boards, so the actual role may instead be a nodal operations person, programme team, or treating unit.
+The local tumour-board operational owner is the primary-user hypothesis. Survey evidence shows designated secretariats in 52.5% of reported boards, while one historical single-centre audit assigns later data collection to a patient care coordinator. The current target role may instead be a secretariat, nodal operations person, programme team, registry/quality operator, patient care coordinator, or treating unit.
 
 The product must not create the clinical decision, determine whether treatment was correctly followed, or duplicate the existing NCG/iECHO pre-board workflow.
 
 ### Judgment
 
-**Continue P5 validation; do not lock the product.** Public evidence narrows the gap but cannot establish the local actor, current system, baseline, or whether the problem is software rather than staffing/governance.
+**Continue P5 validation; do not lock the product.** Public evidence narrows the gap and supports a coordinator role in one site, but cannot establish the current target actor, acknowledgement path, person-time baseline, or whether the remaining problem is software rather than staffing, governance, or follow-up access.
 
 ## Outside theme — follow-up and continuity
 

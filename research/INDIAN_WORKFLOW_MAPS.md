@@ -179,6 +179,23 @@ Public P5 validation adds that NCG already publishes a six-slide presentation te
 
 The current NCG page describes email and Zoom, while an NCG 2022 account says VTB moved to iECHO. Treat the exact current platform configuration as unverified.
 
+The draft NABH oncology HIS/EMR annexure independently expects patient selection, tumour-board IDs, scheduling, clinician notifications, a central case list, integrated evidence review, attendance, and standardised documentation of multidisciplinary inputs, recommendations, and follow-ups (`EV-0042`). It is a draft requirement, not evidence that a hospital has implemented the workflow.
+
+### Single-centre audited workflow
+
+One Eastern India hospital audit provides a concrete but non-generalisable workflow (`EV-0043`):
+
+```text
+Case details entered into preformed Excel list
+  → weekly tumour-board discussion
+  → board management decision entered after meeting
+  → patient care coordinator collects treatment and follow-up data
+  → coordinator traces patients and updates master chart
+  → missing, unknown, and lost-follow-up data remain
+```
+
+The audit recorded 800 discussions in 12 months, including 227 repeat discussions. It identifies a patient care coordinator as a post-board data-collection role, but does not identify who entered the decision, whether the treating unit acknowledged it, or the person-time burden.
+
 ### Observed Indian gaps
 
 The 2026 NCRP hospital survey (`EV-0019`) found among 137 reported boards:

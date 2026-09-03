@@ -64,6 +64,26 @@ Implication:
 
 “Connect oncologists,” generic board scheduling, presentation templates, and pre-board file review are already served. Validate only a post-board handoff from an existing clinician-authored decision to authorised treating-unit acknowledgement and operational disposition. Public omission is not proof of a local gap.
 
+### NABH draft oncology HIS/EMR annexure
+
+Evidence: `EV-0042`; [public draft annexure](https://portal.nabh.co/Announcement/Draft%20Cancer%20Care%20and%20Management%20Annexure.pdf).
+
+The draft already expects electronic patient selection, board IDs, scheduling, clinician notifications, a central case list, integrated record review, attendance, and standardised documentation of multidisciplinary inputs, recommendations, and follow-ups.
+
+Implication:
+
+An electronic tumour-board module is an emerging certification requirement, not a novel category. The only plausible gap is an implementation-level handoff not already covered by the local HIS/EMR. The document is a draft and does not prove adoption.
+
+### Single-centre spreadsheet and coordinator workflow
+
+Evidence: `EV-0043`; [Eastern India audit](https://doi.org/10.31557/apjcc.2024.9.1.97-102).
+
+One hospital used preformed Excel case lists, entered the board decision after weekly meetings, and used a patient care coordinator to collect later treatment and follow-up data and complete a master chart.
+
+Implication:
+
+Spreadsheet plus staffing is a real existing alternative. A product must demonstrate reduced missing data, duplicate entry, or staff burden rather than assume the absence of ownership. The audit does not measure acknowledgement or person-time and cannot be generalised beyond the site.
+
 ### ABDM and NRCeS FHIR guide
 
 Evidence: `EV-0010`; [FHIR Implementation Guide for ABDM v7 draft](https://www.nrces.in/preview/ndhm/fhir/r4/index.html).
@@ -200,15 +220,15 @@ Why still open:
 
 KCDO reports referral-history upload/access gaps, and Onco-Insight still needs manual outside-care review. ABDM and NCG interoperability are moving toward the same problem, so the candidate must prove a specific pre-consultation step and light adapter.
 
-### 2. Tumour-board case readiness and follow-through
+### 2. Post-board decision handoff and operational disposition
 
 Possible gap:
 
-A coordinator or presenting team needs a complete, permissioned packet, explicit missing items, documented human decision, and owned follow-through.
+A local tumour-board operational owner needs to make or reference the existing clinician-authored decision in the authorised treating workflow, record acknowledgement, and keep explicitly assigned non-clinical ownership and status visible.
 
 Why still open:
 
-Indian boards often use physical records and nearly half report no follow-up system. But NCG already has an MDT module and VTB; the candidate should complement them rather than become another board.
+Indian boards use heterogeneous documentation and nearly half report no follow-up system. One direct Indian site used Excel and a patient care coordinator, while NCG/KCDO and draft NABH standards already define broad board and follow-up documentation. The exact target-site owner, meaning of follow-up, acknowledgement path, burden, and incremental value remain unknown.
 
 ### 3. Barrier-aware follow-up operations
 
