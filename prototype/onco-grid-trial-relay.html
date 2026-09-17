@@ -1,0 +1,1905 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Trial Relay — OncoGrid prototype</title>
+  <style>
+    :root {
+      --canvas: #edf1ef;
+      --paper: #fbfcfb;
+      --paper-2: #f4f7f5;
+      --ink: #182630;
+      --ink-2: #33434c;
+      --muted: #68777e;
+      --faint: #8f9ba0;
+      --rule: #d3dcd8;
+      --rule-dark: #b9c6c0;
+      --navy: #173d5b;
+      --navy-2: #245d86;
+      --blue-soft: #e4eff7;
+      --green: #176b50;
+      --green-soft: #e2f1ea;
+      --amber: #9b5b13;
+      --amber-soft: #fff1d9;
+      --red: #a33d47;
+      --red-soft: #fae8e9;
+      --plum: #685277;
+      --plum-soft: #eee9f2;
+      --shadow: 0 12px 32px rgba(34, 53, 45, .08);
+      --shadow-high: 0 22px 70px rgba(24, 38, 48, .20);
+      --sidebar: 236px;
+      --topbar: 68px;
+      --radius: 12px;
+      --font-ui: "Avenir Next", Avenir, "Segoe UI", Helvetica, Arial, sans-serif;
+      --font-reading: Charter, "Iowan Old Style", Georgia, serif;
+      --font-data: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      background: var(--canvas);
+      color: var(--ink);
+      font-family: var(--font-ui);
+      font-size: 15px;
+      line-height: 1.48;
+    }
+    button, input, select, textarea { font: inherit; }
+    button, select { cursor: pointer; }
+    a { color: var(--navy-2); text-underline-offset: 2px; }
+    svg.icon { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
+    :focus-visible { outline: 3px solid #e5a943; outline-offset: 2px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+    .app-shell { min-height: 100vh; }
+    .sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 40;
+      display: flex;
+      width: var(--sidebar);
+      flex-direction: column;
+      border-right: 1px solid #264c66;
+      background: var(--navy);
+      color: #e8f0f4;
+    }
+    .brand {
+      display: flex;
+      min-height: var(--topbar);
+      align-items: center;
+      gap: 10px;
+      padding: 0 20px;
+      border-bottom: 1px solid rgba(255,255,255,.13);
+    }
+    .brand-mark {
+      position: relative;
+      width: 31px;
+      height: 31px;
+      border: 1px solid rgba(255,255,255,.56);
+      border-radius: 8px;
+      background: rgba(255,255,255,.08);
+    }
+    .brand-mark::before, .brand-mark::after {
+      content: "";
+      position: absolute;
+      background: #9cd7c1;
+    }
+    .brand-mark::before { width: 15px; height: 2px; left: 7px; top: 9px; box-shadow: 0 10px 0 #9cd7c1; }
+    .brand-mark::after { width: 2px; height: 15px; left: 14px; top: 7px; }
+    .brand-name { font-weight: 780; letter-spacing: -.02em; }
+    .brand-name small { display: block; margin-top: -1px; color: #9fb5c2; font-size: 10px; font-weight: 650; letter-spacing: .04em; }
+    .side-section-label { padding: 20px 20px 7px; color: #8da8b8; font-size: 10px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
+    .side-nav { display: grid; gap: 3px; padding: 0 10px; }
+    .nav-button {
+      position: relative;
+      display: flex;
+      width: 100%;
+      align-items: center;
+      gap: 11px;
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 11px;
+      background: transparent;
+      color: #bed0da;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 690;
+    }
+    .nav-button:hover { background: rgba(255,255,255,.075); color: #fff; }
+    .nav-button.active { background: #f5f8f6; color: var(--navy); }
+    .nav-count {
+      margin-left: auto;
+      min-width: 22px;
+      border-radius: 999px;
+      padding: 1px 6px;
+      background: rgba(255,255,255,.13);
+      color: inherit;
+      font-family: var(--font-data);
+      font-size: 10px;
+      text-align: center;
+    }
+    .nav-button.active .nav-count { background: var(--amber-soft); color: var(--amber); }
+    .sidebar-foot {
+      margin-top: auto;
+      padding: 12px 14px 16px;
+    }
+    .demo-note {
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 9px;
+      padding: 10px 11px;
+      background: rgba(255,255,255,.05);
+      color: #b9ccd6;
+      font-size: 11px;
+      line-height: 1.45;
+    }
+    .demo-note strong { display: block; margin-bottom: 3px; color: #fff; }
+
+    .workspace { min-height: 100vh; margin-left: var(--sidebar); }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      display: flex;
+      min-height: var(--topbar);
+      align-items: center;
+      gap: 18px;
+      border-bottom: 1px solid var(--rule);
+      background: rgba(251,252,251,.96);
+      padding: 0 24px;
+      backdrop-filter: blur(16px);
+    }
+    .mobile-brand { display: none; font-weight: 800; }
+    .crumb { min-width: 0; }
+    .crumb strong { display: block; font-size: 13px; }
+    .crumb span { display: block; color: var(--muted); font-size: 11px; }
+    .command-trigger {
+      display: flex;
+      width: min(410px, 36vw);
+      align-items: center;
+      gap: 9px;
+      margin-left: auto;
+      border: 1px solid var(--rule);
+      border-radius: 9px;
+      padding: 8px 10px;
+      background: var(--paper-2);
+      color: var(--muted);
+      text-align: left;
+      font-size: 12px;
+    }
+    .command-trigger kbd { margin-left: auto; border: 1px solid var(--rule); border-bottom-color: var(--rule-dark); border-radius: 5px; padding: 1px 5px; background: var(--paper); color: var(--muted); font-family: var(--font-data); font-size: 9px; }
+    .icon-button {
+      display: inline-flex;
+      width: 36px;
+      height: 36px;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      background: var(--paper);
+      color: var(--ink-2);
+    }
+    .icon-button:hover { border-color: var(--rule-dark); background: var(--paper-2); }
+    .avatar {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      border: 0;
+      background: transparent;
+      color: var(--ink);
+      text-align: left;
+    }
+    .avatar-circle {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--navy);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .avatar span:last-child { font-size: 11px; line-height: 1.2; }
+    .avatar small { display: block; color: var(--muted); }
+    .role-select { max-width: 148px; border: 0; padding: 0 16px 0 0; background: transparent; color: var(--ink); font-size: 10px; font-weight: 760; }
+    .role-switch { cursor: default; }
+    .role-switch > span:last-child { display: grid; }
+
+    .source-alert {
+      display: none;
+      align-items: center;
+      gap: 9px;
+      border-bottom: 1px solid #efd3a8;
+      padding: 9px 24px;
+      background: var(--amber-soft);
+      color: #70420f;
+      font-size: 12px;
+    }
+    .source-alert.visible { display: flex; }
+
+    .view { display: none; padding: 26px; }
+    .view.active { display: block; }
+    .view-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 18px;
+    }
+    .view-heading { min-width: 0; }
+    .view-heading h1 {
+      margin: 0;
+      color: var(--ink);
+      font-family: var(--font-reading);
+      font-size: clamp(27px, 3vw, 38px);
+      font-weight: 650;
+      line-height: 1.08;
+      letter-spacing: -.035em;
+    }
+    .view-heading p { max-width: 730px; margin: 7px 0 0; color: var(--muted); font-size: 13px; }
+    .header-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .priority-badge, .tag, .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border-radius: 999px;
+      white-space: nowrap;
+      font-weight: 760;
+    }
+    .priority-badge { border: 1px solid var(--rule); padding: 4px 8px; background: var(--paper); color: var(--muted); font-size: 10px; }
+    .priority-badge.p0 { border-color: #a8cabc; background: var(--green-soft); color: var(--green); }
+    .priority-badge.p1 { border-color: #b9cee0; background: var(--blue-soft); color: var(--navy-2); }
+    .priority-badge.p2 { border-color: #d1c5d8; background: var(--plum-soft); color: var(--plum); }
+    .tag { padding: 3px 7px; background: var(--paper-2); color: var(--muted); font-size: 10px; }
+    .status-pill { padding: 4px 8px; font-size: 10px; }
+    .status-pill.good { background: var(--green-soft); color: var(--green); }
+    .status-pill.warn { background: var(--amber-soft); color: var(--amber); }
+    .status-pill.bad { background: var(--red-soft); color: var(--red); }
+    .status-pill.neutral { background: #e8ecea; color: #55636a; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+    .button {
+      display: inline-flex;
+      min-height: 36px;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid var(--rule-dark);
+      border-radius: 8px;
+      padding: 7px 12px;
+      background: var(--paper);
+      color: var(--ink-2);
+      font-size: 12px;
+      font-weight: 750;
+      text-decoration: none;
+    }
+    .button:hover { border-color: #97aaa1; background: var(--paper-2); }
+    .button.primary { border-color: var(--navy); background: var(--navy); color: #fff; }
+    .button.primary:hover { background: #0e314c; }
+    .button.success { border-color: var(--green); background: var(--green); color: #fff; }
+    .button.danger { border-color: #dfb8bc; background: var(--red-soft); color: var(--red); }
+    .button.ghost { border-color: transparent; background: transparent; color: var(--navy-2); }
+    .button:disabled { cursor: not-allowed; border-color: var(--rule); background: #edf0ee; color: #9ba6a1; }
+    .button.small { min-height: 30px; padding: 5px 9px; font-size: 11px; }
+
+    .safety-strip {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 14px;
+      border: 1px solid #b9d7ca;
+      border-radius: 9px;
+      padding: 9px 12px;
+      background: var(--green-soft);
+      color: #285c49;
+      font-size: 11px;
+    }
+    .safety-strip strong { color: var(--green); }
+    .safety-strip .spacer { flex: 1; }
+
+    .filter-bar {
+      display: grid;
+      grid-template-columns: minmax(220px, 1.7fr) repeat(3, minmax(135px, .7fr)) auto;
+      gap: 8px;
+      margin-bottom: 12px;
+      border: 1px solid var(--rule);
+      border-radius: 11px;
+      padding: 10px;
+      background: var(--paper);
+      box-shadow: 0 3px 12px rgba(34,53,45,.04);
+    }
+    .input-shell { position: relative; min-width: 0; }
+    .input-shell > .icon { position: absolute; left: 10px; top: 50%; width: 17px; height: 17px; color: var(--muted); transform: translateY(-50%); pointer-events: none; }
+    .field, .select {
+      width: 100%;
+      min-height: 38px;
+      border: 1px solid var(--rule);
+      border-radius: 7px;
+      background: var(--paper);
+      color: var(--ink);
+      font-size: 12px;
+    }
+    .field { padding: 8px 10px; }
+    .input-shell .field { padding-left: 35px; }
+    .select { padding: 7px 30px 7px 9px; }
+    textarea.field { min-height: 92px; resize: vertical; }
+    .field::placeholder { color: #97a19d; }
+    .field:hover, .select:hover { border-color: var(--rule-dark); }
+    .field:focus, .select:focus { border-color: var(--navy-2); outline: 2px solid rgba(36,93,134,.12); }
+
+    .result-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 2px 10px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .result-meta strong { color: var(--ink-2); }
+    .result-meta .spacer { flex: 1; }
+    .sort-select { border: 0; background: transparent; color: var(--ink-2); font-size: 11px; font-weight: 700; }
+
+    .explorer-grid { display: grid; grid-template-columns: minmax(340px, 430px) minmax(0, 1fr); gap: 13px; align-items: start; }
+    .result-list { display: grid; gap: 8px; min-width: 0; }
+    .trial-card {
+      position: relative;
+      width: 100%;
+      border: 1px solid var(--rule);
+      border-radius: 10px;
+      padding: 14px;
+      background: var(--paper);
+      color: var(--ink);
+      text-align: left;
+      box-shadow: 0 2px 8px rgba(34,53,45,.035);
+    }
+    .trial-card:hover { border-color: #9fb2aa; box-shadow: 0 6px 18px rgba(34,53,45,.07); }
+    .trial-card.selected { border-color: var(--navy-2); box-shadow: inset 3px 0 0 var(--navy-2), 0 6px 18px rgba(34,53,45,.07); }
+    .trial-card-top { display: flex; align-items: center; gap: 7px; margin-bottom: 9px; }
+    .trial-card-top .updated { margin-left: auto; color: var(--muted); font-size: 10px; }
+    .trial-card h2 { margin: 0 0 8px; font-family: var(--font-reading); font-size: 17px; font-weight: 650; line-height: 1.27; letter-spacing: -.015em; }
+    .trial-meta { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
+    .dual-status-mini { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .mini-state { border-left: 3px solid var(--rule-dark); padding: 5px 7px; background: var(--paper-2); }
+    .mini-state.registry { border-left-color: var(--navy-2); }
+    .mini-state.verified.good { border-left-color: var(--green); }
+    .mini-state.verified.warn { border-left-color: var(--amber); }
+    .mini-state.verified.bad { border-left-color: var(--red); }
+    .mini-state span { display: block; color: var(--muted); font-size: 9px; }
+    .mini-state strong { display: block; margin-top: 1px; font-size: 11px; }
+
+    .detail-panel {
+      position: sticky;
+      top: calc(var(--topbar) + 18px);
+      min-width: 0;
+      border: 1px solid var(--rule);
+      border-radius: 11px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .detail-head { padding: 18px 20px 15px; }
+    .detail-overline { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; margin-bottom: 8px; }
+    .record-id { color: var(--muted); font-family: var(--font-data); font-size: 10px; }
+    .detail-head h2 { max-width: 850px; margin: 0; font-family: var(--font-reading); font-size: clamp(23px, 2.3vw, 31px); font-weight: 650; line-height: 1.16; letter-spacing: -.025em; }
+    .detail-head .summary { max-width: 830px; margin: 8px 0 0; color: var(--muted); font-size: 12px; }
+    .dual-status {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+    }
+    .status-block { position: relative; min-width: 0; padding: 15px 20px 14px 24px; }
+    .status-block + .status-block { border-left: 1px solid var(--rule); }
+    .status-block::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; background: var(--navy-2); }
+    .status-block.verified::before { background: var(--green); }
+    .status-block.verified.warn::before { background: var(--amber); }
+    .status-block.verified.bad::before { background: var(--red); }
+    .status-label { color: var(--muted); font-size: 10px; font-weight: 780; letter-spacing: .035em; text-transform: uppercase; }
+    .status-value { display: flex; align-items: center; gap: 8px; margin-top: 3px; font-size: 15px; font-weight: 800; }
+    .status-block p { margin: 3px 0 0; color: var(--muted); font-size: 10px; }
+    .detail-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 13px 20px; border-bottom: 1px solid var(--rule); background: var(--paper-2); }
+    .tabs { display: flex; gap: 2px; overflow-x: auto; border-bottom: 1px solid var(--rule); padding: 0 14px; background: var(--paper); }
+    .tab-button { flex: 0 0 auto; border: 0; border-bottom: 2px solid transparent; padding: 11px 8px 9px; background: transparent; color: var(--muted); font-size: 11px; font-weight: 750; }
+    .tab-button:hover { color: var(--ink); }
+    .tab-button.active { border-bottom-color: var(--navy-2); color: var(--navy); }
+    .tab-content { min-height: 286px; padding: 18px 20px 22px; }
+    .detail-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 18px; }
+    .fact label { display: block; margin-bottom: 3px; color: var(--muted); font-size: 9px; font-weight: 780; letter-spacing: .05em; text-transform: uppercase; }
+    .fact strong { display: block; overflow-wrap: anywhere; font-size: 12px; }
+    .fact p { margin: 0; color: var(--ink-2); font-size: 12px; }
+    .wide { grid-column: 1 / -1; }
+    .notice { border: 1px solid #efd5a9; border-radius: 8px; padding: 10px 11px; background: var(--amber-soft); color: #6b4519; font-size: 11px; }
+    .timeline { display: grid; gap: 0; }
+    .timeline-item { position: relative; padding: 0 0 16px 26px; }
+    .timeline-item::before { content: ""; position: absolute; left: 7px; top: 5px; width: 7px; height: 7px; border: 2px solid var(--paper); border-radius: 50%; background: var(--navy-2); box-shadow: 0 0 0 1px var(--navy-2); }
+    .timeline-item::after { content: ""; position: absolute; left: 10px; top: 15px; bottom: -3px; width: 1px; background: var(--rule); }
+    .timeline-item:last-child::after { display: none; }
+    .timeline-item strong { display: block; font-size: 11px; }
+    .timeline-item span { color: var(--muted); font-size: 10px; }
+
+    .empty-state {
+      border: 1px dashed var(--rule-dark);
+      border-radius: 10px;
+      padding: 38px 22px;
+      background: var(--paper);
+      color: var(--muted);
+      text-align: center;
+    }
+    .empty-state .empty-symbol { display: grid; width: 44px; height: 44px; place-items: center; margin: 0 auto 12px; border: 1px solid var(--rule); border-radius: 50%; color: var(--navy-2); }
+    .empty-state h2 { margin: 0 0 5px; color: var(--ink); font-family: var(--font-reading); font-size: 20px; }
+    .empty-state p { max-width: 430px; margin: 0 auto 14px; font-size: 12px; }
+    .skeleton { overflow: hidden; border-radius: 8px; background: linear-gradient(90deg,#e9eeeb 25%,#f7f9f8 37%,#e9eeeb 63%); background-size: 400% 100%; animation: shimmer 1.2s ease infinite; }
+    .skeleton.card { height: 142px; border: 0; }
+    @keyframes shimmer { 0%{background-position:100% 0} 100%{background-position:0 0} }
+
+    .panel {
+      border: 1px solid var(--rule);
+      border-radius: 11px;
+      background: var(--paper);
+      box-shadow: 0 3px 12px rgba(34,53,45,.035);
+      overflow: hidden;
+    }
+    .panel-head { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--rule); padding: 13px 15px; }
+    .panel-head h2 { margin: 0; font-size: 13px; }
+    .panel-head p { margin: 0; color: var(--muted); font-size: 10px; }
+    .panel-head .spacer { flex: 1; }
+    .panel-body { padding: 15px; }
+    .ops-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(280px, .6fr); gap: 13px; align-items: start; }
+    .queue-list { display: grid; }
+    .queue-item {
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1.5fr) minmax(125px, .65fr) minmax(120px, .55fr) auto;
+      gap: 11px;
+      align-items: center;
+      border: 0;
+      border-bottom: 1px solid var(--rule);
+      padding: 11px 14px;
+      background: var(--paper);
+      color: var(--ink);
+      text-align: left;
+    }
+    .queue-item:last-child { border-bottom: 0; }
+    .queue-item:hover { background: var(--paper-2); }
+    .queue-item.active { background: var(--blue-soft); }
+    .queue-rank { display: grid; width: 27px; height: 27px; place-items: center; border-radius: 6px; background: var(--paper-2); color: var(--muted); font-family: var(--font-data); font-size: 10px; }
+    .queue-title strong { display: block; font-family: var(--font-reading); font-size: 13px; line-height: 1.25; }
+    .queue-title span, .queue-cell span { display: block; color: var(--muted); font-size: 9px; }
+    .queue-cell strong { display: block; font-size: 11px; }
+    .workbench-title { margin: 0; font-family: var(--font-reading); font-size: 21px; line-height: 1.2; }
+    .workbench-meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 9px 0 15px; }
+    .rule-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .rule-list li { display: flex; gap: 8px; color: var(--ink-2); font-size: 11px; }
+    .rule-list .check { display: grid; width: 17px; height: 17px; flex: 0 0 17px; place-items: center; border-radius: 50%; background: var(--green-soft); color: var(--green); font-size: 10px; }
+
+    .inquiry-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    .inquiry-table th { border-bottom: 1px solid var(--rule); padding: 9px 12px; color: var(--muted); font-size: 9px; letter-spacing: .045em; text-align: left; text-transform: uppercase; }
+    .inquiry-table td { border-bottom: 1px solid var(--rule); padding: 11px 12px; vertical-align: middle; }
+    .inquiry-table tr:last-child td { border-bottom: 0; }
+    .inquiry-table tbody tr:hover { background: var(--paper-2); }
+    .inquiry-trial { max-width: 360px; }
+    .inquiry-trial strong { display: block; font-family: var(--font-reading); font-size: 13px; line-height: 1.25; }
+    .inquiry-trial span { color: var(--muted); font-family: var(--font-data); font-size: 9px; }
+    .stage-control { display: flex; align-items: center; gap: 6px; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; margin-bottom: 13px; }
+    .stat-card { border: 1px solid var(--rule); border-radius: 10px; padding: 13px; background: var(--paper); }
+    .stat-card span { display: block; color: var(--muted); font-size: 10px; }
+    .stat-card strong { display: block; margin: 4px 0 2px; font-family: var(--font-reading); font-size: 27px; font-weight: 650; line-height: 1; }
+    .stat-card small { color: var(--muted); font-size: 9px; }
+
+    .source-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; }
+    .source-card { position: relative; min-height: 206px; border: 1px solid var(--rule); border-radius: 10px; padding: 14px; background: var(--paper); }
+    .source-card h2 { margin: 10px 0 3px; font-family: var(--font-reading); font-size: 19px; }
+    .source-card p { margin: 0 0 12px; color: var(--muted); font-size: 11px; }
+    .source-facts { display: grid; gap: 6px; }
+    .source-fact { display: flex; justify-content: space-between; gap: 10px; border-top: 1px solid var(--rule); padding-top: 6px; color: var(--muted); font-size: 9px; }
+    .source-fact strong { color: var(--ink-2); text-align: right; }
+    .source-card.unavailable { border-color: #e1b7a5; background: #fff8f2; }
+
+    .audit-list { display: grid; }
+    .audit-row { display: grid; grid-template-columns: 130px 115px minmax(0,1fr) 100px; gap: 12px; align-items: start; border-bottom: 1px solid var(--rule); padding: 10px 14px; font-size: 10px; }
+    .audit-row:last-child { border-bottom: 0; }
+    .audit-row time { color: var(--muted); font-family: var(--font-data); }
+    .audit-actor { font-weight: 750; }
+    .audit-event strong { display: block; font-size: 11px; }
+    .audit-event span { color: var(--muted); }
+    .audit-type { text-align: right; }
+
+    .priority-columns { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 11px; align-items: start; }
+    .priority-column { border: 1px solid var(--rule); border-radius: 11px; background: var(--paper); overflow: hidden; }
+    .priority-column header { border-bottom: 1px solid var(--rule); padding: 14px; }
+    .priority-column header h2 { margin: 0; font-family: var(--font-reading); font-size: 22px; }
+    .priority-column header p { margin: 3px 0 0; color: var(--muted); font-size: 10px; }
+    .feature-list { display: grid; }
+    .feature-row { border-bottom: 1px solid var(--rule); padding: 11px 13px; }
+    .feature-row:last-child { border-bottom: 0; }
+    .feature-row strong { display: block; font-size: 11px; }
+    .feature-row p { margin: 3px 0 0; color: var(--muted); font-size: 10px; }
+    .feature-row .evidence { display: inline-block; margin-top: 6px; color: var(--navy-2); font-size: 9px; font-weight: 750; }
+    .excluded-box { margin-top: 13px; border: 1px solid #e4b6ba; border-radius: 10px; padding: 13px 14px; background: var(--red-soft); }
+    .excluded-box h2 { margin: 0 0 4px; color: var(--red); font-size: 13px; }
+    .excluded-box p { margin: 0; color: #6f3e42; font-size: 11px; }
+
+    dialog {
+      width: min(620px, calc(100vw - 30px));
+      max-height: calc(100vh - 40px);
+      border: 0;
+      border-radius: 13px;
+      padding: 0;
+      background: var(--paper);
+      color: var(--ink);
+      box-shadow: var(--shadow-high);
+      overflow: auto;
+    }
+    dialog::backdrop { background: rgba(16, 34, 45, .56); backdrop-filter: blur(2px); }
+    .dialog-head { position: sticky; top: 0; z-index: 2; display: flex; align-items: flex-start; gap: 12px; border-bottom: 1px solid var(--rule); padding: 17px 18px; background: var(--paper); }
+    .dialog-head h2 { margin: 0; font-family: var(--font-reading); font-size: 23px; line-height: 1.15; }
+    .dialog-head p { margin: 3px 0 0; color: var(--muted); font-size: 10px; }
+    .dialog-head .icon-button { margin-left: auto; }
+    .dialog-body { padding: 18px; }
+    .dialog-foot { position: sticky; bottom: 0; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--rule); padding: 12px 18px; background: var(--paper); }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-row { min-width: 0; }
+    .form-row.full { grid-column: 1 / -1; }
+    .form-row label { display: block; margin-bottom: 5px; color: var(--ink-2); font-size: 10px; font-weight: 780; }
+    .field-help { margin: 4px 0 0; color: var(--muted); font-size: 9px; }
+    .checkbox-row { display: flex; align-items: flex-start; gap: 8px; border: 1px solid var(--rule); border-radius: 8px; padding: 9px; background: var(--paper-2); color: var(--ink-2); font-size: 10px; }
+    .checkbox-row input { margin-top: 2px; }
+    .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .compare-card { border: 1px solid var(--rule); border-radius: 9px; padding: 12px; }
+    .compare-card h3 { margin: 0 0 9px; font-size: 12px; }
+    .compare-row { border-top: 1px solid var(--rule); padding: 7px 0; }
+    .compare-row label { display: block; color: var(--muted); font-size: 9px; }
+    .compare-row strong { font-size: 11px; }
+    .toast-region { position: fixed; z-index: 100; right: 20px; bottom: 20px; display: grid; gap: 8px; }
+    .toast { display: flex; max-width: 370px; align-items: flex-start; gap: 9px; border: 1px solid #b7d6c8; border-radius: 9px; padding: 10px 12px; background: #f2fbf6; color: #245b47; box-shadow: var(--shadow-high); font-size: 11px; animation: toast-in .18s ease-out; }
+    @keyframes toast-in { from { transform: translateY(8px); opacity: .2; } }
+
+    .no-script { margin: 20px; border: 1px solid #e1b7a5; border-radius: 10px; padding: 14px; background: #fff8f2; }
+
+    .emr-context-bar {
+      display: flex;
+      min-height: 54px;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid #c9d9d1;
+      padding: 8px 24px;
+      background: #f4faf7;
+      color: var(--ink-2);
+    }
+    .emr-context-icon { display: grid; width: 32px; height: 32px; flex: 0 0 32px; place-items: center; border-radius: 8px; background: var(--green); color: #fff; }
+    .emr-context-copy { min-width: 160px; }
+    .emr-context-copy strong { display: block; font-size: 11px; }
+    .emr-context-copy span { display: block; color: var(--muted); font-size: 9px; }
+    .context-chip { border: 1px solid #c8d9d1; border-radius: 999px; padding: 4px 8px; background: var(--paper); color: var(--ink-2); font-size: 9px; font-weight: 700; white-space: nowrap; }
+    .context-boundary { display: inline-flex; align-items: center; gap: 5px; margin-left: auto; color: var(--green); font-size: 9px; font-weight: 760; white-space: nowrap; }
+    .context-boundary .icon { width: 15px; height: 15px; }
+
+    .case-identity {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 13px;
+      border: 1px solid var(--rule);
+      border-left: 4px solid var(--green);
+      border-radius: 10px;
+      padding: 12px 14px;
+      background: var(--paper);
+    }
+    .patient-monogram { display: grid; width: 42px; height: 42px; flex: 0 0 42px; place-items: center; border-radius: 50%; background: var(--navy); color: #fff; font-size: 11px; font-weight: 800; }
+    .case-identity-copy { min-width: 0; }
+    .case-identity-copy strong { display: block; font-family: var(--font-reading); font-size: 17px; }
+    .case-identity-copy span { color: var(--muted); font-size: 10px; }
+    .case-identity-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
+    .case-grid { display: grid; grid-template-columns: minmax(320px, .82fr) minmax(0, 1.18fr); gap: 13px; align-items: start; }
+    .case-stack { display: grid; gap: 13px; min-width: 0; }
+    .artifact-list { display: grid; }
+    .artifact-row { display: grid; grid-template-columns: 34px minmax(0,1fr) auto; gap: 10px; align-items: center; border-bottom: 1px solid var(--rule); padding: 11px 13px; }
+    .artifact-row:last-child { border-bottom: 0; }
+    .artifact-icon { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 7px; background: var(--blue-soft); color: var(--navy-2); }
+    .artifact-icon .icon { width: 16px; height: 16px; }
+    .artifact-copy strong { display: block; font-size: 11px; }
+    .artifact-copy span { display: block; color: var(--muted); font-size: 9px; }
+    .artifact-action { color: var(--navy-2); font-size: 9px; font-weight: 750; }
+    .human-fact-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .human-fact { border: 1px solid var(--rule); border-radius: 8px; padding: 9px; background: var(--paper-2); }
+    .human-fact label { display: block; color: var(--muted); font-size: 8px; letter-spacing: .04em; text-transform: uppercase; }
+    .human-fact strong { display: block; margin: 2px 0; font-size: 11px; }
+    .human-fact span { color: var(--green); font-size: 8px; font-weight: 720; }
+    .trial-review-head { border-bottom: 1px solid var(--rule); padding: 15px; }
+    .trial-review-head h2 { margin: 5px 0 4px; font-family: var(--font-reading); font-size: 20px; line-height: 1.2; }
+    .trial-review-head p { margin: 0; color: var(--muted); font-size: 10px; }
+    .review-warning { display: flex; gap: 8px; border-bottom: 1px solid #ecd2aa; padding: 9px 13px; background: var(--amber-soft); color: #6e4518; font-size: 9px; }
+    .criteria-list { display: grid; }
+    .criterion-row { display: grid; grid-template-columns: minmax(0,1.35fr) minmax(125px,.65fr) minmax(150px,.65fr); gap: 12px; align-items: center; border-bottom: 1px solid var(--rule); padding: 11px 13px; }
+    .criterion-row:last-child { border-bottom: 0; }
+    .criterion-copy strong { display: block; font-size: 10px; }
+    .criterion-copy span { display: block; margin-top: 2px; color: var(--muted); font-size: 8px; }
+    .criterion-source { color: var(--navy-2); font-size: 9px; font-weight: 700; }
+    .criterion-select { width: 100%; min-height: 31px; border: 1px solid var(--rule); border-radius: 6px; padding: 5px 24px 5px 7px; background: var(--paper); color: var(--ink); font-size: 9px; }
+    .review-footer { display: flex; align-items: center; gap: 9px; border-top: 1px solid var(--rule); padding: 12px 13px; background: var(--paper-2); }
+    .review-footer p { margin: 0; color: var(--muted); font-size: 9px; }
+    .review-footer .button:first-of-type { margin-left: auto; }
+    .packet-manifest { display: grid; gap: 7px; }
+    .packet-item { display: flex; align-items: flex-start; gap: 8px; border: 1px solid var(--rule); border-radius: 8px; padding: 9px; background: var(--paper-2); font-size: 10px; }
+    .packet-item input { margin-top: 2px; }
+    .packet-item strong { display: block; }
+    .packet-item span { display: block; color: var(--muted); font-size: 9px; }
+
+    .board-grid { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(290px,.8fr); gap: 13px; align-items: start; }
+    .session-banner { display: flex; align-items: center; gap: 12px; border: 1px solid var(--rule); border-radius: 10px; padding: 13px; background: var(--paper); }
+    .session-date { display: grid; width: 48px; height: 52px; flex: 0 0 48px; place-items: center; border-radius: 8px; background: var(--navy); color: #fff; line-height: 1; }
+    .session-date strong { display: block; font-family: var(--font-reading); font-size: 22px; }
+    .session-date span { font-size: 8px; }
+    .session-copy strong { display: block; font-family: var(--font-reading); font-size: 16px; }
+    .session-copy span { color: var(--muted); font-size: 9px; }
+    .agenda-card { border: 1px solid var(--rule); border-radius: 10px; background: var(--paper); overflow: hidden; }
+    .agenda-row { display: grid; grid-template-columns: 30px minmax(0,1fr) auto; gap: 10px; align-items: center; border-bottom: 1px solid var(--rule); padding: 11px 13px; }
+    .agenda-row:last-child { border-bottom: 0; }
+    .agenda-row.active { background: var(--green-soft); }
+    .agenda-order { color: var(--muted); font-family: var(--font-data); font-size: 9px; }
+    .agenda-copy strong { display: block; font-size: 11px; }
+    .agenda-copy span { color: var(--muted); font-size: 8px; }
+    .board-lifecycle { display: grid; gap: 0; padding: 5px 0; }
+    .board-stage { position: relative; display: grid; grid-template-columns: 25px minmax(0,1fr); gap: 9px; padding-bottom: 14px; }
+    .board-stage::after { content: ""; position: absolute; left: 11px; top: 22px; bottom: -1px; width: 1px; background: var(--rule); }
+    .board-stage:last-child::after { display: none; }
+    .board-stage-marker { z-index: 1; display: grid; width: 23px; height: 23px; place-items: center; border: 1px solid var(--rule); border-radius: 50%; background: var(--paper); color: var(--muted); font-size: 8px; }
+    .board-stage.done .board-stage-marker { border-color: var(--green); background: var(--green); color: #fff; }
+    .board-stage.current .board-stage-marker { border-color: var(--amber); background: var(--amber-soft); color: var(--amber); }
+    .board-stage strong { display: block; font-size: 10px; }
+    .board-stage span { color: var(--muted); font-size: 8px; }
+    .participant-stack { display: flex; margin: 8px 0; }
+    .participant { display: grid; width: 30px; height: 30px; place-items: center; margin-left: -5px; border: 2px solid var(--paper); border-radius: 50%; background: var(--navy); color: #fff; font-size: 8px; font-weight: 800; }
+    .participant:first-child { margin-left: 0; }
+
+    .integration-grid { display: grid; grid-template-columns: minmax(0,1.1fr) minmax(300px,.9fr); gap: 13px; align-items: start; }
+    .integration-hero { display: flex; align-items: center; gap: 12px; border: 1px solid #b8d3c7; border-radius: 10px; padding: 13px; background: var(--green-soft); }
+    .integration-hero .signal { width: 10px; height: 10px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 4px rgba(23,107,80,.12); }
+    .integration-hero strong { display: block; font-size: 12px; }
+    .integration-hero span { color: var(--muted); font-size: 9px; }
+    .resource-map { display: grid; }
+    .resource-row { display: grid; grid-template-columns: 120px minmax(0,1fr) 90px; gap: 10px; align-items: center; border-bottom: 1px solid var(--rule); padding: 9px 12px; }
+    .resource-row:last-child { border-bottom: 0; }
+    .resource-name { font-family: var(--font-data); font-size: 9px; font-weight: 760; }
+    .resource-use { color: var(--ink-2); font-size: 9px; }
+    .scope-pill { border-radius: 999px; padding: 3px 6px; background: var(--blue-soft); color: var(--navy-2); font-size: 8px; font-weight: 730; text-align: center; }
+    .scope-pill.write { background: var(--plum-soft); color: var(--plum); }
+    .sync-list { display: grid; }
+    .sync-row { display: grid; grid-template-columns: 72px minmax(0,1fr) auto; gap: 9px; border-bottom: 1px solid var(--rule); padding: 9px 11px; font-size: 9px; }
+    .sync-row:last-child { border-bottom: 0; }
+    .sync-row time { color: var(--muted); font-family: var(--font-data); }
+    .sync-row strong { display: block; }
+    .sync-row span { color: var(--muted); }
+
+    .analytics-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 13px; }
+    .bar-chart { display: grid; gap: 10px; }
+    .bar-row { display: grid; grid-template-columns: 120px minmax(0,1fr) 42px; gap: 10px; align-items: center; font-size: 9px; }
+    .bar-track { height: 8px; border-radius: 999px; background: #e5ebe8; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: inherit; background: var(--navy-2); }
+    .bar-fill.green { background: var(--green); }
+    .bar-fill.amber { background: var(--amber); }
+    .funnel { display: grid; gap: 7px; }
+    .funnel-step { display: flex; align-items: center; justify-content: space-between; border-left: 4px solid var(--navy-2); padding: 8px 10px; background: var(--paper-2); font-size: 10px; }
+    .funnel-step:nth-child(2) { margin-inline: 4%; border-left-color: #3b7a9f; }
+    .funnel-step:nth-child(3) { margin-inline: 8%; border-left-color: var(--green); }
+    .funnel-step:nth-child(4) { margin-inline: 12%; border-left-color: var(--amber); }
+    .funnel-step strong { font-family: var(--font-reading); font-size: 18px; }
+
+    @media (max-width: 1120px) {
+      .context-chip:nth-of-type(2) { display: none; }
+      .case-grid, .integration-grid { grid-template-columns: 1fr; }
+      .board-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 720px) {
+      .emr-context-bar { flex-wrap: wrap; padding: 8px 12px; }
+      .emr-context-copy { flex: 1; }
+      .context-boundary { order: 4; margin-left: 0; }
+      .emr-context-bar .button { margin-left: auto; }
+      .case-identity { align-items: flex-start; flex-wrap: wrap; }
+      .case-identity-meta { width: 100%; margin-left: 56px; }
+      .criterion-row { grid-template-columns: 1fr; gap: 6px; }
+      .review-footer { align-items: stretch; flex-direction: column; }
+      .review-footer .button:first-of-type { margin-left: 0; }
+      .analytics-grid { grid-template-columns: 1fr; }
+      .resource-row { grid-template-columns: 100px minmax(0,1fr) 70px; }
+    }
+    @media (max-width: 480px) {
+      .context-chip { display: none; }
+      .context-boundary { width: 100%; }
+      .case-identity-meta { margin-left: 0; }
+      .human-fact-list { grid-template-columns: 1fr; }
+      .artifact-row { grid-template-columns: 32px minmax(0,1fr); }
+      .artifact-action { grid-column: 2; }
+      .resource-row { grid-template-columns: 1fr auto; }
+      .resource-use { grid-column: 1 / -1; }
+      .bar-row { grid-template-columns: 92px minmax(0,1fr) 34px; }
+    }
+
+    @media (max-width: 1120px) {
+      .filter-bar { grid-template-columns: minmax(220px, 1.4fr) repeat(2, minmax(130px,.7fr)); }
+      .filter-bar .state-filter { display: none; }
+      .source-grid { grid-template-columns: 1fr 1fr; }
+      .priority-columns { grid-template-columns: 1fr; }
+      .priority-column { display: grid; grid-template-columns: 220px 1fr; }
+      .priority-column header { border-right: 1px solid var(--rule); border-bottom: 0; }
+      .feature-list { grid-template-columns: 1fr 1fr; }
+      .feature-row:nth-child(odd) { border-right: 1px solid var(--rule); }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 900px) {
+      :root { --sidebar: 0px; }
+      .sidebar { position: sticky; top: 0; z-index: 60; width: 100%; height: auto; flex-direction: row; align-items: center; border-right: 0; border-bottom: 1px solid #264c66; overflow-x: auto; }
+      .brand { min-width: 168px; min-height: 56px; padding: 0 13px; border-bottom: 0; border-right: 1px solid rgba(255,255,255,.13); }
+      .brand-mark { width: 27px; height: 27px; }
+      .brand-mark::before { left: 5px; top: 7px; }
+      .brand-mark::after { left: 12px; top: 5px; }
+      .side-section-label, .sidebar-foot { display: none; }
+      .side-nav { display: flex; gap: 3px; padding: 7px; }
+      .nav-button { width: auto; white-space: nowrap; padding: 8px 10px; }
+      .nav-button.active { background: rgba(255,255,255,.95); }
+      .nav-count { display: none; }
+      .workspace { margin-left: 0; }
+      .topbar { top: 56px; min-height: 58px; padding: 0 16px; }
+      .crumb { display: none; }
+      .mobile-brand { display: block; }
+      .command-trigger { width: min(360px, 47vw); margin-left: auto; }
+      .explorer-grid { grid-template-columns: minmax(300px, .85fr) minmax(0, 1.15fr); }
+      .detail-grid { grid-template-columns: 1fr 1fr; }
+      .detail-panel { top: 128px; }
+      .ops-grid { grid-template-columns: 1fr; }
+      .panel.sticky-workbench { position: static; }
+    }
+    @media (max-width: 720px) {
+      .view { padding: 18px 12px 28px; }
+      .view-header { align-items: stretch; flex-direction: column; gap: 12px; }
+      .header-actions { align-self: flex-start; }
+      .topbar { padding-inline: 12px; }
+      .command-trigger { width: auto; flex: 1; }
+      .command-trigger .command-copy, .command-trigger kbd { display: none; }
+      .avatar span:last-child { display: none; }
+      .source-alert { padding-inline: 12px; }
+      .safety-strip { align-items: flex-start; }
+      .safety-strip .spacer { display: none; }
+      .filter-bar { grid-template-columns: 1fr 1fr; }
+      .filter-bar .input-shell { grid-column: 1 / -1; }
+      .filter-bar .button { width: 100%; }
+      .explorer-grid { grid-template-columns: 1fr; }
+      .detail-panel { position: static; }
+      .result-list { max-height: 470px; overflow: auto; padding-right: 2px; }
+      .detail-grid { grid-template-columns: 1fr 1fr; }
+      .queue-item { grid-template-columns: 28px minmax(0,1fr) auto; }
+      .queue-item .queue-cell { display: none; }
+      .source-grid { grid-template-columns: 1fr; }
+      .audit-row { grid-template-columns: 105px 1fr; }
+      .audit-row .audit-event { grid-column: 1 / -1; }
+      .audit-type { text-align: left; }
+      .priority-column { display: block; }
+      .priority-column header { border-right: 0; border-bottom: 1px solid var(--rule); }
+      .feature-list { grid-template-columns: 1fr; }
+      .feature-row:nth-child(odd) { border-right: 0; }
+      .inquiry-table thead { display: none; }
+      .inquiry-table, .inquiry-table tbody, .inquiry-table tr, .inquiry-table td { display: block; width: 100%; }
+      .inquiry-table tr { border-bottom: 1px solid var(--rule); padding: 11px; }
+      .inquiry-table td { border: 0; padding: 3px 0; }
+      .inquiry-table tr:last-child { border-bottom: 0; }
+      .inquiry-table td::before { content: attr(data-label); display: inline-block; min-width: 85px; color: var(--muted); font-size: 9px; text-transform: uppercase; }
+      .inquiry-table td:first-child::before { display: none; }
+      .stage-control { display: inline-flex; }
+      .form-grid, .compare-grid { grid-template-columns: 1fr; }
+      .form-row.full { grid-column: auto; }
+    }
+    @media (max-width: 480px) {
+      .sidebar { align-items: stretch; }
+      .brand { min-width: 60px; width: 60px; justify-content: center; }
+      .brand-name { display: none; }
+      .nav-button { padding: 8px; }
+      .nav-button span:not(.nav-count) { display: none; }
+      .topbar { top: 56px; }
+      .view-heading h1 { font-size: 29px; }
+      .dual-status, .dual-status-mini { grid-template-columns: 1fr; }
+      .status-block + .status-block { border-left: 0; border-top: 1px solid var(--rule); }
+      .filter-bar { grid-template-columns: 1fr; }
+      .filter-bar .input-shell { grid-column: auto; }
+      .filter-bar .registry-filter { display: none; }
+      .detail-grid, .stats-grid { grid-template-columns: 1fr; }
+      .detail-actions .button { flex: 1 1 calc(50% - 5px); }
+      dialog { width: 100%; max-width: none; max-height: 94vh; margin: auto 0 0; border-radius: 14px 14px 0 0; }
+      .toast-region { inset: auto 10px 10px; }
+      .toast { max-width: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+    @media print {
+      .sidebar, .topbar, .source-alert, .header-actions, .filter-bar, .result-list, .detail-actions, dialog, .toast-region { display: none !important; }
+      .workspace { margin: 0; }
+      .view { display: none !important; padding: 0; }
+      .view.active { display: block !important; }
+      .explorer-grid { display: block; }
+      .detail-panel { position: static; box-shadow: none; border-color: #888; }
+      .detail-head h2 { font-size: 22pt; }
+      body { background: #fff; color: #111; }
+    }
+    @media (max-width: 720px) {
+      .role-switch { position: relative; }
+      .role-switch > span:last-child { position: absolute; inset: 0; display: block; }
+      .role-switch .role-select { width: 36px; height: 36px; max-width: none; opacity: 0; }
+      .role-switch small { display: none; }
+    }
+
+    .guide-intro { display: grid; grid-template-columns: minmax(0,1fr) 290px; gap: 13px; margin-bottom: 13px; }
+    .guide-summary { border: 1px solid var(--rule); border-radius: 11px; padding: 16px; background: var(--paper); }
+    .guide-summary h2 { margin: 0; font-family: var(--font-reading); font-size: 22px; }
+    .guide-summary p { max-width: 720px; margin: 5px 0 0; color: var(--muted); font-size: 11px; }
+    .guide-boundary { border: 1px solid #e7c08a; border-radius: 11px; padding: 14px; background: var(--amber-soft); color: #6b4519; }
+    .guide-boundary strong { display: block; margin-bottom: 4px; font-size: 11px; }
+    .guide-boundary span { display: block; font-size: 9px; }
+    .usage-timeline { display: grid; border: 1px solid var(--rule); border-radius: 11px; background: var(--paper); overflow: hidden; }
+    .usage-step { position: relative; display: grid; grid-template-columns: 58px minmax(0,1fr) minmax(160px,.45fr) 120px; gap: 14px; align-items: center; border-bottom: 1px solid var(--rule); padding: 14px 15px; }
+    .usage-step:last-child { border-bottom: 0; }
+    .usage-step::after { content: ""; position: absolute; left: 43px; top: 46px; bottom: -16px; width: 2px; background: var(--rule); }
+    .usage-step:last-child::after { display: none; }
+    .usage-marker { z-index: 1; display: grid; width: 36px; height: 36px; place-items: center; border: 2px solid var(--paper); border-radius: 50%; background: var(--navy); color: #fff; box-shadow: 0 0 0 1px var(--navy); font-family: var(--font-data); font-size: 10px; font-weight: 800; }
+    .usage-copy strong { display: block; font-family: var(--font-reading); font-size: 15px; }
+    .usage-copy span { display: block; color: var(--muted); font-size: 9px; }
+    .usage-owner { color: var(--ink-2); font-size: 9px; }
+    .usage-owner span { display: block; color: var(--muted); font-size: 8px; }
+    .usage-outcome { border-radius: 7px; padding: 6px 8px; background: var(--paper-2); color: var(--ink-2); font-size: 8px; font-weight: 740; text-align: center; }
+
+    .alert-layout { display: grid; grid-template-columns: minmax(0,1.25fr) minmax(290px,.75fr); gap: 13px; align-items: start; }
+    .alert-list { display: grid; }
+    .alert-item { display: grid; grid-template-columns: 36px minmax(0,1fr) auto; gap: 11px; align-items: start; border-bottom: 1px solid var(--rule); padding: 12px 13px; background: var(--paper); }
+    .alert-item:last-child { border-bottom: 0; }
+    .alert-item.unread { background: #f5faf8; }
+    .alert-symbol { display: grid; width: 32px; height: 32px; place-items: center; border-radius: 8px; background: var(--blue-soft); color: var(--navy-2); }
+    .alert-symbol.warn { background: var(--amber-soft); color: var(--amber); }
+    .alert-symbol.bad { background: var(--red-soft); color: var(--red); }
+    .alert-copy strong { display: block; font-size: 11px; }
+    .alert-copy p { margin: 3px 0; color: var(--ink-2); font-size: 10px; }
+    .alert-copy span { color: var(--muted); font-size: 8px; }
+    .alert-actions { display: grid; justify-items: end; gap: 5px; }
+    .recipient-row { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+    .recipient { border-radius: 999px; padding: 3px 6px; background: var(--paper-2); color: var(--muted); font-size: 8px; font-weight: 700; }
+    .rule-builder { display: grid; gap: 9px; }
+    .alert-rule-card { border: 1px solid var(--rule); border-radius: 8px; padding: 10px; background: var(--paper-2); }
+    .alert-rule-card strong { display: block; font-size: 10px; }
+    .alert-rule-card p { margin: 3px 0 7px; color: var(--muted); font-size: 8px; }
+    .channel-row { display: flex; flex-wrap: wrap; gap: 5px; }
+    .channel { border: 1px solid var(--rule); border-radius: 999px; padding: 3px 6px; background: var(--paper); color: var(--ink-2); font-size: 8px; font-weight: 720; }
+
+    .candidate-layout { display: grid; grid-template-columns: minmax(0,1.3fr) minmax(300px,.7fr); gap: 13px; align-items: start; }
+    .candidate-list { display: grid; }
+    .candidate-row { display: grid; grid-template-columns: 42px minmax(0,1.2fr) minmax(150px,.65fr) minmax(150px,.65fr) auto; gap: 11px; align-items: center; border-bottom: 1px solid var(--rule); padding: 12px 13px; }
+    .candidate-row:last-child { border-bottom: 0; }
+    .candidate-monogram { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 50%; background: var(--navy); color: #fff; font-size: 8px; font-weight: 800; }
+    .candidate-copy strong { display: block; font-family: var(--font-reading); font-size: 13px; }
+    .candidate-copy span, .candidate-cell span { display: block; color: var(--muted); font-size: 8px; }
+    .candidate-cell strong { display: block; font-size: 10px; }
+    .boundary-choice { display: grid; gap: 8px; }
+    .boundary-option { border: 1px solid var(--rule); border-radius: 8px; padding: 10px; background: var(--paper-2); }
+    .boundary-option.allowed { border-left: 4px solid var(--green); }
+    .boundary-option.blocked { border-left: 4px solid var(--red); background: var(--red-soft); }
+    .boundary-option strong { display: block; font-size: 10px; }
+    .boundary-option p { margin: 3px 0 0; color: var(--muted); font-size: 8px; }
+    .boundary-option.blocked p { color: #71464a; }
+
+    @media (max-width: 1120px) {
+      .guide-intro, .alert-layout, .candidate-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 720px) {
+      .usage-step { grid-template-columns: 45px minmax(0,1fr); }
+      .usage-step::after { left: 32px; }
+      .usage-owner, .usage-outcome { grid-column: 2; }
+      .usage-outcome { text-align: left; }
+      .candidate-row { grid-template-columns: 38px minmax(0,1fr) auto; }
+      .candidate-cell { display: none; }
+    }
+    @media (max-width: 480px) {
+      .alert-item { grid-template-columns: 34px minmax(0,1fr); }
+      .alert-actions { grid-column: 2; justify-items: start; }
+    }
+  </style>
+</head>
+<body>
+  <svg class="sr-only" aria-hidden="true">
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15 9-2 5-5 2 2-5 5-2Z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4 20-7Z"/><path d="M22 2 11 13"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></symbol>
+    <symbol id="i-activity" viewBox="0 0 24 24"><path d="M3 12h4l2-7 4 14 2-7h6"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5M3 17l9 5 9-5"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.2 1.2"/><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.2-1.2"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 5h16M7 12h10M10 19h4"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M6 2h9l4 4v16H6z"/><path d="M14 2v5h5M9 12h7M9 16h7"/></symbol>
+    <symbol id="i-warning" viewBox="0 0 24 24"><path d="M12 3 2 21h20L12 3Z"/><path d="M12 9v5M12 18h.01"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+    <symbol id="i-board" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h3M8 17h6"/></symbol>
+    <symbol id="i-plug" viewBox="0 0 24 24"><path d="m12 22 1-5-4-2 6-4-4-2 1-7M5 11l4 4M15 11l4 4"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+    <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V4h8v3M3 12h18M10 12v2h4v-2"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V3M7 8l5-5 5 5M4 21h16"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></symbol>
+  </svg>
+
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Primary navigation">
+      <div class="brand" aria-label="Trial Relay home">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <div class="brand-name">Trial Relay<small>OncoGrid prototype</small></div>
+      </div>
+      <div class="side-section-label">Workspace</div>
+      <nav class="side-nav">
+        <button class="nav-button" type="button" data-target="guide" aria-label="How to use"><svg class="icon"><use href="#i-list"/></svg><span>How to use</span></button>
+        <button class="nav-button active" type="button" data-target="explore" aria-label="Explore trials"><svg class="icon"><use href="#i-compass"/></svg><span>Explore trials</span></button>
+        <button class="nav-button" type="button" data-target="case" aria-label="Case review"><svg class="icon"><use href="#i-user"/></svg><span>Case review</span><span class="nav-count">1</span></button>
+        <button class="nav-button" type="button" data-target="candidates" aria-label="Candidate review"><svg class="icon"><use href="#i-briefcase"/></svg><span>Candidate review</span><span class="nav-count">4</span></button>
+        <button class="nav-button" type="button" data-target="verification" aria-label="Verification queue"><svg class="icon"><use href="#i-check"/></svg><span>Verification queue</span><span class="nav-count" id="verify-count">3</span></button>
+        <button class="nav-button" type="button" data-target="inquiries" aria-label="Referrals and inquiries"><svg class="icon"><use href="#i-send"/></svg><span>Referrals & inquiries</span><span class="nav-count" id="inquiry-count">2</span></button>
+        <button class="nav-button" type="button" data-target="alerts" aria-label="Alerts"><svg class="icon"><use href="#i-bell"/></svg><span>Alerts</span><span class="nav-count" id="alert-count">4</span></button>
+        <button class="nav-button" type="button" data-target="board" aria-label="Tumour board"><svg class="icon"><use href="#i-board"/></svg><span>Tumour board</span><span class="nav-count">1</span></button>
+        <button class="nav-button" type="button" data-target="activity" aria-label="Audit activity"><svg class="icon"><use href="#i-activity"/></svg><span>Audit activity</span></button>
+        <button class="nav-button" type="button" data-target="integrations" aria-label="EMR integration"><svg class="icon"><use href="#i-plug"/></svg><span>EMR integration</span></button>
+        <button class="nav-button" type="button" data-target="analytics" aria-label="Operations analytics"><svg class="icon"><use href="#i-chart"/></svg><span>Operations analytics</span></button>
+        <button class="nav-button" type="button" data-target="sources" aria-label="Registry sources"><svg class="icon"><use href="#i-database"/></svg><span>Registry sources</span></button>
+        <button class="nav-button" type="button" data-target="priorities" aria-label="Feature priorities"><svg class="icon"><use href="#i-layers"/></svg><span>Feature priorities</span></button>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="demo-note"><strong>Synthetic workspace</strong>No real patient, site, investigator, or trial record is used. State resets on reload.</div>
+      </div>
+    </aside>
+
+    <div class="workspace">
+      <header class="topbar">
+        <div class="mobile-brand">Trial Relay</div>
+        <div class="crumb"><strong id="crumb-title">Explore trials</strong><span>India oncology research operations</span></div>
+        <button class="command-trigger" id="command-trigger" type="button" aria-label="Focus trial search">
+          <svg class="icon"><use href="#i-search"/></svg><span class="command-copy">Search trials, locations, or protocol terms</span><kbd>/</kbd>
+        </button>
+        <button class="icon-button" id="notification-button" type="button" aria-label="Notifications"><svg class="icon"><use href="#i-bell"/></svg></button>
+        <label class="avatar role-switch"><span class="avatar-circle" id="role-initial">AR</span><span><select class="role-select" id="role-select" aria-label="Prototype role"><option value="coordinator">A. Rao</option><option value="oncologist">Dr M. Shah</option><option value="site">Site steward</option><option value="auditor">Auditor</option></select><small id="role-description">Research coordinator</small></span></label>
+      </header>
+
+      <div class="source-alert" id="source-alert" role="status"><svg class="icon"><use href="#i-warning"/></svg><strong>CTRI source unavailable in demo.</strong> Last valid snapshots remain visible as stale; verification work can continue.</div>
+      <div class="emr-context-bar" id="emr-context-bar">
+        <div class="emr-context-icon"><svg class="icon"><use href="#i-user"/></svg></div>
+        <div class="emr-context-copy"><strong>Synthetic case SYN-2047</strong><span>In-context EMR launch · source records available</span></div>
+        <span class="context-chip">Clinician-confirmed: NSCLC</span>
+        <span class="context-chip">4 source artifacts</span>
+        <span class="context-boundary"><svg class="icon"><use href="#i-shield"/></svg>Not used to rank trials</span>
+        <button class="button small" type="button" id="open-case-workspace">Open case workspace</button>
+      </div>
+
+      <main>
+        <section class="view" id="view-guide" data-view="guide" aria-labelledby="guide-title">
+          <div class="view-header"><div class="view-heading"><h1 id="guide-title">How to use Trial Relay</h1><p>Follow one case from the EMR to a trial-site answer. Every important choice stays with a person.</p></div><div class="header-actions"><span class="priority-badge p0">Usage guide</span><button class="button primary" type="button" id="start-guided-use"><svg class="icon"><use href="#i-compass"/></svg>Start with trial search</button></div></div>
+          <div class="guide-intro"><div class="guide-summary"><h2>One clear path, three human owners</h2><p>The oncologist chooses what to review. The coordinator checks the site and manages the handoff. The trial team makes the final eligibility decision.</p></div><div class="guide-boundary"><strong>Automatic patient matching is not active.</strong><span>The safe workflow helps people review evidence and complete the handoff. It never tells a patient or doctor that someone qualifies.</span></div></div>
+          <div class="usage-timeline" aria-label="Trial Relay usage timeline">
+            <div class="usage-step"><span class="usage-marker">1</span><div class="usage-copy"><strong>Open from the EMR</strong><span>Trial Relay receives the signed-in user, institution, encounter, and synthetic case context.</span></div><div class="usage-owner"><span>Owner</span>EMR + care team</div><div class="usage-outcome">Secure case session</div></div>
+            <div class="usage-step"><span class="usage-marker">2</span><div class="usage-copy"><strong>Search for a trial</strong><span>Search by cancer, phase, location, registry, and site status. The case is not used to rank the list.</span></div><div class="usage-owner"><span>Owner</span>Oncologist or coordinator</div><div class="usage-outcome">Clinician chooses a trial</div></div>
+            <div class="usage-step"><span class="usage-marker">3</span><div class="usage-copy"><strong>Check the trial and site</strong><span>Compare the registry status with the latest site confirmation and see when each was checked.</span></div><div class="usage-owner"><span>Owner</span>Coordinator + site</div><div class="usage-outcome">Current operational answer</div></div>
+            <div class="usage-step"><span class="usage-marker">4</span><div class="usage-copy"><strong>Review original EMR records</strong><span>Open pathology, molecular, treatment, and laboratory records from the EMR. Trial Relay does not interpret them.</span></div><div class="usage-owner"><span>Owner</span>Clinician</div><div class="usage-outcome">Source-linked evidence</div></div>
+            <div class="usage-step"><span class="usage-marker">5</span><div class="usage-copy"><strong>Complete the checklist</strong><span>The clinician marks each trial criterion as reviewed, not met, or needing clarification. No overall score is calculated.</span></div><div class="usage-owner"><span>Owner</span>Clinician</div><div class="usage-outcome">Human review recorded</div></div>
+            <div class="usage-step"><span class="usage-marker">6</span><div class="usage-copy"><strong>Prepare a referral packet</strong><span>Select the exact EMR records to reference, recipient, owner, purpose, and access expiry.</span></div><div class="usage-owner"><span>Owner</span>Coordinator</div><div class="usage-outcome">Draft awaiting approval</div></div>
+            <div class="usage-step"><span class="usage-marker">7</span><div class="usage-copy"><strong>Use the tumour board if needed</strong><span>Route the packet, record the signed human decision reference, and assign the next step.</span></div><div class="usage-owner"><span>Owner</span>Board + treating unit</div><div class="usage-outcome">Human decision and task</div></div>
+            <div class="usage-step"><span class="usage-marker">8</span><div class="usage-copy"><strong>Send and track the handoff</strong><span>A person approves the release. The coordinator tracks sent, acknowledged, and closed states.</span></div><div class="usage-owner"><span>Owner</span>Coordinator + trial team</div><div class="usage-outcome">Closed-loop referral</div></div>
+            <div class="usage-step"><span class="usage-marker">9</span><div class="usage-copy"><strong>Watch for changes</strong><span>Alert interested team members when registry status, site verification, inquiry, board, or EMR task state changes.</span></div><div class="usage-owner"><span>Owner</span>Named subscribers</div><div class="usage-outcome">Right update, right role</div></div>
+          </div>
+          <div class="panel" style="margin-top:13px"><div class="panel-head"><div><h2>What the system does not do</h2><p>The trial team still decides formal eligibility</p></div><span class="spacer"></span><button class="button small" id="open-guide-priorities" type="button">See all P0–P2 features</button></div><div class="panel-body"><div class="boundary-choice"><div class="boundary-option allowed"><strong>Included: clinician-led candidate review</strong><p>A clinician adds a case, reviews each criterion, links the source, and sends a packet for formal site screening.</p></div><div class="boundary-option blocked"><strong>Not included: recommendation engine that finds qualifying patients</strong><p>Scanning EMR records, deciding who qualifies, or ranking trials is patient-specific clinical decision support and remains outside the project boundary.</p></div></div></div></div>
+        </section>
+
+        <section class="view active" id="view-explore" data-view="explore" aria-labelledby="explore-title">
+          <div class="view-header">
+            <div class="view-heading"><h1 id="explore-title">Find a trial and check the site</h1><p>Search trial details, see where each fact came from, and check what the site most recently confirmed.</p></div>
+            <div class="header-actions"><span class="priority-badge p0">P0 workflow</span><button class="button" id="refresh-results" type="button"><svg class="icon"><use href="#i-refresh"/></svg>Refresh view</button></div>
+          </div>
+
+          <div class="safety-strip"><svg class="icon"><use href="#i-shield"/></svg><strong>General discovery only.</strong><span>No patient facts, eligibility scores, rankings, or treatment recommendations.</span><span class="spacer"></span><span>Synthetic records</span></div>
+
+          <div class="filter-bar" aria-label="Trial filters">
+            <div class="input-shell"><svg class="icon"><use href="#i-search"/></svg><label class="sr-only" for="trial-search">Search trials</label><input class="field" id="trial-search" type="search" placeholder="Cancer type, study title, phase, or city" autocomplete="off"></div>
+            <label class="sr-only" for="cancer-filter">Cancer type</label><select class="select" id="cancer-filter"><option value="all">All cancers</option><option value="Lung">Lung</option><option value="Head and neck">Head and neck</option><option value="Breast">Breast</option><option value="Supportive care">Supportive care</option></select>
+            <label class="sr-only" for="verify-filter">Verification status</label><select class="select" id="verify-filter"><option value="all">Any verification</option><option value="verified">Recently verified</option><option value="attention">Needs attention</option><option value="unverified">Not verified</option></select>
+            <label class="sr-only" for="state-filter">State</label><select class="select state-filter" id="state-filter"><option value="all">All states</option><option value="Maharashtra">Maharashtra</option><option value="Delhi">Delhi</option><option value="Tamil Nadu">Tamil Nadu</option><option value="Karnataka">Karnataka</option></select>
+            <button class="button" id="clear-filters" type="button"><svg class="icon"><use href="#i-filter"/></svg>Reset</button>
+          </div>
+
+          <div class="result-meta"><strong id="result-count">4 trials</strong><span>sorted by operational confidence</span><span class="spacer"></span><label for="sort-results">Sort</label><select class="sort-select" id="sort-results"><option value="confidence">Operational confidence</option><option value="recent">Recently verified</option><option value="title">Study title</option></select></div>
+
+          <div class="explorer-grid">
+            <div class="result-list" id="result-list" aria-live="polite"></div>
+            <article class="detail-panel" id="trial-detail" aria-live="polite"></article>
+          </div>
+        </section>
+
+        <section class="view" id="view-case" data-view="case" aria-labelledby="case-title">
+          <div class="view-header">
+            <div class="view-heading"><h1 id="case-title">Review a case with a trial</h1><p>Open the original EMR records next to a trial chosen by the clinician. The clinician reviews every criterion.</p></div>
+            <div class="header-actions"><span class="priority-badge p0">P0 · EMR integrated</span><button class="button" type="button" id="return-to-search"><svg class="icon"><use href="#i-compass"/></svg>Choose another trial</button></div>
+          </div>
+          <div class="case-identity">
+            <div class="patient-monogram">SYN</div>
+            <div class="case-identity-copy"><strong>Synthetic case SYN-2047</strong><span>Launched from EMR encounter ENC-DEMO-8821 · access context expires with this session</span></div>
+            <div class="case-identity-meta"><span class="status-pill good"><span class="status-dot"></span>EMR connected</span><span class="tag">4 source artifacts</span><span class="tag">3 clinician-confirmed facts</span></div>
+          </div>
+          <div class="safety-strip"><svg class="icon"><use href="#i-shield"/></svg><strong>Read-through context.</strong><span>EMR facts are displayed with provenance and are not used to rank, score, or automatically qualify trials.</span><span class="spacer"></span><span>Synthetic only</span></div>
+          <div class="case-grid">
+            <div class="case-stack">
+              <article class="panel">
+                <div class="panel-head"><div><h2>Facts reviewed by a clinician</h2><p>Accepted by Dr M. Shah for this workspace</p></div><span class="spacer"></span><span class="status-pill good"><span class="status-dot"></span>Human reviewed</span></div>
+                <div class="panel-body"><div class="human-fact-list">
+                  <div class="human-fact"><label>Diagnosis</label><strong>Non-small cell lung cancer</strong><span>Source: pathology report · confirmed</span></div>
+                  <div class="human-fact"><label>Recorded disease state</label><strong>Stage IV</strong><span>Source: oncology encounter · confirmed</span></div>
+                  <div class="human-fact"><label>Recorded biomarker</label><strong>PD-L1 TPS 60%</strong><span>Source: diagnostic report · confirmed</span></div>
+                  <div class="human-fact"><label>Performance status</label><strong>ECOG 1</strong><span>Source: clinician note · not reinterpreted</span></div>
+                </div></div>
+              </article>
+              <article class="panel">
+                <div class="panel-head"><div><h2>Original EMR records</h2><p>Open the source record; do not rely on copied text alone</p></div><span class="spacer"></span><span class="priority-badge p0">read from EMR</span></div>
+                <div class="artifact-list">
+                  <div class="artifact-row"><div class="artifact-icon"><svg class="icon"><use href="#i-file"/></svg></div><div class="artifact-copy"><strong>Pathology report · final</strong><span>DiagnosticReport · 28 Aug 2026 · reporting laboratory</span></div><button class="button small artifact-action" type="button" data-preview-artifact="Pathology report">Open source</button></div>
+                  <div class="artifact-row"><div class="artifact-icon"><svg class="icon"><use href="#i-file"/></svg></div><div class="artifact-copy"><strong>Molecular diagnostic report</strong><span>DocumentReference · 02 Sep 2026 · linked PDF</span></div><button class="button small artifact-action" type="button" data-preview-artifact="Molecular report">Open source</button></div>
+                  <div class="artifact-row"><div class="artifact-icon"><svg class="icon"><use href="#i-activity"/></svg></div><div class="artifact-copy"><strong>Treatment administration timeline</strong><span>MedicationAdministration · clinician-reviewed history</span></div><button class="button small artifact-action" type="button" data-preview-artifact="Treatment timeline">Open source</button></div>
+                  <div class="artifact-row"><div class="artifact-icon"><svg class="icon"><use href="#i-file"/></svg></div><div class="artifact-copy"><strong>Latest laboratory report</strong><span>Observation panel · 11 Sep 2026 · source values only</span></div><button class="button small artifact-action" type="button" data-preview-artifact="Laboratory report">Open source</button></div>
+                </div>
+              </article>
+              <article class="panel">
+                <div class="panel-head"><div><h2>Care timeline</h2><p>Recorded events; no inferred response or progression</p></div></div>
+                <div class="panel-body"><div class="timeline">
+                  <div class="timeline-item"><strong>Latest oncology encounter recorded</strong><span>12 Sep 2026 · Encounter ENC-DEMO-8821</span></div>
+                  <div class="timeline-item"><strong>Molecular diagnostic report filed</strong><span>02 Sep 2026 · source document linked</span></div>
+                  <div class="timeline-item"><strong>Pathology report finalised</strong><span>28 Aug 2026 · clinician confirmed diagnosis</span></div>
+                  <div class="timeline-item"><strong>Referral encounter opened</strong><span>25 Aug 2026 · source institution</span></div>
+                </div></div>
+              </article>
+            </div>
+            <div class="case-stack">
+              <article class="panel">
+                <div class="trial-review-head"><div class="detail-overline"><span class="tag">Clinician selected</span><span class="priority-badge p0">no system ranking</span></div><h2 id="case-selected-trial-title">Selected trial</h2><p id="case-selected-trial-meta">Choose a record in Explore trials.</p></div>
+                <div class="review-warning"><svg class="icon"><use href="#i-warning"/></svg><span>Each status below is entered by a clinician. Trial Relay does not calculate an overall match or eligibility result.</span></div>
+                <div class="criteria-list" id="case-criteria-list"></div>
+                <div class="review-footer"><p><strong id="criteria-review-count">0 of 4</strong> criteria reviewed by a human. No aggregate eligibility status is generated.</p><button class="button" id="add-to-board" type="button"><svg class="icon"><use href="#i-board"/></svg>Add to board</button><button class="button primary" id="prepare-packet" type="button"><svg class="icon"><use href="#i-briefcase"/></svg>Prepare referral packet</button></div>
+              </article>
+              <article class="panel">
+                <div class="panel-head"><div><h2>Operational handoff</h2><p>EMR write-back preview</p></div><span class="spacer"></span><span class="status-pill neutral"><span class="status-dot"></span>Draft</span></div>
+                <div class="panel-body"><ul class="rule-list"><li><span class="check">1</span><span>Clinician selects the trial and records criterion judgements.</span></li><li><span class="check">2</span><span>Coordinator prepares a bounded packet manifest from explicitly selected source artifacts.</span></li><li><span class="check">3</span><span>Authorised human approves release and site route.</span></li><li><span class="check">4</span><span>Task status and packet reference write back to the EMR; source documents remain in the EMR.</span></li></ul><button class="button" style="width:100%;margin-top:13px" type="button" id="preview-writeback"><svg class="icon"><use href="#i-upload"/></svg>Preview EMR write-back</button></div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="view-candidates" data-view="candidates" aria-labelledby="candidates-title">
+          <div class="view-header"><div class="view-heading"><h1 id="candidates-title">Review cases people have already flagged</h1><p>This queue starts only when a clinician, board, or trial team adds a case. It does not scan the EMR or recommend patients.</p></div><div class="header-actions"><span class="priority-badge p0">Human-created queue</span><button class="button primary" id="add-current-candidate" type="button"><svg class="icon"><use href="#i-user"/></svg>Add current case</button></div></div>
+          <div class="safety-strip"><svg class="icon"><use href="#i-shield"/></svg><strong>No automatic patient finder.</strong><span>Trial Relay can show criteria, link records, flag missing information, and route work. A clinician reviews each case; the trial team confirms final eligibility.</span></div>
+          <div class="candidate-layout">
+            <article class="panel"><div class="panel-head"><div><h2>Candidate review queue</h2><p>Every row names who added it and who owns the next decision</p></div><span class="spacer"></span><select class="sort-select" id="candidate-filter"><option value="all">All review states</option><option value="review">Needs clinician review</option><option value="site">With trial team</option><option value="final">Final site outcome</option></select></div><div class="candidate-list" id="candidate-list">
+              <div class="candidate-row" data-candidate-state="review"><span class="candidate-monogram">S47</span><span class="candidate-copy"><strong>Synthetic case SYN-2047</strong><span>Added by Dr M. Shah · selected trial DEMO-CTRI-001</span></span><span class="candidate-cell"><span>Human review</span><strong>1 of 4 criteria</strong></span><span class="candidate-cell"><span>Next owner</span><strong>Treating oncologist</strong></span><button class="button small" type="button" data-open-candidate="SYN-2047">Open review</button></div>
+              <div class="candidate-row" data-candidate-state="review"><span class="candidate-monogram" style="background:var(--amber)">S91</span><span class="candidate-copy"><strong>Synthetic case SYN-2091</strong><span>Added by thoracic board · source record missing</span></span><span class="candidate-cell"><span>Human review</span><strong>Needs pathology source</strong></span><span class="candidate-cell"><span>Next owner</span><strong>Board presenter</strong></span><button class="button small" type="button" data-open-candidate="SYN-2091">View gap</button></div>
+              <div class="candidate-row" data-candidate-state="site"><span class="candidate-monogram" style="background:var(--plum)">S14</span><span class="candidate-copy"><strong>Synthetic case SYN-2114</strong><span>Packet sent by coordinator · trial DEMO-NCT-004</span></span><span class="candidate-cell"><span>Formal screening</span><strong>Trial team reviewing</strong></span><span class="candidate-cell"><span>Next owner</span><strong>External trial team</strong></span><button class="button small" type="button" data-open-candidate="SYN-2114">Track status</button></div>
+              <div class="candidate-row" data-candidate-state="final"><span class="candidate-monogram" style="background:var(--green)">S62</span><span class="candidate-copy"><strong>Synthetic case SYN-2162</strong><span>Final outcome returned by authorised trial team</span></span><span class="candidate-cell"><span>Site decision</span><strong>Trial team confirmed eligible</strong></span><span class="candidate-cell"><span>Source</span><strong>Site investigator · 12 Sep</strong></span><button class="button small" type="button" data-open-candidate="SYN-2162">View outcome</button></div>
+            </div></article>
+            <div class="case-stack">
+              <article class="panel"><div class="panel-head"><div><h2>What “candidate review” means</h2><p>Plain language boundary</p></div></div><div class="panel-body"><div class="boundary-choice"><div class="boundary-option allowed"><strong>Trial Relay may help people review</strong><p>Show exact criteria, open source records, highlight missing information, track the human review, and route a packet.</p></div><div class="boundary-option allowed"><strong>Trial Relay may show a trial-team outcome</strong><p>After the authorised site decides, display its confirmed eligible/ineligible outcome with source and date.</p></div><div class="boundary-option blocked"><strong>Trial Relay may not decide who qualifies</strong><p>No EMR-wide scan, inferred eligibility, recommendation score, “best trial,” or automatic patient list.</p></div></div></div></article>
+              <article class="panel"><div class="panel-head"><div><h2>Review timeline</h2><p>Authority moves, but never disappears</p></div></div><div class="panel-body"><div class="board-lifecycle"><div class="board-stage done"><span class="board-stage-marker">1</span><div><strong>Human adds the case</strong><span>Clinician or board states the reason</span></div></div><div class="board-stage current"><span class="board-stage-marker">2</span><div><strong>Clinician reviews criteria</strong><span>Each state links to an EMR source</span></div></div><div class="board-stage"><span class="board-stage-marker">3</span><div><strong>Human approves packet</strong><span>Recipient and expiry are fixed</span></div></div><div class="board-stage"><span class="board-stage-marker">4</span><div><strong>Trial team screens</strong><span>Formal eligibility authority</span></div></div><div class="board-stage"><span class="board-stage-marker">5</span><div><strong>Outcome returns</strong><span>Source, date, owner, next step</span></div></div></div></div></article>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="view-verification" data-view="verification" aria-labelledby="verification-title">
+          <div class="view-header"><div class="view-heading"><h1 id="verification-title">Verification queue</h1><p>Resolve the operational question the registry cannot answer: did an authorised site source recently confirm its state and contact path?</p></div><div class="header-actions"><span class="priority-badge p0">P0 workflow</span><button class="button primary" type="button" id="verify-selected"><svg class="icon"><use href="#i-check"/></svg>Record verification</button></div></div>
+          <div class="stats-grid"><div class="stat-card"><span>Needs attention</span><strong id="verification-attention-count">3</strong><small>expired, unverified, or discrepant</small></div><div class="stat-card"><span>Verified this week</span><strong id="verification-week-count">3</strong><small>synthetic demonstration metric</small></div><div class="stat-card"><span>Median response</span><strong>1.8d</strong><small>proposed pilot measure</small></div><div class="stat-card"><span>Registry conflicts</span><strong id="verification-conflict-count">1</strong><small>requires human disposition</small></div></div>
+          <div class="ops-grid">
+            <div class="panel"><div class="panel-head"><div><h2>Priority queue</h2><p>Oldest and highest-risk assertions first</p></div><span class="spacer"></span><span class="status-pill warn" id="verification-open-pill"><span class="status-dot"></span>3 open</span></div><div class="queue-list" id="verification-list"></div></div>
+            <aside class="panel sticky-workbench" id="verification-workbench"><div class="panel-body"><h2 class="workbench-title">Select a queue item</h2><p class="view-heading">Review source state, prior attempts, and the required evidence before recording an assertion.</p></div></aside>
+          </div>
+        </section>
+
+        <section class="view" id="view-inquiries" data-view="inquiries" aria-labelledby="inquiries-title">
+          <div class="view-header"><div class="view-heading"><h1 id="inquiries-title">Referral and inquiry handoffs</h1><p>One operational ledger for general site questions and EMR-referenced packet tasks: a human approves release, a named owner acts, and acknowledgement stays visible.</p></div><div class="header-actions"><span class="priority-badge p0">P0 workflow</span><button class="button primary" type="button" id="new-inquiry-global"><svg class="icon"><use href="#i-send"/></svg>New general inquiry</button></div></div>
+          <div class="safety-strip"><svg class="icon"><use href="#i-shield"/></svg><strong>No autonomous release.</strong><span>General inquiries contain no patient facts. Referral packets remain EMR-controlled references and require human approval; formal eligibility stays with the trial team.</span></div>
+          <div class="panel"><div class="panel-head"><div><h2>Open and recent inquiries</h2><p>Advance state only when the human action occurred</p></div><span class="spacer"></span><select class="sort-select" id="inquiry-filter"><option value="all">All states</option><option value="open">Open only</option><option value="closed">Closed</option></select></div><div id="inquiry-table-wrap"></div></div>
+        </section>
+
+        <section class="view" id="view-alerts" data-view="alerts" aria-labelledby="alerts-title">
+          <div class="view-header"><div class="view-heading"><h1 id="alerts-title">Alerts for trials your team follows</h1><p>Tell the right person when a registry, site, referral, board, or EMR task changes. Each alert shows its source and who needs to act.</p></div><div class="header-actions"><span class="priority-badge p0">Operational alerts</span><button class="button" id="mark-alerts-read" type="button"><svg class="icon"><use href="#i-check"/></svg>Mark all read</button><button class="button primary" id="new-alert-rule" type="button"><svg class="icon"><use href="#i-bell"/></svg>New alert rule</button></div></div>
+          <div class="safety-strip"><svg class="icon"><use href="#i-shield"/></svg><strong>Status alerts, not clinical advice.</strong><span>Alerts report a source change or a human workflow event. They do not say that a trial is right for a patient.</span></div>
+          <div class="alert-layout">
+            <article class="panel"><div class="panel-head"><div><h2>Alert inbox</h2><p>Unread first · grouped by trial and workflow</p></div><span class="spacer"></span><select class="sort-select" id="alert-filter"><option value="all">All alerts</option><option value="trial">Trial status</option><option value="verification">Site verification</option><option value="handoff">Referral and EMR</option></select></div><div class="alert-list" id="alerts-list"></div></article>
+            <div class="case-stack">
+              <article class="panel"><div class="panel-head"><div><h2>Following</h2><p>Changes to these trials can trigger alerts</p></div><span class="spacer"></span><span class="status-pill good"><span class="status-dot"></span><span id="followed-count">2</span> trials</span></div><div class="panel-body" id="followed-trials"></div></article>
+              <article class="panel"><div class="panel-head"><div><h2>Who gets what</h2><p>Role-based defaults; each rule can be narrowed</p></div></div><div class="panel-body"><div class="rule-builder">
+                <div class="alert-rule-card"><strong>Registry or site status changes</strong><p>Send to the trial follower and verification owner.</p><div class="channel-row"><span class="channel">In app</span><span class="channel">EMR inbox</span></div></div>
+                <div class="alert-rule-card"><strong>Verification expires or conflicts</strong><p>Send to the research coordinator and site steward.</p><div class="channel-row"><span class="channel">In app</span><span class="channel">EMR Task</span></div></div>
+                <div class="alert-rule-card"><strong>Referral or board task changes</strong><p>Send to the task owner, treating unit, and board presenter where applicable.</p><div class="channel-row"><span class="channel">In app</span><span class="channel">EMR Task</span><span class="channel">Approved email</span></div></div>
+                <div class="alert-rule-card"><strong>Trial-team eligibility outcome</strong><p>Show only the authorised trial team's recorded decision to the treating team and coordinator.</p><div class="channel-row"><span class="channel">In app</span><span class="channel">EMR inbox</span></div></div>
+              </div></div></article>
+              <article class="panel"><div class="panel-head"><div><h2>Alert controls</h2><p>Reduce noise and prevent disclosure</p></div></div><div class="panel-body"><ul class="rule-list"><li><span class="check">1</span><span>Deduplicate the same source change.</span></li><li><span class="check">2</span><span>Do not put clinical details in external notifications.</span></li><li><span class="check">3</span><span>Stop alerts when interest, access, or task ownership ends.</span></li><li><span class="check">4</span><span>Escalate only through an approved policy.</span></li></ul></div></article>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="view-board" data-view="board" aria-labelledby="board-title">
+          <div class="view-header"><div class="view-heading"><h1 id="board-title">Tumour-board handoff</h1><p>Prepare a bounded source-linked packet, record the human decision, and return operational ownership to the treating unit through the EMR.</p></div><div class="header-actions"><span class="priority-badge p1">P1 · EMR connected</span><button class="button primary" type="button" id="record-board-decision"><svg class="icon"><use href="#i-check"/></svg>Record human decision</button></div></div>
+          <div class="safety-strip"><svg class="icon"><use href="#i-shield"/></svg><strong>Human discussion only.</strong><span>Trial Relay schedules, routes, records, and audits. It does not generate the board's clinical decision.</span></div>
+          <div class="board-grid">
+            <div class="case-stack">
+              <div class="session-banner"><div class="session-date"><span>SEP</span><strong>16</strong></div><div class="session-copy"><strong>Thoracic multidisciplinary board</strong><span>14:00–15:00 · 4 synthetic cases · secure EMR session</span></div><span class="spacer"></span><span class="status-pill good"><span class="status-dot"></span>Packet window open</span></div>
+              <article class="agenda-card">
+                <div class="panel-head"><div><h2>Agenda</h2><p>Purpose and readiness visible before the meeting</p></div></div>
+                <div class="agenda-row active"><span class="agenda-order">01</span><span class="agenda-copy"><strong>SYN-2047 · trial screening handoff</strong><span>Question: authorise site contact for formal trial-team screening?</span></span><span class="status-pill good"><span class="status-dot"></span>Ready</span></div>
+                <div class="agenda-row"><span class="agenda-order">02</span><span class="agenda-copy"><strong>SYN-2091 · diagnostic-source review</strong><span>Missing outside imaging source</span></span><span class="status-pill warn"><span class="status-dot"></span>1 gap</span></div>
+                <div class="agenda-row"><span class="agenda-order">03</span><span class="agenda-copy"><strong>SYN-2114 · clinician-authored plan review</strong><span>Packet reviewed by presenter</span></span><span class="status-pill neutral"><span class="status-dot"></span>Queued</span></div>
+              </article>
+              <article class="panel">
+                <div class="panel-head"><div><h2>Case packet manifest · SYN-2047</h2><p>References source artifacts in the EMR; does not duplicate clinical content</p></div><span class="spacer"></span><button class="button small" type="button" id="open-board-case"><svg class="icon"><use href="#i-eye"/></svg>Open case</button></div>
+                <div class="panel-body"><div class="human-fact-list"><div class="human-fact"><label>Purpose</label><strong>Human decision on site-contact handoff</strong><span>Presenter supplied</span></div><div class="human-fact"><label>Selected trial</label><strong id="board-trial-title">Synthetic selected record</strong><span>Chosen by clinician</span></div><div class="human-fact"><label>Included sources</label><strong>Pathology, molecular, timeline</strong><span>3 EMR references</span></div><div class="human-fact"><label>Access</label><strong>Board participants only</strong><span>Expires after workflow policy</span></div></div></div>
+              </article>
+            </div>
+            <div class="case-stack">
+              <article class="panel"><div class="panel-head"><div><h2>Lifecycle</h2><p>Decision-to-task handoff</p></div></div><div class="panel-body"><div class="board-lifecycle" id="board-lifecycle"><div class="board-stage done"><span class="board-stage-marker">1</span><div><strong>Case selected</strong><span>Treating oncologist · 13 Sep</span></div></div><div class="board-stage done"><span class="board-stage-marker">2</span><div><strong>Packet sources reviewed</strong><span>Presenter · synthetic artifacts</span></div></div><div class="board-stage current"><span class="board-stage-marker">3</span><div><strong>Board discussion scheduled</strong><span>Awaiting human decision</span></div></div><div class="board-stage"><span class="board-stage-marker">4</span><div><strong>Decision signed</strong><span>No system-generated content</span></div></div><div class="board-stage"><span class="board-stage-marker">5</span><div><strong>Task written to EMR</strong><span>Owner and acknowledgement visible</span></div></div></div></div></article>
+              <article class="panel"><div class="panel-head"><div><h2>Participants</h2><p>Attendance and authority</p></div></div><div class="panel-body"><div class="participant-stack" aria-label="Synthetic board participants"><span class="participant">MO</span><span class="participant" style="background:#176b50">RO</span><span class="participant" style="background:#685277">SO</span><span class="participant" style="background:#925611">PA</span><span class="participant" style="background:#376b7b">RA</span></div><p style="margin:8px 0 0;color:var(--muted);font-size:9px">Medical, radiation and surgical oncology; pathology; radiology. Final role requirements remain local policy.</p></div></article>
+              <article class="panel"><div class="panel-head"><div><h2>Signed operational disposition</h2><p id="board-decision-state">No decision recorded</p></div></div><div class="panel-body"><p id="board-decision-copy" style="margin-top:0;color:var(--muted);font-size:10px">After the meeting, record the clinician-authored decision reference, authorised recipient, task owner, due date, and acknowledgement state.</p><button class="button" style="width:100%" type="button" id="board-writeback" disabled><svg class="icon"><use href="#i-upload"/></svg>Write task to EMR</button></div></article>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="view-integrations" data-view="integrations" aria-labelledby="integrations-title">
+          <div class="view-header"><div class="view-heading"><h1 id="integrations-title">EMR integration control</h1><p>Assumed successful integration, made explicit: in-context launch, source read-through, least-privilege scopes, and operational write-back.</p></div><div class="header-actions"><span class="priority-badge p0">Owner assumption</span><button class="button" id="test-writeback" type="button"><svg class="icon"><use href="#i-refresh"/></svg>Test synthetic write-back</button></div></div>
+          <div class="integration-hero"><span class="signal"></span><div><strong>Connected to synthetic Oncology EMR</strong><span>SMART-style in-context session · patient scope · no credentials stored in this file</span></div><span class="spacer"></span><span class="status-pill good"><span class="status-dot"></span>Healthy</span></div>
+          <div class="integration-grid" style="margin-top:13px">
+            <article class="panel"><div class="panel-head"><div><h2>Resource and capability map</h2><p>Exact EMR mapping remains vendor-specific</p></div><span class="spacer"></span><span class="priority-badge p0">least privilege</span></div><div class="resource-map">
+              <div class="resource-row"><span class="resource-name">Patient</span><span class="resource-use">In-context identity and minimum banner fields</span><span class="scope-pill">read</span></div>
+              <div class="resource-row"><span class="resource-name">Condition</span><span class="resource-use">Clinician-authored diagnosis reference; never inferred</span><span class="scope-pill">read</span></div>
+              <div class="resource-row"><span class="resource-name">DiagnosticReport</span><span class="resource-use">Pathology/laboratory report references and status</span><span class="scope-pill">read</span></div>
+              <div class="resource-row"><span class="resource-name">DocumentReference</span><span class="resource-use">Open original source artifacts; packet manifest by reference</span><span class="scope-pill">read</span></div>
+              <div class="resource-row"><span class="resource-name">Observation</span><span class="resource-use">Display source values selected by clinician; no interpretation</span><span class="scope-pill">read</span></div>
+              <div class="resource-row"><span class="resource-name">Medication*</span><span class="resource-use">Recorded treatment history for human review</span><span class="scope-pill">read</span></div>
+              <div class="resource-row"><span class="resource-name">Procedure</span><span class="resource-use">Recorded surgery/radiation events for human review</span><span class="scope-pill">read</span></div>
+              <div class="resource-row"><span class="resource-name">Task</span><span class="resource-use">Inquiry/referral owner, due state, acknowledgement</span><span class="scope-pill write">write</span></div>
+              <div class="resource-row"><span class="resource-name">DocumentReference</span><span class="resource-use">Referral packet manifest or signed board decision reference</span><span class="scope-pill write">write</span></div>
+              <div class="resource-row"><span class="resource-name">Communication</span><span class="resource-use">Authorised handoff status; no autonomous patient message</span><span class="scope-pill write">write</span></div>
+            </div></article>
+            <div class="case-stack">
+              <article class="panel"><div class="panel-head"><div><h2>Session controls</h2><p>Current synthetic launch context</p></div></div><div class="panel-body"><div class="source-facts"><div class="source-fact"><span>Launch</span><strong>EMR in-context</strong></div><div class="source-fact"><span>Subject</span><strong>SYN-2047</strong></div><div class="source-fact"><span>Identity</span><strong>Research coordinator</strong></div><div class="source-fact"><span>Token location</span><strong>Runtime memory only</strong></div><div class="source-fact"><span>Clinical content cache</span><strong>None in proposal</strong></div><div class="source-fact"><span>Session termination</span><strong>Revoke context + clear view</strong></div></div></div></article>
+              <article class="panel"><div class="panel-head"><div><h2>Recent sync events</h2><p>Correlation and outcome</p></div></div><div class="sync-list" id="sync-list"><div class="sync-row"><time>09:12:04</time><span><strong>Context launched</strong>Patient/Condition references read</span><span class="status-pill good">OK</span></div><div class="sync-row"><time>09:12:05</time><span><strong>Source manifest loaded</strong>4 document/report references</span><span class="status-pill good">OK</span></div><div class="sync-row"><time>09:13:41</time><span><strong>Task write-back check</strong>Dry-run validation passed</span><span class="status-pill neutral">DRY RUN</span></div></div></article>
+              <article class="panel"><div class="panel-head"><div><h2>Failure behavior</h2><p>Keep EMR authority intact</p></div></div><div class="panel-body"><ul class="rule-list"><li><span class="check">1</span><span>Expired context: stop reads/writes and require relaunch.</span></li><li><span class="check">2</span><span>Partial read: show exact missing source category; do not infer.</span></li><li><span class="check">3</span><span>Write conflict: preserve draft and require human reconcile.</span></li><li><span class="check">4</span><span>EMR outage: keep registry operations available; disable patient workflow.</span></li></ul></div></article>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="view-analytics" data-view="analytics" aria-labelledby="analytics-title">
+          <div class="view-header"><div class="view-heading"><h1 id="analytics-title">Operations analytics</h1><p>Measure information freshness, workflow completion, and staff effort. Do not report clinical outcomes, eligibility rates, or treatment recommendations.</p></div><div class="header-actions"><span class="priority-badge p2">P2 · operational only</span><button class="button" type="button" id="analytics-period">Last 30 days · synthetic</button></div></div>
+          <div class="stats-grid"><div class="stat-card"><span>Authoritative answers</span><strong>78%</strong><small>within proposed service interval</small></div><div class="stat-card"><span>Median site response</span><strong>1.8d</strong><small>from first authorised attempt</small></div><div class="stat-card"><span>Current assertions</span><strong>64%</strong><small>inside the synthetic expiry window</small></div><div class="stat-card"><span>Coordinator effort</span><strong>11m</strong><small>median per resolved inquiry</small></div></div>
+          <div class="analytics-grid">
+            <article class="panel"><div class="panel-head"><div><h2>Verification coverage</h2><p>Operational status by source state</p></div></div><div class="panel-body"><div class="bar-chart"><div class="bar-row"><span>Recently verified</span><div class="bar-track"><div class="bar-fill green" style="width:64%"></div></div><strong>64%</strong></div><div class="bar-row"><span>Due soon</span><div class="bar-track"><div class="bar-fill amber" style="width:18%"></div></div><strong>18%</strong></div><div class="bar-row"><span>Expired</span><div class="bar-track"><div class="bar-fill" style="width:10%"></div></div><strong>10%</strong></div><div class="bar-row"><span>No response</span><div class="bar-track"><div class="bar-fill" style="width:8%;background:var(--red)"></div></div><strong>8%</strong></div></div></div></article>
+            <article class="panel"><div class="panel-head"><div><h2>Inquiry lifecycle</h2><p>Human workflow completion</p></div></div><div class="panel-body"><div class="funnel"><div class="funnel-step"><span>Created by human</span><strong>42</strong></div><div class="funnel-step"><span>Approved and sent</span><strong>35</strong></div><div class="funnel-step"><span>Acknowledged</span><strong>28</strong></div><div class="funnel-step"><span>Human-closed</span><strong>21</strong></div></div></div></article>
+            <article class="panel"><div class="panel-head"><div><h2>Failure reasons</h2><p>Use to improve operations, not infer site quality</p></div></div><div class="panel-body"><div class="bar-chart"><div class="bar-row"><span>Contact stale</span><div class="bar-track"><div class="bar-fill" style="width:41%"></div></div><strong>41%</strong></div><div class="bar-row"><span>No response</span><div class="bar-track"><div class="bar-fill amber" style="width:32%"></div></div><strong>32%</strong></div><div class="bar-row"><span>Registry conflict</span><div class="bar-track"><div class="bar-fill green" style="width:18%"></div></div><strong>18%</strong></div><div class="bar-row"><span>Source unavailable</span><div class="bar-track"><div class="bar-fill" style="width:9%"></div></div><strong>9%</strong></div></div></div></article>
+            <article class="panel"><div class="panel-head"><div><h2>EMR handoff completion</h2><p>Operational state only</p></div></div><div class="panel-body"><div class="source-facts"><div class="source-fact"><span>Draft packets reviewed</span><strong>31 / 36</strong></div><div class="source-fact"><span>Tasks written back</span><strong>27 / 31</strong></div><div class="source-fact"><span>Treating-unit acknowledgement</span><strong>23 / 27</strong></div><div class="source-fact"><span>Unresolved write conflicts</span><strong>2</strong></div><div class="source-fact"><span>Clinical outcomes measured</span><strong>None</strong></div></div><div class="notice" style="margin-top:10px"><strong>Synthetic dashboard:</strong> values illustrate information hierarchy, not evidence or pilot targets.</div></div></article>
+          </div>
+        </section>
+
+        <section class="view" id="view-activity" data-view="activity" aria-labelledby="activity-title">
+          <div class="view-header"><div class="view-heading"><h1 id="activity-title">Audit activity</h1><p>Every source, normalization, verification, and task transition should answer who changed what, when, why, and from which evidence.</p></div><div class="header-actions"><span class="priority-badge p0">P0 control</span></div></div>
+          <div class="panel"><div class="panel-head"><div><h2>Immutable event preview</h2><p>Synthetic events ordered newest first</p></div><span class="spacer"></span><button class="button small" type="button" id="copy-audit"><svg class="icon"><use href="#i-copy"/></svg>Copy event IDs</button></div><div class="audit-list" id="audit-list"></div></div>
+        </section>
+
+        <section class="view" id="view-sources" data-view="sources" aria-labelledby="sources-title">
+          <div class="view-header"><div class="view-heading"><h1 id="sources-title">Source health and rights</h1><p>Machine availability is not enough. Each source needs a permitted purpose, access contract, freshness expectation, and failure owner.</p></div><div class="header-actions"><span class="priority-badge p1">P1 operability</span><button class="button" id="toggle-outage" type="button"><svg class="icon"><use href="#i-warning"/></svg>Simulate CTRI outage</button></div></div>
+          <div class="source-grid" id="source-grid">
+            <article class="source-card" id="ctri-source"><span class="status-pill warn"><span class="status-dot"></span>Permission unresolved</span><h2>CTRI</h2><p>Official Indian registry. Public HTML search exists; no supported public API or open commercial-reuse licence was found.</p><div class="source-facts"><div class="source-fact"><span>Access</span><strong>Interactive HTML + CAPTCHA</strong></div><div class="source-fact"><span>System of record</span><strong>Registry-declared India fields</strong></div><div class="source-fact"><span>Required next</span><strong>Written extract/API terms</strong></div><div class="source-fact"><span>Failure response</span><strong>Serve last snapshot as stale</strong></div></div></article>
+            <article class="source-card"><span class="status-pill good"><span class="status-dot"></span>API observable</span><h2>ClinicalTrials.gov</h2><p>Documented API v2 for NCT records. Useful for cross-registry facts, but does not replace CTRI or verify Indian site operations.</p><div class="source-facts"><div class="source-fact"><span>Access</span><strong>JSON API v2</strong></div><div class="source-fact"><span>Observed version</span><strong>2.0.5</strong></div><div class="source-fact"><span>Coverage boundary</span><strong>NCT records only</strong></div><div class="source-fact"><span>Failure response</span><strong>Backoff + stale marker</strong></div></div></article>
+            <article class="source-card"><span class="status-pill bad"><span class="status-dot"></span>Commercial restriction</span><h2>WHO ICTRP</h2><p>CSV/XML and credentialed XML service exist, but published terms restrict commercial use, storage, and charging.</p><div class="source-facts"><div class="source-fact"><span>Access</span><strong>CSV/XML + partner service</strong></div><div class="source-fact"><span>Permitted default</span><strong>Research use</strong></div><div class="source-fact"><span>CTRI feed</span><strong>Monthly per CTRI FAQ</strong></div><div class="source-fact"><span>Decision</span><strong>Do not assume product use</strong></div></div></article>
+          </div>
+          <div class="panel" style="margin-top:13px"><div class="panel-head"><div><h2>Source contract checklist</h2><p>Must be closed before production architecture</p></div></div><div class="panel-body"><ul class="rule-list"><li><span class="check">1</span><span>Permitted fields, purpose, automated access, caching, redistribution, and commercial use.</span></li><li><span class="check">2</span><span>Authentication, request limits, schema/version notice, refresh cadence, and outage behavior.</span></li><li><span class="check">3</span><span>Attribution, original-value preservation, correction route, deletion, and termination obligations.</span></li><li><span class="check">4</span><span>Contact-data minimization, retention, access control, audit, and accountable owner.</span></li></ul></div></div>
+        </section>
+
+        <section class="view" id="view-priorities" data-view="priorities" aria-labelledby="priorities-title">
+          <div class="view-header"><div class="view-heading"><h1 id="priorities-title">Feature priorities</h1><p>Expanded under the explicit assumption that EMR integration succeeds. Priority still describes evidence and governance order—not a promise or automatic clinical capability.</p></div><div class="header-actions"><span class="priority-badge">Proposal · internal review pending</span></div></div>
+          <div class="priority-columns">
+            <article class="priority-column"><header><span class="priority-badge p0">P0</span><h2>Complete the human workflow</h2><p>Required to test one end-to-end EMR-connected path</p></header><div class="feature-list">
+              <div class="feature-row"><strong>In-context EMR launch</strong><p>Institution identity, user role, encounter and synthetic patient context with session expiry.</p><span class="evidence">Prototype: persistent context rail</span></div>
+              <div class="feature-row"><strong>Visual usage guide</strong><p>A nine-step timeline names the action, human owner, and expected output.</p><span class="evidence">Prototype: How to use</span></div>
+              <div class="feature-row"><strong>Read-through source artifacts</strong><p>Open original pathology, diagnostic, medication and procedure records; keep EMR authoritative.</p><span class="evidence">Prototype: Case workspace</span></div>
+              <div class="feature-row"><strong>Clinician-confirmed facts</strong><p>Separate source assertion from the authorised clinician's confirmation, actor and time.</p><span class="evidence">Prototype: confirmed-fact panel</span></div>
+              <div class="feature-row"><strong>General trial discovery</strong><p>Disease, phase, geography, registry and operational state; EMR context is not applied to ranking.</p><span class="evidence">Prototype: Explore</span></div>
+              <div class="feature-row"><strong>Field provenance and dual status</strong><p>Original registry value, retrieval age, normalization rule and separate site assertion.</p><span class="evidence">Prototype: detail rail + provenance</span></div>
+              <div class="feature-row"><strong>Human criterion worksheet</strong><p>Clinician records reviewed/not met/clarify per criterion and links source evidence; no aggregate score.</p><span class="evidence">Prototype: Case review</span></div>
+              <div class="feature-row"><strong>Human-created candidate queue</strong><p>Cases enter only when added by a clinician, board, or trial team; no EMR-wide patient scan.</p><span class="evidence">Prototype: Candidate review</span></div>
+              <div class="feature-row"><strong>Bounded referral packet</strong><p>Explicitly selected EMR references, purpose, recipient, owner and expiry; draft before release.</p><span class="evidence">Prototype: packet builder</span></div>
+              <div class="feature-row"><strong>Site verification</strong><p>Authority, method, evidence, assertion, discrepancy and expiry.</p><span class="evidence">Prototype: Verification queue</span></div>
+              <div class="feature-row"><strong>Followed-trial alerts</strong><p>Factual updates for registry, site, verification, referral, board, and EMR task changes.</p><span class="evidence">Prototype: Alerts</span></div>
+              <div class="feature-row"><strong>Referral and inquiry lifecycle</strong><p>Draft, human-approved, sent, acknowledged, closed or unable to contact.</p><span class="evidence">Prototype: Referrals & inquiries</span></div>
+              <div class="feature-row"><strong>EMR write-back and audit</strong><p>Task, packet reference, owner, due state and immutable event using version preconditions.</p><span class="evidence">Prototype: write-back preview</span></div>
+            </div></article>
+            <article class="priority-column"><header><span class="priority-badge p1">P1</span><h2>Coordinate the institution</h2><p>Add only after the P0 path is observed repeatedly</p></header><div class="feature-list">
+              <div class="feature-row"><strong>Tumour-board handoff</strong><p>Agenda, bounded case packet, attendance, signed human decision reference, task and acknowledgement.</p><span class="evidence">Prototype: Tumour board</span></div>
+              <div class="feature-row"><strong>Cross-registry review</strong><p>Declared secondary-ID links, field-by-field conflicts and uncertain duplicate review.</p><span class="evidence">Prototype: Compare sources</span></div>
+              <div class="feature-row"><strong>Source and integration health</strong><p>Rights, API/session state, source lag, schema changes, stale mode and write-back conflicts.</p><span class="evidence">Prototype: Registry + EMR controls</span></div>
+              <div class="feature-row"><strong>Institution roles</strong><p>Doctor, coordinator, presenter, site steward, auditor and admin with least-privilege scopes.</p><span class="evidence">Architecture decision required</span></div>
+              <div class="feature-row"><strong>Role-based alert rules</strong><p>Choose the trigger, recipients, approved channels, repeat control, and stop condition.</p><span class="evidence">Prototype: alert rule builder</span></div>
+              <div class="feature-row"><strong>Saved workspaces</strong><p>Views by disease group, board, site, assertion expiry, task owner and unresolved evidence.</p><span class="evidence">Needs observed team use</span></div>
+              <div class="feature-row"><strong>Bulk work assignment</strong><p>Assign verification or review workload without bulk-changing clinical or site states.</p><span class="evidence">Needs volume threshold</span></div>
+              <div class="feature-row"><strong>Approved communication templates</strong><p>Versioned site and treating-unit messages under sponsor, institution and Ethics Committee control.</p><span class="evidence">Needs local approval</span></div>
+              <div class="feature-row"><strong>Correction and escalation</strong><p>Dispute source/normalized/site assertions, preserve history, and route unresolved work.</p><span class="evidence">Prototype: discrepancy pattern</span></div>
+              <div class="feature-row"><strong>Access and retention controls</strong><p>Packet audience, expiry, revocation, acknowledgement, audit export and deletion policy.</p><span class="evidence">Needs governance thresholds</span></div>
+            </div></article>
+            <article class="priority-column"><header><span class="priority-badge p2">P2</span><h2>Scale proven operations</h2><p>Buyer, rights, safety, support and unit economics required</p></header><div class="feature-list">
+              <div class="feature-row"><strong>Authorised site portal</strong><p>Site stewards maintain operational status, contacts, capacity notes and correction history.</p><span class="evidence">Requires site incentive validation</span></div>
+              <div class="feature-row"><strong>Operations analytics</strong><p>Freshness, response, discrepancy, workload, write-back and handoff completion only.</p><span class="evidence">Prototype: Analytics</span></div>
+              <div class="feature-row"><strong>Alert service analytics</strong><p>Unread age, duplicate suppression, delivery failure, unsubscribe, and action completion.</p><span class="evidence">Requires real delivery volume</span></div>
+              <div class="feature-row"><strong>Multi-EMR adapters</strong><p>Versioned mappings, capability discovery and consistent provenance across approved vendors.</p><span class="evidence">Requires second integration</span></div>
+              <div class="feature-row"><strong>Multi-institution tenancy</strong><p>Explicit isolation, visibility, regional residency, correction and shared-network rules.</p><span class="evidence">Requires network buyer</span></div>
+              <div class="feature-row"><strong>Institutional workflow export</strong><p>Approved task, packet-manifest, decision-reference and audit exchange without a second clinical record.</p><span class="evidence">Requires target contracts</span></div>
+              <div class="feature-row"><strong>Multilingual operations</strong><p>Approved general and operational copy with named content owner and version.</p><span class="evidence">Requires language/user evidence</span></div>
+              <div class="feature-row"><strong>Sponsor and site portfolio views</strong><p>Operational inquiry and verification visibility under strict institution/site permissions.</p><span class="evidence">Requires commercial model</span></div>
+              <div class="feature-row"><strong>Verification capacity controls</strong><p>Coverage tiers, expiry policy, assignment, service-level reporting and cost per active site.</p><span class="evidence">Likely moat and cost centre</span></div>
+              <div class="feature-row"><strong>Reliability and recovery controls</strong><p>Source isolation, bounded retries, restore drills, audit continuity and rollback.</p><span class="evidence">Requires approved SLO/RTO/RPO</span></div>
+            </div></article>
+          </div>
+          <div class="excluded-box"><h2>Still excluded from every priority</h2><p>Automated interpretation of notes, pathology, biomarkers, stage, response, progression or risk; inferred eligibility; automatic trial ranking; treatment recommendations; autonomous patient communication; and any unsupported CTRI/ICMR endorsement. EMR integration increases available evidence—it does not move the human clinical boundary.</p></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <dialog id="inquiry-dialog" aria-labelledby="inquiry-dialog-title">
+    <form method="dialog" id="inquiry-form">
+      <div class="dialog-head"><div><h2 id="inquiry-dialog-title">Start a site inquiry</h2><p id="inquiry-trial-label">General operational question</p></div><button class="icon-button close-dialog" type="button" aria-label="Close inquiry dialog"><svg class="icon"><use href="#i-x"/></svg></button></div>
+      <div class="dialog-body"><div class="notice" style="margin-bottom:13px"><strong>Keep this general.</strong> Do not enter a person's diagnosis, reports, biomarkers, treatment history, contact details, or other patient information.</div><div class="form-grid">
+        <div class="form-row"><label for="inquiry-type">Question</label><select class="select" id="inquiry-type" required><option value="Confirm site recruitment">Confirm site recruitment</option><option value="Confirm preferred contact route">Confirm preferred contact route</option><option value="Resolve registry discrepancy">Resolve registry discrepancy</option><option value="Request general study information">Request general study information</option></select></div>
+        <div class="form-row"><label for="inquiry-owner">Owner</label><select class="select" id="inquiry-owner" required><option>A. Rao — research coordinator</option><option>Dr M. Shah — treating oncologist</option><option>Trial office — shared queue</option></select></div>
+        <div class="form-row"><label for="inquiry-due">Follow-up date</label><input class="field" id="inquiry-due" type="date" required></div>
+        <div class="form-row"><label for="inquiry-route">Approved route</label><select class="select" id="inquiry-route" required><option>Registry public-query channel</option><option>Site trial office</option><option>Sponsor central contact</option></select></div>
+        <div class="form-row full"><label for="inquiry-note">Operational note</label><textarea class="field" id="inquiry-note" maxlength="280" placeholder="Example: Please confirm whether the listed site is accepting general screening inquiries and the preferred referral route."></textarea><p class="field-help">Maximum 280 characters. This field is intentionally not a clinical referral note.</p></div>
+        <div class="form-row full"><label class="checkbox-row"><input id="inquiry-safe" type="checkbox" required><span>I confirm this inquiry contains no patient-identifying or patient-specific clinical information.</span></label></div>
+      </div></div>
+      <div class="dialog-foot"><button class="button close-dialog" type="button">Cancel</button><button class="button primary" type="submit"><svg class="icon"><use href="#i-send"/></svg>Create inquiry</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="verification-dialog" aria-labelledby="verification-dialog-title">
+    <form method="dialog" id="verification-form">
+      <div class="dialog-head"><div><h2 id="verification-dialog-title">Record site verification</h2><p id="verification-trial-label">Human-sourced operational assertion</p></div><button class="icon-button close-dialog" type="button" aria-label="Close verification dialog"><svg class="icon"><use href="#i-x"/></svg></button></div>
+      <div class="dialog-body"><div class="notice" style="margin-bottom:13px"><strong>Evidence, not inference.</strong> “No response” is not “not recruiting.” Record only what an authorised source explicitly stated.</div><div class="form-grid">
+        <div class="form-row"><label for="verification-status">Site assertion</label><select class="select" id="verification-status" required><option value="verified_recruiting">Verified recruiting</option><option value="verified_not_recruiting">Verified not recruiting</option><option value="temporarily_paused">Temporarily paused</option><option value="no_authoritative_response">No authoritative response</option><option value="registry_site_discrepancy">Registry/site discrepancy</option></select></div>
+        <div class="form-row"><label for="verification-source">Source role</label><select class="select" id="verification-source" required><option>Site trial coordinator</option><option>Site principal investigator</option><option>Sponsor trial operations</option><option>Institutional trial office</option></select></div>
+        <div class="form-row"><label for="verification-method">Method</label><select class="select" id="verification-method" required><option>Authorised email confirmation</option><option>Recorded trial-office call</option><option>Approved site portal</option><option>Sponsor update</option></select></div>
+        <div class="form-row"><label for="verification-date">Confirmed on</label><input class="field" id="verification-date" type="date" required></div>
+        <div class="form-row full"><label for="verification-note">Evidence note</label><textarea class="field" id="verification-note" maxlength="280" placeholder="State the operational assertion and evidence reference. Do not include patient information."></textarea></div>
+        <div class="form-row full"><label class="checkbox-row"><input id="verification-authority" type="checkbox" required><span>I confirmed the source was authorised to speak for this site or study operation.</span></label></div>
+      </div></div>
+      <div class="dialog-foot"><button class="button close-dialog" type="button">Cancel</button><button class="button success" type="submit"><svg class="icon"><use href="#i-check"/></svg>Save verification</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="compare-dialog" aria-labelledby="compare-dialog-title">
+    <div class="dialog-head"><div><h2 id="compare-dialog-title">Compare source assertions</h2><p id="compare-trial-label">Original values remain separate</p></div><button class="icon-button close-dialog" type="button" aria-label="Close source comparison"><svg class="icon"><use href="#i-x"/></svg></button></div>
+    <div class="dialog-body" id="compare-content"></div>
+    <div class="dialog-foot"><button class="button close-dialog" type="button">Close comparison</button></div>
+  </dialog>
+
+  <dialog id="artifact-dialog" aria-labelledby="artifact-dialog-title">
+    <div class="dialog-head"><div><h2 id="artifact-dialog-title">Source artifact</h2><p>Read-through from synthetic EMR · original remains system of record</p></div><button class="icon-button close-dialog" type="button" aria-label="Close artifact preview"><svg class="icon"><use href="#i-x"/></svg></button></div>
+    <div class="dialog-body" id="artifact-dialog-body"></div>
+    <div class="dialog-foot"><button class="button close-dialog" type="button">Close source</button><button class="button" type="button" id="confirm-source-fact"><svg class="icon"><use href="#i-check"/></svg>Record clinician confirmation</button></div>
+  </dialog>
+
+  <dialog id="packet-dialog" aria-labelledby="packet-dialog-title">
+    <form id="packet-form">
+      <div class="dialog-head"><div><h2 id="packet-dialog-title">Prepare referral packet</h2><p id="packet-trial-label">Bounded source manifest · draft only</p></div><button class="icon-button close-dialog" type="button" aria-label="Close packet builder"><svg class="icon"><use href="#i-x"/></svg></button></div>
+      <div class="dialog-body"><div class="notice" style="margin-bottom:13px"><strong>Explicit selection only.</strong> Trial Relay references chosen EMR source artifacts. It does not infer relevance, summarize clinical meaning, or release the packet automatically.</div><div class="form-grid">
+        <div class="form-row"><label for="packet-purpose">Purpose</label><select class="select" id="packet-purpose"><option>Trial-team formal screening</option><option>Tumour-board discussion</option><option>External expert review</option></select></div>
+        <div class="form-row"><label for="packet-recipient">Authorised recipient</label><select class="select" id="packet-recipient"><option>Verified site trial office</option><option>Sponsor central trial team</option><option>Internal tumour board</option></select></div>
+        <div class="form-row"><label for="packet-owner">Handoff owner</label><select class="select" id="packet-owner"><option>A. Rao — research coordinator</option><option>Dr M. Shah — treating oncologist</option><option>Trial office — shared queue</option></select></div>
+        <div class="form-row"><label for="packet-expiry">Access expiry</label><input class="field" id="packet-expiry" type="date" value="2026-09-27" required></div>
+        <div class="form-row full"><label>Source manifest</label><div class="packet-manifest"><label class="packet-item"><input type="checkbox" checked><span><strong>Pathology report · final</strong>DiagnosticReport reference · clinician reviewed</span></label><label class="packet-item"><input type="checkbox" checked><span><strong>Molecular diagnostic report</strong>DocumentReference · original linked report</span></label><label class="packet-item"><input type="checkbox" checked><span><strong>Treatment administration timeline</strong>MedicationAdministration references · no inferred response</span></label><label class="packet-item"><input type="checkbox"><span><strong>Latest laboratory report</strong>Observation references · include only if clinician selects</span></label></div></div>
+        <div class="form-row full"><label class="checkbox-row"><input id="packet-authorised" type="checkbox" required><span>I am authorised to prepare this packet and will review the exact source manifest before any release.</span></label></div>
+      </div></div>
+      <div class="dialog-foot"><button class="button close-dialog" type="button">Cancel</button><button class="button primary" type="submit"><svg class="icon"><use href="#i-briefcase"/></svg>Create draft packet</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="board-dialog" aria-labelledby="board-dialog-title">
+    <form id="board-form">
+      <div class="dialog-head"><div><h2 id="board-dialog-title">Record human board decision</h2><p>Operational disposition only · reference the signed clinical record</p></div><button class="icon-button close-dialog" type="button" aria-label="Close board decision form"><svg class="icon"><use href="#i-x"/></svg></button></div>
+      <div class="dialog-body"><div class="notice" style="margin-bottom:13px"><strong>Do not generate or rewrite the clinical decision.</strong> Enter the reference to the clinician-authored record and only the operational handoff authorised by the board.</div><div class="form-grid">
+        <div class="form-row"><label for="board-record-ref">Signed decision reference</label><input class="field" id="board-record-ref" value="MDT-DEMO-2026-0916-01" required></div>
+        <div class="form-row"><label for="board-disposition">Operational disposition</label><select class="select" id="board-disposition"><option>Authorise site contact for formal screening</option><option>Request missing source artifact</option><option>Defer operational handoff</option><option>No operational action</option></select></div>
+        <div class="form-row"><label for="board-owner">Task owner</label><select class="select" id="board-owner"><option>A. Rao — research coordinator</option><option>Trial office — shared queue</option><option>Treating unit — shared queue</option></select></div>
+        <div class="form-row"><label for="board-due">Due date</label><input class="field" id="board-due" type="date" value="2026-09-17" required></div>
+        <div class="form-row full"><label for="board-recipient">Authorised recipient</label><select class="select" id="board-recipient"><option>Treating oncology unit</option><option>Institutional trial office</option><option>Verified external trial site</option></select></div>
+        <div class="form-row full"><label class="checkbox-row"><input id="board-human-authored" type="checkbox" required><span>I confirm the clinical decision was authored and signed by the human board; this form records only its reference and operational disposition.</span></label></div>
+      </div></div>
+      <div class="dialog-foot"><button class="button close-dialog" type="button">Cancel</button><button class="button success" type="submit"><svg class="icon"><use href="#i-check"/></svg>Record disposition</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="writeback-dialog" aria-labelledby="writeback-dialog-title">
+    <div class="dialog-head"><div><h2 id="writeback-dialog-title">EMR write-back preview</h2><p>Dry-run payload · no external system is contacted</p></div><button class="icon-button close-dialog" type="button" aria-label="Close write-back preview"><svg class="icon"><use href="#i-x"/></svg></button></div>
+    <div class="dialog-body" id="writeback-body"><div class="compare-grid"><div class="compare-card"><span class="tag">Task</span><h3>Operational handoff</h3><div class="compare-row"><label>Subject</label><strong>Patient/SYN-2047</strong></div><div class="compare-row"><label>Owner</label><strong>Research coordinator</strong></div><div class="compare-row"><label>Intent</label><strong>order · operational</strong></div><div class="compare-row"><label>Status</label><strong>draft</strong></div></div><div class="compare-card"><span class="tag">DocumentReference</span><h3>Packet manifest</h3><div class="compare-row"><label>Content</label><strong>References only</strong></div><div class="compare-row"><label>Clinical source copied</label><strong>No</strong></div><div class="compare-row"><label>Security label</label><strong>Restricted care team</strong></div><div class="compare-row"><label>Expiry</label><strong>Policy controlled</strong></div></div></div><div class="notice" style="margin-top:12px"><strong>Transaction:</strong> write-back uses the EMR version/precondition. A conflict preserves the local draft and requires human reconciliation; it never silently overwrites the EMR.</div></div>
+    <div class="dialog-foot"><button class="button close-dialog" type="button">Close preview</button><button class="button primary" type="button" id="simulate-writeback"><svg class="icon"><use href="#i-upload"/></svg>Run synthetic write-back</button></div>
+  </dialog>
+
+  <dialog id="alert-rule-dialog" aria-labelledby="alert-rule-title">
+    <form id="alert-rule-form">
+      <div class="dialog-head"><div><h2 id="alert-rule-title">Create an alert rule</h2><p>Operational changes only · synthetic prototype</p></div><button class="icon-button close-dialog" type="button" aria-label="Close alert rule"><svg class="icon"><use href="#i-x"/></svg></button></div>
+      <div class="dialog-body"><div class="notice" style="margin-bottom:13px"><strong>Keep alerts factual.</strong> State what changed, where it came from, and who owns the next step. Do not include a match score, treatment advice, or clinical details in an external message.</div><div class="form-grid">
+        <div class="form-row"><label for="alert-trial">Followed trial</label><select class="select" id="alert-trial"><option value="DEMO-CTRI-001">DEMO-CTRI-001 · lung study</option><option value="DEMO-CTRI-003">DEMO-CTRI-003 · supportive-care study</option><option value="DEMO-NCT-004">DEMO-NCT-004 · breast study</option></select></div>
+        <div class="form-row"><label for="alert-trigger">Tell me when</label><select class="select" id="alert-trigger"><option>Registry recruitment status changes</option><option>Site verification changes or expires</option><option>Registry and site disagree</option><option>Referral is acknowledged or overdue</option><option>Board or EMR task changes</option><option>Trial team records final eligibility outcome</option></select></div>
+        <div class="form-row full"><label>Recipients</label><div class="packet-manifest"><label class="packet-item"><input type="checkbox" name="alert-recipient" value="Treating oncologist" checked><span><strong>Treating oncologist</strong>In-app and EMR inbox</span></label><label class="packet-item"><input type="checkbox" name="alert-recipient" value="Research coordinator" checked><span><strong>Research coordinator</strong>Owns verification and handoff follow-up</span></label><label class="packet-item"><input type="checkbox" name="alert-recipient" value="Site steward"><span><strong>Site steward</strong>Only for site-status or correction work</span></label><label class="packet-item"><input type="checkbox" name="alert-recipient" value="Board presenter"><span><strong>Board presenter</strong>Only for board-owned tasks</span></label></div></div>
+        <div class="form-row full"><label>Delivery</label><div class="channel-row"><label class="channel"><input type="checkbox" name="alert-channel" value="In app" checked> In app</label><label class="channel"><input type="checkbox" name="alert-channel" value="EMR inbox" checked> EMR inbox</label><label class="channel"><input type="checkbox" name="alert-channel" value="EMR Task"> EMR Task</label><label class="channel"><input type="checkbox" name="alert-channel" value="Approved email"> Approved email</label></div></div>
+        <div class="form-row"><label for="alert-repeat">Repeat control</label><select class="select" id="alert-repeat"><option>Once per source change</option><option>Daily reminder until owned</option><option>Escalate after approved interval</option></select></div>
+        <div class="form-row"><label for="alert-end">Stop alerts</label><select class="select" id="alert-end"><option>When task closes or follow ends</option><option>When trial closes</option><option>On a chosen date</option></select></div>
+        <div class="form-row full"><label class="checkbox-row"><input id="alert-safe" type="checkbox" required><span>I confirm this rule sends operational status only and uses approved recipients and channels.</span></label></div>
+      </div></div>
+      <div class="dialog-foot"><button class="button close-dialog" type="button">Cancel</button><button class="button primary" type="submit"><svg class="icon"><use href="#i-bell"/></svg>Save alert rule</button></div>
+    </form>
+  </dialog>
+
+  <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+  <noscript><div class="no-script"><strong>Interactive prototype requires JavaScript.</strong><p>The core product contract remains: general trial discovery, separate registry and site states, human verification, human-approved inquiry tasks, and no patient-specific matching.</p></div></noscript>
+
+  <script>
+    const today = '2026-09-13';
+    const trials = [
+      {
+        id: 'DEMO-CTRI-001', source: 'CTRI', secondary: 'DEMO-NCT-101', cancer: 'Lung', state: 'Maharashtra', city: 'Mumbai', phase: 'Phase 3',
+        title: 'Biomarker-guided maintenance study in advanced non-small cell lung cancer',
+        summary: 'Synthetic interventional study record used to demonstrate general discovery, provenance, and a recently verified site contact path.',
+        registryStatus: 'Open to recruitment', registryUpdated: '2026-08-02', registryAge: '42 days',
+        verifyKey: 'verified_recruiting', verifyLabel: 'Verified recruiting', verifyTone: 'good', verifiedAt: '2026-09-10', verifyAge: '3 days ago', verifyMethod: 'Site trial coordinator · authorised email',
+        location: 'Harbour Oncology Research Centre, Mumbai', sponsor: 'Synthetic Oncology Research Network', design: 'Randomised interventional study',
+        generalCriteria: 'Advanced non-small cell lung cancer; protocol-defined biomarker and prior-treatment conditions apply. Trial team performs formal screening.',
+        operational: 'Site accepts general screening inquiries through its trial office. No patient information is required for the first contact.',
+        confidence: 95, due: false, discrepancy: false,
+        activity: [
+          ['2026-09-10 15:22', 'Site verification recorded', 'A. Rao · authorised email'],
+          ['2026-09-08 09:05', 'Registry snapshot refreshed', 'CTRI · synthetic fixture'],
+          ['2026-09-08 09:05', 'Cross-registry ID linked', 'Deterministic secondary-ID rule']
+        ]
+      },
+      {
+        id: 'DEMO-CTRI-002', source: 'CTRI', secondary: 'No declared NCT ID', cancer: 'Head and neck', state: 'Delhi', city: 'New Delhi', phase: 'Phase 2',
+        title: 'Perioperative immunotherapy study in resectable oral cavity cancer',
+        summary: 'Synthetic record demonstrating an open registry declaration with no authoritative response from the listed site.',
+        registryStatus: 'Open to recruitment', registryUpdated: '2026-06-16', registryAge: '89 days',
+        verifyKey: 'no_authoritative_response', verifyLabel: 'No authoritative response', verifyTone: 'warn', verifiedAt: '2026-09-07', verifyAge: 'attempted 6 days ago', verifyMethod: 'Two trial-office attempts · no confirmation',
+        location: 'North Capital Cancer Institute, New Delhi', sponsor: 'Synthetic Academic Cancer Group', design: 'Open-label interventional study',
+        generalCriteria: 'Resectable oral cavity cancer; protocol-defined stage, fitness, and prior-treatment criteria apply.',
+        operational: 'The registry declaration remains visible, but the site has not confirmed current screening availability.',
+        confidence: 54, due: true, discrepancy: false,
+        activity: [
+          ['2026-09-07 11:34', 'Verification attempt recorded', 'A. Rao · trial-office call'],
+          ['2026-09-04 16:20', 'Verification attempt recorded', 'Shared trial office · public-query route'],
+          ['2026-09-01 08:50', 'Registry snapshot refreshed', 'CTRI · synthetic fixture']
+        ]
+      },
+      {
+        id: 'DEMO-CTRI-003', source: 'CTRI', secondary: 'DEMO-NCT-303', cancer: 'Supportive care', state: 'Tamil Nadu', city: 'Chennai', phase: 'Phase 2',
+        title: 'Navigation and symptom-support workflow during definitive radiotherapy',
+        summary: 'Synthetic operational study record showing a direct disagreement between registry-declared and site-confirmed recruitment state.',
+        registryStatus: 'Open to recruitment', registryUpdated: '2026-09-01', registryAge: '12 days',
+        verifyKey: 'registry_site_discrepancy', verifyLabel: 'Site reports temporary pause', verifyTone: 'bad', verifiedAt: '2026-09-12', verifyAge: '1 day ago', verifyMethod: 'Institutional trial office · recorded call',
+        location: 'Coastal Cancer Care Centre, Chennai', sponsor: 'Synthetic Supportive Care Consortium', design: 'Pragmatic interventional study',
+        generalCriteria: 'Adults receiving protocol-defined radiotherapy; site team confirms formal inclusion and exclusion criteria.',
+        operational: 'Site trial office reports a temporary screening pause while the registry still displays open recruitment. Follow-up is due.',
+        confidence: 48, due: true, discrepancy: true,
+        activity: [
+          ['2026-09-12 10:18', 'Registry/site discrepancy recorded', 'K. Iyer · trial-office call'],
+          ['2026-09-12 10:15', 'Site assertion recorded', 'Temporarily paused'],
+          ['2026-09-11 09:10', 'Registry snapshot refreshed', 'CTRI · synthetic fixture']
+        ]
+      },
+      {
+        id: 'DEMO-NCT-004', source: 'ClinicalTrials.gov', secondary: 'DEMO-CTRI-404', cancer: 'Breast', state: 'Karnataka', city: 'Bengaluru', phase: 'Phase 3',
+        title: 'Adjuvant strategy study in HER2-positive early breast cancer',
+        summary: 'Synthetic cross-registry example with a not-yet-recruiting declaration and site startup confirmation.',
+        registryStatus: 'Not yet recruiting', registryUpdated: '2026-09-08', registryAge: '5 days',
+        verifyKey: 'verified_not_recruiting', verifyLabel: 'Site startup confirmed', verifyTone: 'neutral', verifiedAt: '2026-09-09', verifyAge: '4 days ago', verifyMethod: 'Sponsor trial operations · authorised update',
+        location: 'Garden City Oncology Institute, Bengaluru', sponsor: 'Synthetic Breast Research Alliance', design: 'Randomised interventional study',
+        generalCriteria: 'HER2-positive early breast cancer; protocol-defined pathology, stage, prior-treatment, and timing criteria apply.',
+        operational: 'Site confirms startup activities but is not accepting screening inquiries. Recheck after the stated activation window.',
+        confidence: 83, due: true, discrepancy: false,
+        activity: [
+          ['2026-09-09 13:45', 'Site startup state confirmed', 'Sponsor trial operations'],
+          ['2026-09-08 09:00', 'Registry snapshot refreshed', 'ClinicalTrials.gov API fixture'],
+          ['2026-09-08 09:00', 'Secondary ID linked', 'Declared identifier rule']
+        ]
+      }
+    ];
+    let currentRole = 'coordinator';
+    const followedTrialIds = new Set(['DEMO-CTRI-001','DEMO-CTRI-003']);
+    let alertRules = 4;
+    let alerts = [
+      {id:'ALT-301',type:'trial',tone:'warn',title:'Registry status changed',body:'DEMO-CTRI-001 changed from Not yet recruiting to Open to recruitment in the latest synthetic registry snapshot.',source:'CTRI snapshot · 18 minutes ago',recipients:['Treating oncologist','Research coordinator'],unread:true},
+      {id:'ALT-302',type:'verification',tone:'bad',title:'Registry and site do not agree',body:'DEMO-CTRI-003 is listed as open, but the site reports a temporary pause. A coordinator owns the follow-up.',source:'Site trial office · 1 hour ago',recipients:['Research coordinator','Site steward'],unread:true},
+      {id:'ALT-303',type:'handoff',tone:'good',title:'Referral acknowledged',body:'The trial office acknowledged INQ-1038. Formal screening remains with the trial team.',source:'Trial office · 3 hours ago',recipients:['Treating oncologist','Research coordinator'],unread:true},
+      {id:'ALT-304',type:'verification',tone:'warn',title:'Site verification expires soon',body:'The site assertion for DEMO-NCT-004 reaches its review date tomorrow.',source:'Verification policy · today',recipients:['Research coordinator'],unread:true},
+      {id:'ALT-305',type:'handoff',tone:'neutral',title:'Board task written to EMR',body:'Task/SYN-TASK-901 was created and is waiting for treating-unit acknowledgement.',source:'EMR adapter · yesterday',recipients:['Treating unit','Board presenter'],unread:false}
+    ];
+
+    let selectedTrialId = trials[0].id;
+    let selectedVerificationId = trials[2].id;
+    let activeTab = 'summary';
+    let ctriOutage = false;
+    let caseSelectedTrialId = trials[0].id;
+    let currentArtifactName = '';
+    let packetDrafted = false;
+    let boardDecisionRecorded = false;
+    const criterionDecisions = new Map();
+    let inquiries = [
+      {id:'INQ-1042', trialId:'DEMO-CTRI-003', question:'Resolve registry discrepancy', owner:'A. Rao', due:'2026-09-14', route:'Site trial office', status:'sent', created:'2026-09-12'},
+      {id:'INQ-1038', trialId:'DEMO-CTRI-002', question:'Confirm site recruitment', owner:'Trial office', due:'2026-09-15', route:'Registry public-query channel', status:'acknowledged', created:'2026-09-07'}
+    ];
+    let auditEvents = [
+      {id:'EVT-2048', at:'2026-09-13 08:40', actor:'System fixture', title:'Prototype workspace opened', note:'Synthetic data loaded in browser memory', type:'system'},
+      {id:'EVT-2047', at:'2026-09-12 10:18', actor:'K. Iyer', title:'Registry/site discrepancy recorded', note:'DEMO-CTRI-003 · site reports temporary pause', type:'verification'},
+      {id:'EVT-2046', at:'2026-09-12 10:16', actor:'A. Rao', title:'Inquiry marked sent', note:'INQ-1042 · site trial office', type:'task'},
+      {id:'EVT-2045', at:'2026-09-10 15:22', actor:'A. Rao', title:'Site verification recorded', note:'DEMO-CTRI-001 · verified recruiting', type:'verification'},
+      {id:'EVT-2044', at:'2026-09-08 09:05', actor:'Source adapter', title:'Registry snapshot refreshed', note:'Three synthetic CTRI records processed', type:'source'}
+    ];
+
+    const $ = (selector, root=document) => root.querySelector(selector);
+    const $$ = (selector, root=document) => Array.from(root.querySelectorAll(selector));
+    const icon = (name) => `<svg class="icon" aria-hidden="true"><use href="#i-${name}"/></svg>`;
+    const trialById = (id) => trials.find(t => t.id === id);
+    const formatDate = (value) => new Intl.DateTimeFormat('en-IN',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(value+'T00:00:00'));
+    const statusPill = (trial) => `<span class="status-pill ${trial.verifyTone}"><span class="status-dot"></span>${trial.verifyLabel}</span>`;
+    const statusHuman = {draft:'Draft',approved:'Human approved',sent:'Sent',acknowledged:'Acknowledged',closed:'Closed',unable:'Unable to contact'};
+
+    function showToast(message) {
+      const region = $('#toast-region');
+      const node = document.createElement('div');
+      node.className = 'toast';
+      node.innerHTML = `${icon('check')}<span>${message}</span>`;
+      region.appendChild(node);
+      setTimeout(() => node.remove(), 3600);
+    }
+
+    function filteredTrials() {
+      const query = $('#trial-search').value.trim().toLowerCase();
+      const cancer = $('#cancer-filter').value;
+      const verify = $('#verify-filter').value;
+      const state = $('#state-filter').value;
+      const sort = $('#sort-results').value;
+      let rows = trials.filter(t => {
+        const searchable = [t.title,t.cancer,t.phase,t.city,t.state,t.id,t.sponsor,t.registryStatus,t.verifyLabel].join(' ').toLowerCase();
+        const verifyMatch = verify === 'all' || (verify === 'verified' && ['verified_recruiting','verified_not_recruiting'].includes(t.verifyKey)) || (verify === 'attention' && (t.due || t.discrepancy)) || (verify === 'unverified' && t.verifyKey === 'no_authoritative_response');
+        return (!query || searchable.includes(query)) && (cancer === 'all' || t.cancer === cancer) && (state === 'all' || t.state === state) && verifyMatch;
+      });
+      if (sort === 'confidence') rows.sort((a,b)=>b.confidence-a.confidence);
+      if (sort === 'recent') rows.sort((a,b)=>b.verifiedAt.localeCompare(a.verifiedAt));
+      if (sort === 'title') rows.sort((a,b)=>a.title.localeCompare(b.title));
+      return rows;
+    }
+
+    function renderTrials() {
+      const rows = filteredTrials();
+      const list = $('#result-list');
+      $('#result-count').textContent = `${rows.length} ${rows.length === 1 ? 'trial' : 'trials'}`;
+      if (!rows.length) {
+        list.innerHTML = `<div class="empty-state"><div class="empty-symbol">${icon('search')}</div><h2>No general records found</h2><p>Try a broader cancer term or clear the operational-state filters. No patient details are needed.</p><button class="button" type="button" id="empty-reset">Clear filters</button></div>`;
+        $('#trial-detail').innerHTML = `<div class="detail-head"><h2>No record selected</h2><p class="summary">The detail panel updates when a general trial record is selected.</p></div>`;
+        $('#empty-reset')?.addEventListener('click', clearFilters);
+        return;
+      }
+      if (!rows.some(t=>t.id===selectedTrialId)) selectedTrialId = rows[0].id;
+      list.innerHTML = rows.map(t => `
+        <button class="trial-card ${t.id===selectedTrialId?'selected':''}" type="button" data-trial-id="${t.id}" aria-pressed="${t.id===selectedTrialId}">
+          <div class="trial-card-top"><span class="tag">${t.source}</span><span class="tag">${t.phase}</span><span class="updated">registry ${t.registryAge}</span></div>
+          <h2>${t.title}</h2>
+          <div class="trial-meta"><span class="tag">${t.cancer}</span><span class="tag">${t.city}</span>${t.discrepancy?'<span class="tag" style="color:var(--red);background:var(--red-soft)">discrepancy</span>':''}</div>
+          <div class="dual-status-mini"><div class="mini-state registry"><span>Registry declares</span><strong>${t.registryStatus}</strong></div><div class="mini-state verified ${t.verifyTone}"><span>Site verification</span><strong>${t.verifyLabel}</strong></div></div>
+        </button>`).join('');
+      $$('.trial-card', list).forEach(button => button.addEventListener('click', () => { selectedTrialId=button.dataset.trialId; activeTab='summary'; renderTrials(); }));
+      renderDetail(trialById(selectedTrialId));
+    }
+
+    function renderDetail(t) {
+      const target = $('#trial-detail');
+      const tabData = {
+        summary: `<div class="detail-grid"><div class="fact"><label>Cancer area</label><strong>${t.cancer}</strong></div><div class="fact"><label>Study phase</label><strong>${t.phase}</strong></div><div class="fact"><label>Study design</label><strong>${t.design}</strong></div><div class="fact"><label>Lead sponsor</label><strong>${t.sponsor}</strong></div><div class="fact"><label>Indian location</label><strong>${t.city}, ${t.state}</strong></div><div class="fact"><label>Operational confidence</label><strong>${t.confidence}/100 · demonstration rule</strong></div><div class="fact wide"><label>Why this record is here</label><p>${t.operational}</p></div><div class="notice wide"><strong>Human boundary:</strong> This view does not determine whether any person qualifies. Contact the trial team for protocol screening and formal eligibility.</div></div>`,
+        sites: `<div class="detail-grid"><div class="fact wide"><label>Site</label><strong>${t.location}</strong></div><div class="fact"><label>Site assertion</label><strong>${t.verifyLabel}</strong></div><div class="fact"><label>Confirmed</label><strong>${formatDate(t.verifiedAt)}</strong></div><div class="fact"><label>Evidence route</label><strong>${t.verifyMethod}</strong></div><div class="fact wide"><label>Operational note</label><p>${t.operational}</p></div><div class="notice wide"><strong>Expiry rule:</strong> A verification must be time-bounded. This prototype displays age but the actual expiry interval requires local policy and evidence.</div></div>`,
+        criteria: `<div class="detail-grid"><div class="fact wide"><label>Registry summary of criteria</label><p>${t.generalCriteria}</p></div><div class="notice wide"><strong>Not a pre-screen:</strong> Registry text can be incomplete or method-specific. The trial coordinator and investigator review every applicable criterion and source record.</div><div class="fact wide"><label>Allowed use here</label><p>Read general protocol language, preserve its source, and ask the site an operational question. Do not paste a patient's facts or request a match.</p></div></div>`,
+        provenance: `<div class="detail-grid"><div class="fact"><label>Primary source</label><strong>${t.source}</strong></div><div class="fact"><label>Record ID</label><strong>${t.id}</strong></div><div class="fact"><label>Declared secondary ID</label><strong>${t.secondary}</strong></div><div class="fact"><label>Registry updated</label><strong>${formatDate(t.registryUpdated)}</strong></div><div class="fact"><label>Snapshot retrieved</label><strong>13 Sep 2026 · synthetic</strong></div><div class="fact"><label>Normalization rule</label><strong>DEMO-RULESET-1</strong></div><div class="notice wide"><strong>Prototype provenance:</strong> These identifiers and facts are fictional. A real product must preserve original record values and exact URLs without implying CTRI/ICMR endorsement.</div></div>`,
+        activity: `<div class="timeline">${t.activity.map(a=>`<div class="timeline-item"><strong>${a[1]}</strong><span>${a[0]} · ${a[2]}</span></div>`).join('')}</div>`
+      };
+      target.innerHTML = `
+        <div class="detail-head"><div class="detail-overline"><span class="tag">${t.source}</span><span class="record-id">${t.id}</span><span class="priority-badge p0">synthetic</span></div><h2>${t.title}</h2><p class="summary">${t.summary}</p></div>
+        <div class="dual-status"><div class="status-block"><span class="status-label">Registry declares</span><div class="status-value">${t.registryStatus}</div><p>${t.source} · updated ${formatDate(t.registryUpdated)} · ${t.registryAge}</p></div><div class="status-block verified ${t.verifyTone}"><span class="status-label">Site verification</span><div class="status-value">${statusPill(t)}</div><p>${t.verifyMethod} · ${t.verifyAge}</p></div></div>
+        <div class="detail-actions"><button class="button primary" type="button" id="review-with-case">${icon('user')}Review with EMR case</button><button class="button" type="button" id="start-inquiry">${icon('send')}General site inquiry</button><button class="button" type="button" id="compare-sources">${icon('link')}Compare sources</button><button class="button ${followedTrialIds.has(t.id)?'success':''}" type="button" id="toggle-follow">${icon('bell')}${followedTrialIds.has(t.id)?'Following trial':'Follow trial'}</button><button class="button" type="button" id="copy-reference">${icon('copy')}Copy reference</button></div>
+        <div class="tabs" role="tablist" aria-label="Trial detail sections">${[['summary','Summary'],['sites','Sites & status'],['criteria','Criteria'],['provenance','Provenance'],['activity','Activity']].map(([key,label])=>`<button class="tab-button ${activeTab===key?'active':''}" type="button" role="tab" aria-selected="${activeTab===key}" data-tab="${key}">${label}</button>`).join('')}</div>
+        <div class="tab-content">${tabData[activeTab]}</div>`;
+      $('#review-with-case').addEventListener('click', () => {
+        caseSelectedTrialId=t.id;
+        renderCase();
+        switchView('case');
+      });
+      $('#start-inquiry').addEventListener('click', () => openInquiry(t.id));
+      $('#compare-sources').addEventListener('click', () => openCompare(t.id));
+      $('#toggle-follow').addEventListener('click', () => {
+        if(followedTrialIds.has(t.id)){
+          followedTrialIds.delete(t.id);
+          showToast(`Stopped following ${t.id}. New trial-status alerts will stop.`);
+        }else{
+          followedTrialIds.add(t.id);
+          showToast(`Following ${t.id}. Your team can now receive factual status alerts.`);
+        }
+        renderDetail(t);
+        renderAlerts();
+      });
+      $('#copy-reference').addEventListener('click', () => copyText(`${t.id} — ${t.title} — synthetic prototype record`, 'Reference copied.'));
+      $$('.tab-button', target).forEach(btn=>btn.addEventListener('click',()=>{activeTab=btn.dataset.tab;renderDetail(t);}));
+    }
+
+    function clearFilters() {
+      $('#trial-search').value=''; $('#cancer-filter').value='all'; $('#verify-filter').value='all'; $('#state-filter').value='all'; $('#sort-results').value='confidence'; renderTrials(); $('#trial-search').focus();
+    }
+
+    function openInquiry(trialId=selectedTrialId) {
+      const t = trialById(trialId) || trials[0];
+      selectedTrialId=t.id;
+      $('#inquiry-trial-label').textContent=`${t.id} · ${t.title}`;
+      $('#inquiry-form').dataset.trialId=t.id;
+      $('#inquiry-safe').checked=false;
+      $('#inquiry-note').value='';
+      $('#inquiry-due').value='2026-09-16';
+      $('#inquiry-dialog').showModal();
+      $('#inquiry-type').focus();
+    }
+
+    function openVerification(trialId=selectedVerificationId) {
+      const t=trialById(trialId);
+      if(!t) return;
+      $('#verification-trial-label').textContent=`${t.id} · ${t.title}`;
+      $('#verification-form').dataset.trialId=t.id;
+      $('#verification-authority').checked=false;
+      $('#verification-note').value='';
+      $('#verification-date').value=today;
+      $('#verification-dialog').showModal();
+      $('#verification-status').focus();
+    }
+
+    function openCompare(trialId) {
+      const t=trialById(trialId);
+      $('#compare-trial-label').textContent=`${t.id} · synthetic comparison`;
+      $('#compare-content').innerHTML=`<div class="compare-grid"><div class="compare-card"><span class="tag">Registry source</span><h3>${t.source}</h3><div class="compare-row"><label>Status</label><strong>${t.registryStatus}</strong></div><div class="compare-row"><label>Updated</label><strong>${formatDate(t.registryUpdated)}</strong></div><div class="compare-row"><label>Record ID</label><strong>${t.id}</strong></div><div class="compare-row"><label>Secondary ID</label><strong>${t.secondary}</strong></div></div><div class="compare-card"><span class="tag">Human site source</span><h3>Operational assertion</h3><div class="compare-row"><label>Status</label><strong>${t.verifyLabel}</strong></div><div class="compare-row"><label>Confirmed</label><strong>${formatDate(t.verifiedAt)}</strong></div><div class="compare-row"><label>Method</label><strong>${t.verifyMethod}</strong></div><div class="compare-row"><label>Conflict</label><strong>${t.discrepancy?'Yes — unresolved':'None recorded'}</strong></div></div></div><div class="notice" style="margin-top:12px"><strong>No precedence shortcut:</strong> the product may display a discrepancy, but a named human owns its disposition. Neither source silently overwrites the other.</div>`;
+      $('#compare-dialog').showModal();
+    }
+
+    function renderCase() {
+      const t=trialById(caseSelectedTrialId) || trialById(selectedTrialId) || trials[0];
+      caseSelectedTrialId=t.id;
+      $('#case-selected-trial-title').textContent=t.title;
+      $('#case-selected-trial-meta').textContent=`${t.id} · ${t.phase} · ${t.city} · ${t.verifyLabel}`;
+      $('#board-trial-title').textContent=t.title;
+      const criteria=[
+        ['Protocol disease cohort','Clinician compares the protocol text with the clinician-confirmed diagnosis.','Pathology report + Condition'],
+        ['Recorded disease setting','Clinician reviews the protocol stage/state wording and current EMR source.','Oncology encounter'],
+        ['Protocol biomarker requirement','Clinician checks method, threshold, specimen, and accepted report.','Molecular report'],
+        ['Prior treatment and timing','Clinician checks lines, component drugs, dates, washout, and recovery.','Treatment timeline']
+      ];
+      $('#case-criteria-list').innerHTML=criteria.map((c,index)=>{
+        const key=`${t.id}:${index}`;
+        const value=criterionDecisions.get(key)||'not_reviewed';
+        return `<div class="criterion-row"><div class="criterion-copy"><strong>${c[0]}</strong><span>${c[1]}</span></div><span class="criterion-source">${icon('link')}${c[2]}</span><label><span class="sr-only">Human review state for ${c[0]}</span><select class="criterion-select" data-criterion-key="${key}"><option value="not_reviewed" ${value==='not_reviewed'?'selected':''}>Not reviewed</option><option value="confirmed" ${value==='confirmed'?'selected':''}>Confirmed by clinician</option><option value="not_met" ${value==='not_met'?'selected':''}>Not met — human decision</option><option value="clarify" ${value==='clarify'?'selected':''}>Needs clarification</option></select></label></div>`;
+      }).join('');
+      $$('[data-criterion-key]').forEach(select=>select.addEventListener('change',()=>{
+        criterionDecisions.set(select.dataset.criterionKey,select.value);
+        auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:'2026-09-13 09:18',actor:'Dr M. Shah',title:'Criterion review state recorded',note:`${select.dataset.criterionKey} · ${select.options[select.selectedIndex].text}`,type:'clinical-human'});
+        updateCriteriaCount();
+        renderAudit();
+        showToast('Human review state saved. No overall eligibility result was calculated.');
+      }));
+      updateCriteriaCount();
+    }
+
+    function updateCriteriaCount() {
+      const prefix=`${caseSelectedTrialId}:`;
+      const reviewed=[...criterionDecisions.entries()].filter(([key,value])=>key.startsWith(prefix)&&value!=='not_reviewed').length;
+      $('#criteria-review-count').textContent=`${reviewed} of 4`;
+    }
+
+    function openArtifact(name) {
+      currentArtifactName=name;
+      $('#artifact-dialog-title').textContent=name;
+      $('#artifact-dialog-body').innerHTML=`<div class="detail-grid"><div class="fact"><label>EMR source</label><strong>Oncology EMR · synthetic</strong></div><div class="fact"><label>Record status</label><strong>Final / available</strong></div><div class="fact"><label>Source date</label><strong>28 Aug–11 Sep 2026</strong></div><div class="fact wide"><label>Source assertion preview</label><p>This demonstration intentionally omits realistic clinical prose. A production workspace opens the original EMR artifact and keeps any extracted assertion linked to its exact source location.</p></div><div class="notice wide"><strong>No interpretation:</strong> Trial Relay does not infer diagnosis, stage, response, risk, or suitability from this artifact.</div></div>`;
+      $('#artifact-dialog').showModal();
+    }
+
+    function openPacket() {
+      const t=trialById(caseSelectedTrialId);
+      $('#packet-trial-label').textContent=`${t.id} · ${t.title}`;
+      $('#packet-authorised').checked=false;
+      $('#packet-dialog').showModal();
+    }
+
+    function renderBoard() {
+      const t=trialById(caseSelectedTrialId)||trials[0];
+      $('#board-trial-title').textContent=t.title;
+      if(!boardDecisionRecorded) return;
+      $('#board-decision-state').textContent='Human decision recorded · ready for write-back';
+      $('#board-decision-copy').innerHTML='<strong>Operational disposition:</strong> Authorise coordinator to contact the verified site for formal trial-team screening. Clinical decision content remains in the signed EMR record.';
+      $('#board-writeback').disabled=false;
+      $('#board-lifecycle').innerHTML='<div class="board-stage done"><span class="board-stage-marker">1</span><div><strong>Case selected</strong><span>Treating oncologist · 13 Sep</span></div></div><div class="board-stage done"><span class="board-stage-marker">2</span><div><strong>Packet sources reviewed</strong><span>Presenter · synthetic artifacts</span></div></div><div class="board-stage done"><span class="board-stage-marker">3</span><div><strong>Board discussion completed</strong><span>Human participants</span></div></div><div class="board-stage done"><span class="board-stage-marker">4</span><div><strong>Decision reference signed</strong><span>MDT-DEMO-2026-0916-01</span></div></div><div class="board-stage current"><span class="board-stage-marker">5</span><div><strong>EMR task pending</strong><span>Owner and acknowledgement ready</span></div></div>';
+    }
+
+    function renderAlerts() {
+      const filter=$('#alert-filter')?.value||'all';
+      const rows=alerts.filter(alert=>filter==='all'||alert.type===filter);
+      const unread=alerts.filter(alert=>alert.unread).length;
+      $('#alert-count').textContent=unread;
+      $('#alerts-list').innerHTML=rows.length?rows.map(alert=>`<div class="alert-item ${alert.unread?'unread':''}"><div class="alert-symbol ${alert.tone==='bad'?'bad':alert.tone==='warn'?'warn':''}">${icon(alert.type==='trial'?'database':alert.type==='verification'?'check':'send')}</div><div class="alert-copy"><strong>${alert.title}</strong><p>${alert.body}</p><span>${alert.source}</span><div class="recipient-row">${alert.recipients.map(role=>`<span class="recipient">${role}</span>`).join('')}</div></div><div class="alert-actions"><span class="status-pill ${alert.unread?'good':'neutral'}"><span class="status-dot"></span>${alert.unread?'Unread':'Read'}</span><button class="button small" type="button" data-read-alert="${alert.id}" ${alert.unread?'':'disabled'}>Mark read</button></div></div>`).join(''):'<div class="empty-state" style="margin:14px"><h2>No alerts in this view</h2><p>Change the filter or follow another synthetic trial.</p></div>';
+      $$('[data-read-alert]').forEach(button=>button.addEventListener('click',()=>{
+        const alert=alerts.find(item=>item.id===button.dataset.readAlert);
+        if(alert) alert.unread=false;
+        renderAlerts();
+      }));
+      const followed=trials.filter(trial=>followedTrialIds.has(trial.id));
+      $('#followed-count').textContent=followed.length;
+      $('#followed-trials').innerHTML=followed.length?followed.map(trial=>`<div class="source-fact"><span><strong style="display:block;color:var(--ink-2)">${trial.id}</strong>${trial.city} · ${trial.verifyLabel}</span><button class="button small ghost" type="button" data-unfollow="${trial.id}">Stop</button></div>`).join(''):'<div class="empty-state"><h2>No followed trials</h2><p>Open a trial and choose Follow trial.</p></div>';
+      $$('[data-unfollow]').forEach(button=>button.addEventListener('click',()=>{
+        followedTrialIds.delete(button.dataset.unfollow);
+        renderAlerts();
+        if(selectedTrialId===button.dataset.unfollow) renderDetail(trialById(selectedTrialId));
+        showToast(`Stopped alerts for ${button.dataset.unfollow}.`);
+      }));
+    }
+
+    function renderCandidates() {
+      const filter=$('#candidate-filter')?.value||'all';
+      $$('[data-candidate-state]').forEach(row=>{
+        row.style.display=filter==='all'||row.dataset.candidateState===filter?'grid':'none';
+      });
+    }
+
+    function renderVerification() {
+      const queue=[...trials].filter(t=>t.due || t.discrepancy).sort((a,b)=>Number(b.discrepancy)-Number(a.discrepancy));
+      const conflicts=queue.filter(t=>t.discrepancy).length;
+      const verifiedThisWeek=trials.filter(t=>t.verifyKey!=='no_authoritative_response').length;
+      if(queue.length && !queue.some(t=>t.id===selectedVerificationId)) selectedVerificationId=queue[0].id;
+      $('#verify-count').textContent=queue.length;
+      $('#verification-attention-count').textContent=queue.length;
+      $('#verification-week-count').textContent=verifiedThisWeek;
+      $('#verification-conflict-count').textContent=conflicts;
+      $('#verification-open-pill').innerHTML=`<span class="status-dot"></span>${queue.length} open`;
+      $('#verify-selected').disabled=queue.length===0;
+      $('#verification-list').innerHTML=queue.map((t,i)=>`<button class="queue-item ${t.id===selectedVerificationId?'active':''}" type="button" data-id="${t.id}"><span class="queue-rank">${String(i+1).padStart(2,'0')}</span><span class="queue-title"><strong>${t.title}</strong><span>${t.id} · ${t.city}</span></span><span class="queue-cell"><span>Registry</span><strong>${t.registryStatus}</strong></span><span class="queue-cell"><span>Site</span><strong>${t.verifyLabel}</strong></span>${statusPill(t)}</button>`).join('');
+      $$('.queue-item').forEach(btn=>btn.addEventListener('click',()=>{selectedVerificationId=btn.dataset.id;renderVerification();}));
+      const t=trialById(selectedVerificationId);
+      if(!t || !queue.length) {
+        $('#verification-workbench').innerHTML='<div class="panel-body"><h2 class="workbench-title">Queue is clear</h2><p style="color:var(--muted);font-size:11px">No synthetic assertion currently needs attention.</p></div>';
+        return;
+      }
+      $('#verification-workbench').innerHTML=`<div class="panel-head"><div><h2>Verification workbench</h2><p>${t.id}</p></div><span class="spacer"></span>${statusPill(t)}</div><div class="panel-body"><h2 class="workbench-title">${t.title}</h2><div class="workbench-meta"><span class="tag">${t.city}</span><span class="tag">${t.registryAge} registry age</span>${t.discrepancy?'<span class="tag" style="background:var(--red-soft);color:var(--red)">source conflict</span>':''}</div><ul class="rule-list"><li><span class="check">1</span><span>Confirm the source is authorised to speak for site operations.</span></li><li><span class="check">2</span><span>Record exactly what was stated; keep registry value unchanged.</span></li><li><span class="check">3</span><span>Attach method, date, evidence reference, and expiry.</span></li><li><span class="check">4</span><span>Do not include patient or eligibility information.</span></li></ul><button class="button primary" style="width:100%;margin-top:16px" type="button" id="workbench-verify">${icon('check')}Record verification</button></div>`;
+      $('#workbench-verify').addEventListener('click',()=>openVerification(t.id));
+    }
+
+    function renderInquiries() {
+      const filter=$('#inquiry-filter')?.value || 'all';
+      const rows=inquiries.filter(i=>filter==='all'||(filter==='open'&&!['closed','unable'].includes(i.status))||(filter==='closed'&&['closed','unable'].includes(i.status)));
+      $('#inquiry-count').textContent=inquiries.filter(i=>!['closed','unable'].includes(i.status)).length;
+      const wrap=$('#inquiry-table-wrap');
+      if(!rows.length){wrap.innerHTML='<div class="empty-state" style="margin:14px"><h2>No inquiries in this state</h2><p>Change the filter or create a general site inquiry from a trial record.</p></div>';return;}
+      wrap.innerHTML=`<table class="inquiry-table"><thead><tr><th>Trial</th><th>Question</th><th>Owner</th><th>Due</th><th>State</th><th>Next action</th></tr></thead><tbody>${rows.map(i=>{const t=trialById(i.trialId);const next=i.status==='draft'?'Approve':i.status==='approved'?'Mark sent':i.status==='sent'?'Mark acknowledged':i.status==='acknowledged'?'Close':'Closed';return `<tr><td class="inquiry-trial" data-label="Trial"><strong>${t?.title||'Synthetic trial'}</strong><span>${i.id} · ${i.trialId}</span></td><td data-label="Question">${i.question}</td><td data-label="Owner">${i.owner}</td><td data-label="Due">${formatDate(i.due)}</td><td data-label="State"><span class="status-pill ${i.status==='closed'?'good':i.status==='sent'?'warn':'neutral'}"><span class="status-dot"></span>${statusHuman[i.status]}</span></td><td data-label="Next"><div class="stage-control"><button class="button small ${i.status==='acknowledged'?'success':''}" type="button" data-advance="${i.id}" ${['closed','unable'].includes(i.status)?'disabled':''}>${next}</button>${!['closed','unable'].includes(i.status)?`<button class="button small ghost" type="button" data-unable="${i.id}">Unable</button>`:''}</div></td></tr>`}).join('')}</tbody></table>`;
+      $$('[data-advance]',wrap).forEach(btn=>btn.addEventListener('click',()=>advanceInquiry(btn.dataset.advance)));
+      $$('[data-unable]',wrap).forEach(btn=>btn.addEventListener('click',()=>setInquiryUnable(btn.dataset.unable)));
+    }
+
+    function advanceInquiry(id){
+      const item=inquiries.find(i=>i.id===id); if(!item)return;
+      const next={draft:'approved',approved:'sent',sent:'acknowledged',acknowledged:'closed'}[item.status]; if(!next)return;
+      const before=item.status; item.status=next;
+      auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:'2026-09-13 09:05',actor:'A. Rao',title:`Inquiry marked ${statusHuman[next].toLowerCase()}`,note:`${id} · from ${statusHuman[before]}`,type:'task'});
+      if(next==='acknowledged'){
+        alerts.unshift({id:`ALT-${400+alerts.length}`,type:'handoff',tone:'good',title:'Referral acknowledged',body:`${id} was acknowledged. Formal screening remains with the trial team.`,source:'Human task event · just now',recipients:['Treating oncologist','Research coordinator'],unread:true});
+        renderAlerts();
+      }
+      renderInquiries();renderAudit();showToast(`${id} moved to ${statusHuman[next]}.`);
+    }
+    function setInquiryUnable(id){const item=inquiries.find(i=>i.id===id);if(!item)return;item.status='unable';auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:'2026-09-13 09:06',actor:'A. Rao',title:'Inquiry closed — unable to contact',note:id,type:'task'});renderInquiries();renderAudit();showToast(`${id} closed as unable to contact.`);}
+
+    function renderAudit(){
+      $('#audit-list').innerHTML=auditEvents.map(e=>`<div class="audit-row"><time>${e.at}</time><span class="audit-actor">${e.actor}</span><span class="audit-event"><strong>${e.title}</strong><span>${e.note}</span></span><span class="audit-type"><span class="tag">${e.type}</span><br><span style="font-family:var(--font-data);color:var(--muted);font-size:8px">${e.id}</span></span></div>`).join('');
+    }
+
+    function renderSources(){
+      const c=$('#ctri-source');
+      c.classList.toggle('unavailable',ctriOutage);
+      const pill=c.querySelector('.status-pill');
+      pill.className=`status-pill ${ctriOutage?'bad':'warn'}`;
+      pill.innerHTML=`<span class="status-dot"></span>${ctriOutage?'Unavailable · demo':'Permission unresolved'}`;
+      $('#source-alert').classList.toggle('visible',ctriOutage);
+      $('#toggle-outage').innerHTML=`${icon(ctriOutage?'refresh':'warning')}${ctriOutage?'Restore CTRI demo':'Simulate CTRI outage'}`;
+    }
+
+    function copyText(text,message){
+      if(navigator.clipboard?.writeText){navigator.clipboard.writeText(text).then(()=>showToast(message)).catch(()=>showToast('Copy is unavailable in this browser context.'));}
+      else showToast('Copy is unavailable in this browser context.');
+    }
+
+    function switchView(target){
+      $$('.nav-button').forEach(b=>b.classList.toggle('active',b.dataset.target===target));
+      $$('.view').forEach(v=>v.classList.toggle('active',v.dataset.view===target));
+      const active=$(`.nav-button[data-target="${target}"] span:not(.nav-count)`);
+      $('#crumb-title').textContent=active?.textContent||'Trial Relay';
+      history.replaceState(null,'',`#${target}`);
+      window.scrollTo({top:0,behavior:'instant'});
+      if(target==='case')renderCase();
+      if(target==='candidates')renderCandidates();
+      if(target==='verification')renderVerification();
+      if(target==='inquiries')renderInquiries();
+      if(target==='alerts')renderAlerts();
+      if(target==='board')renderBoard();
+      if(target==='activity')renderAudit();
+      if(target==='sources')renderSources();
+    }
+
+    $('#inquiry-form').addEventListener('submit',(event)=>{
+      event.preventDefault();
+      if(!event.currentTarget.reportValidity())return;
+      const trialId=event.currentTarget.dataset.trialId;
+      const id=`INQ-${1043+inquiries.length}`;
+      inquiries.unshift({id,trialId,question:$('#inquiry-type').value,owner:$('#inquiry-owner').value.split(' — ')[0],due:$('#inquiry-due').value,route:$('#inquiry-route').value,status:'draft',created:today});
+      auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:'2026-09-13 09:02',actor:'A. Rao',title:'General site inquiry drafted',note:`${id} · ${trialId} · no patient data`,type:'task'});
+      $('#inquiry-dialog').close(); renderInquiries(); renderAudit(); showToast(`${id} created as a draft. Human approval is still required.`);
+    });
+
+    $('#verification-form').addEventListener('submit',(event)=>{
+      event.preventDefault();
+      if(!event.currentTarget.reportValidity())return;
+      const t=trialById(event.currentTarget.dataset.trialId); if(!t)return;
+      const key=$('#verification-status').value;
+      const mapping={verified_recruiting:['Verified recruiting','good'],verified_not_recruiting:['Verified not recruiting','neutral'],temporarily_paused:['Temporarily paused','bad'],no_authoritative_response:['No authoritative response','warn'],registry_site_discrepancy:['Registry/site discrepancy','bad']};
+      const previousLabel=t.verifyLabel;
+      t.verifyKey=key;t.verifyLabel=mapping[key][0];t.verifyTone=mapping[key][1];t.verifiedAt=$('#verification-date').value;t.verifyAge='recorded today';t.verifyMethod=`${$('#verification-source').value} · ${$('#verification-method').value}`;t.discrepancy=key==='registry_site_discrepancy';t.due=['no_authoritative_response','registry_site_discrepancy','temporarily_paused'].includes(key);
+      auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:'2026-09-13 09:04',actor:'A. Rao',title:'Site verification assertion recorded',note:`${t.id} · ${t.verifyLabel}`,type:'verification'});
+      if(followedTrialIds.has(t.id)&&previousLabel!==t.verifyLabel){
+        alerts.unshift({id:`ALT-${400+alerts.length}`,type:'verification',tone:t.verifyTone,title:'Site verification changed',body:`${t.id} changed from ${previousLabel} to ${t.verifyLabel}. Registry status remains separate.`,source:'Authorised verifier · just now',recipients:['Treating oncologist','Research coordinator','Site steward'],unread:true});
+      }
+      $('#verification-dialog').close(); renderTrials();renderVerification();renderAlerts();renderAudit();showToast(`Verification saved for ${t.id}. Registry value remains unchanged.`);
+    });
+
+    $('#packet-form').addEventListener('submit',(event)=>{
+      event.preventDefault();
+      if(!event.currentTarget.reportValidity())return;
+      packetDrafted=true;
+      const id=`REF-${2200+inquiries.length}`;
+      inquiries.unshift({id,trialId:caseSelectedTrialId,question:'Review referral packet for formal site screening',owner:$('#packet-owner').value.split(' — ')[0],due:$('#packet-expiry').value,route:$('#packet-recipient').value,status:'draft',created:today});
+      auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:'2026-09-13 09:21',actor:'A. Rao',title:'Referral packet manifest drafted',note:`${id} · 3 selected EMR references · not released`,type:'packet'});
+      $('#packet-dialog').close();
+      renderInquiries();
+      renderAudit();
+      showToast(`${id} created as a draft. Source documents remain in the EMR; human release is required.`);
+    });
+
+    $('#board-form').addEventListener('submit',(event)=>{
+      event.preventDefault();
+      if(!event.currentTarget.reportValidity())return;
+      boardDecisionRecorded=true;
+      auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:'2026-09-13 09:24',actor:'Board recorder',title:'Human board disposition recorded',note:`${$('#board-record-ref').value} · ${$('#board-disposition').value}`,type:'board'});
+      $('#board-dialog').close();
+      renderBoard();
+      renderAudit();
+      showToast('Human board disposition recorded. Clinical decision content was not generated or rewritten.');
+    });
+
+    $('#alert-rule-form').addEventListener('submit',(event)=>{
+      event.preventDefault();
+      if(!event.currentTarget.reportValidity())return;
+      const recipients=$$('input[name="alert-recipient"]:checked').map(input=>input.value);
+      const channels=$$('input[name="alert-channel"]:checked').map(input=>input.value);
+      if(!recipients.length||!channels.length){
+        showToast('Choose at least one recipient and one delivery channel.');
+        return;
+      }
+      const trialId=$('#alert-trial').value;
+      followedTrialIds.add(trialId);
+      alertRules+=1;
+      alerts.unshift({id:`ALT-${306+alertRules}`,type:'trial',tone:'neutral',title:'New alert rule saved',body:`${$('#alert-trigger').value} for ${trialId}.`,source:`Rule ${alertRules} · synthetic`,recipients,unread:false});
+      auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:'2026-09-13 10:12',actor:'A. Rao',title:'Operational alert rule created',note:`${trialId} · ${recipients.join(', ')} · ${channels.join(', ')}`,type:'alert'});
+      $('#alert-rule-dialog').close();
+      renderAlerts();
+      renderAudit();
+      showToast(`Alert rule saved for ${trialId}. No clinical recommendation was created.`);
+    });
+
+
+
+    $('#open-case-workspace').addEventListener('click',()=>{renderCase();switchView('case');});
+    $('#return-to-search').addEventListener('click',()=>switchView('explore'));
+    $('#prepare-packet').addEventListener('click',openPacket);
+    $('#add-to-board').addEventListener('click',()=>{renderBoard();switchView('board');showToast('Synthetic case added to the board agenda by a human action.');});
+    $('#preview-writeback').addEventListener('click',()=>$('#writeback-dialog').showModal());
+    $$('[data-preview-artifact]').forEach(button=>button.addEventListener('click',()=>openArtifact(button.dataset.previewArtifact)));
+    $('#confirm-source-fact').addEventListener('click',()=>{
+      auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:'2026-09-13 09:19',actor:'Dr M. Shah',title:'Source assertion confirmed for workspace',note:`${currentArtifactName} · synthetic source`,type:'clinical-human'});
+      $('#artifact-dialog').close();
+      renderAudit();
+      showToast('Clinician confirmation recorded with its source reference.');
+    });
+    $('#record-board-decision').addEventListener('click',()=>{$('#board-human-authored').checked=false;$('#board-dialog').showModal();});
+    $('#open-board-case').addEventListener('click',()=>{renderCase();switchView('case');});
+    $('#board-writeback').addEventListener('click',()=>$('#writeback-dialog').showModal());
+    $('#test-writeback').addEventListener('click',()=>$('#writeback-dialog').showModal());
+    $('#simulate-writeback').addEventListener('click',()=>{
+      auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:'2026-09-13 09:27',actor:'EMR adapter',title:'Synthetic Task write-back completed',note:'Task/SYN-TASK-901 · version precondition accepted',type:'integration'});
+      alerts.unshift({id:`ALT-${400+alerts.length}`,type:'handoff',tone:'good',title:'EMR task written',body:'Task/SYN-TASK-901 was written to the EMR and is waiting for treating-unit acknowledgement.',source:'EMR adapter · just now',recipients:['Treating unit','Board presenter','Research coordinator'],unread:true});
+      $('#writeback-dialog').close();
+      if(boardDecisionRecorded){
+        $('#board-decision-state').textContent='Written to EMR · acknowledgement pending';
+        $('#board-writeback').disabled=true;
+        $('#board-lifecycle').innerHTML='<div class="board-stage done"><span class="board-stage-marker">1</span><div><strong>Case selected</strong><span>Treating oncologist · 13 Sep</span></div></div><div class="board-stage done"><span class="board-stage-marker">2</span><div><strong>Packet sources reviewed</strong><span>Presenter · synthetic artifacts</span></div></div><div class="board-stage done"><span class="board-stage-marker">3</span><div><strong>Board discussion completed</strong><span>Human participants</span></div></div><div class="board-stage done"><span class="board-stage-marker">4</span><div><strong>Decision reference signed</strong><span>MDT-DEMO-2026-0916-01</span></div></div><div class="board-stage done"><span class="board-stage-marker">5</span><div><strong>Task written to EMR</strong><span>Task/SYN-TASK-901 · acknowledgement pending</span></div></div>';
+      }
+      renderAlerts();
+      renderAudit();
+      showToast('Synthetic EMR write-back completed with an audit event.');
+    });
+    $('#role-select').addEventListener('change',(event)=>{
+      currentRole=event.target.value;
+      const roles={coordinator:['AR','Research coordinator'],oncologist:['MS','Treating oncologist'],site:['SS','Site steward'],auditor:['AU','Read-only auditor']};
+      $('#role-initial').textContent=roles[currentRole][0];
+      $('#role-description').textContent=roles[currentRole][1];
+      showToast(`Prototype role switched to ${roles[currentRole][1]}. Production permissions require institutional policy.`);
+    });
+    $('#notification-button').addEventListener('click',()=>switchView('alerts'));
+    $('#analytics-period').addEventListener('click',()=>showToast('Analytics are synthetic and operational only; no clinical outcome data are included.'));
+    $('#start-guided-use').addEventListener('click',()=>switchView('explore'));
+    $('#open-guide-priorities').addEventListener('click',()=>switchView('priorities'));
+    $('#candidate-filter').addEventListener('change',renderCandidates);
+    $('#add-current-candidate').addEventListener('click',()=>showToast('SYN-2047 is already in the human-created review queue.'));
+    $$('[data-open-candidate]').forEach(button=>button.addEventListener('click',()=>{
+      if(button.dataset.openCandidate==='SYN-2047'){
+        renderCase();
+        switchView('case');
+      }else{
+        showToast(`${button.dataset.openCandidate} is a synthetic read-only example. Its displayed state comes from a named human or trial team.`);
+      }
+    }));
+    $('#new-alert-rule').addEventListener('click',()=>{$('#alert-safe').checked=false;$('#alert-rule-dialog').showModal();});
+    $('#mark-alerts-read').addEventListener('click',()=>{alerts.forEach(alert=>alert.unread=false);renderAlerts();showToast('All operational alerts marked read.');});
+    $('#alert-filter').addEventListener('change',renderAlerts);
+    $$('.close-dialog').forEach(button=>button.addEventListener('click',()=>button.closest('dialog').close()));
+    $$('.nav-button').forEach(button=>button.addEventListener('click',()=>switchView(button.dataset.target)));
+    ['trial-search','cancer-filter','verify-filter','state-filter','sort-results'].forEach(id=>$('#'+id).addEventListener(id==='trial-search'?'input':'change',renderTrials));
+    $('#clear-filters').addEventListener('click',clearFilters);
+    $('#command-trigger').addEventListener('click',()=>{switchView('explore');setTimeout(()=>$('#trial-search').focus(),0);});
+    $('#refresh-results').addEventListener('click',()=>{const list=$('#result-list');list.innerHTML='<div class="skeleton card"></div><div class="skeleton card"></div><div class="skeleton card"></div>';setTimeout(()=>{renderTrials();showToast('View refreshed from synthetic snapshots.');},650);});
+    $('#verify-selected').addEventListener('click',()=>openVerification(selectedVerificationId));
+    $('#new-inquiry-global').addEventListener('click',()=>openInquiry(selectedTrialId));
+    $('#inquiry-filter').addEventListener('change',renderInquiries);
+    $('#toggle-outage').addEventListener('click',()=>{ctriOutage=!ctriOutage;renderSources();showToast(ctriOutage?'CTRI outage simulated. Last snapshots are now stale.':'CTRI demo source restored.');});
+    $('#copy-audit').addEventListener('click',()=>copyText(auditEvents.map(e=>e.id).join(', '),'Audit event IDs copied.'));
+    document.addEventListener('keydown',(event)=>{
+      if(event.key==='/'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)){event.preventDefault();switchView('explore');setTimeout(()=>$('#trial-search').focus(),0);}
+      if(event.key==='Escape')$$('dialog[open]').forEach(d=>d.close());
+    });
+
+    const initialHash=location.hash.slice(1);
+    $('#role-select').value='coordinator';
+    $('#role-initial').textContent='AR';
+    $('#role-description').textContent='Research coordinator';
+    $('#trial-search').value='';
+    $('#cancer-filter').value='all';
+    $('#verify-filter').value='all';
+    $('#state-filter').value='all';
+    $('#sort-results').value='confidence';
+    renderTrials();renderCase();renderCandidates();renderVerification();renderInquiries();renderAlerts();renderBoard();renderAudit();renderSources();
+    if(['guide','explore','case','candidates','verification','inquiries','alerts','board','activity','integrations','analytics','sources','priorities'].includes(initialHash))switchView(initialHash);
+  </script>
+</body>
+</html>

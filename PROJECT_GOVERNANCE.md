@@ -121,6 +121,8 @@ A coordinate can become `DONE` only when its row and report name the artifact or
 
 On 2026-09-03 the owner authorised the first non-sensitive publication with `chatroom_notes.md` and other sensitive/local material ignored, and required all project changes to reach the public default branch through pull requests. The one-time direct push of the existing empty `main` commit is permitted only to establish a PR base; it publishes no project file.
 
+On 2026-09-17 the owner made the GitHub repository private and authorised a private, owner-controlled live oncologist validation build using real public India-located oncology trial records from the documented ClinicalTrials.gov API. The owner also authorised a Vercel validation deployment and required every remote code change to be pushed through the existing review branch and pull request—never directly to `main`. This is a validation instrument, not product lock: patient and EMR demonstrations remain synthetic; no identifiable patient data, automated patient matching, eligibility recommendation, treatment recommendation, or unapproved CTRI/WHO data use is authorised.
+
 ## Gap register
 
 | Gap | Status | Evidence | Owner | Next action |
@@ -133,6 +135,7 @@ On 2026-09-03 the owner authorised the first non-sensitive publication with `cha
 | `GAP-TUMOUR-BOARD-LOCAL-WORKFLOW` | Narrowed, internally routed | V2 contains no answered tumour-board workflow; existing Indian examples still do not establish a current general target-site owner, acknowledgement, person-time, or baseline | Agent and repository owner | Ask the internal analyst first. Resume a separately approved external operator request only if internal evidence remains insufficient. |
 | `GAP-OUTREACH-AUTHORITY` | Paused by owner | An external email was prepared but not sent; the owner redirected validation to the internal analyst after providing the expanded source | Repository owner | Do not send externally. Require fresh point-of-risk confirmation for the exact recipient, channel, and message if external outreach later resumes. |
 | `GAP-V2-PROVENANCE` | Open | The expanded source mixes duplicate synthesis, proposed questionnaires, author assumptions, three sensitive caregiver accounts, and an uncited primer | Internal analyst and repository owner | Clarify authorship, sample, method, whether questionnaires were administered, and whether de-identified answer notes exist. |
+| `GAP-CTRI-BULK-ACCESS` | Open; research mirror measured | Direct CTRI search is CAPTCHA/CSRF gated with no documented bulk API or open/commercial reuse terms found; the permitted WHO mirror was 4,611 primary records behind the CTRI homepage count and prohibits commercial/marketing/promotional use | Repository owner and source authority | Obtain written CTRI access/reuse terms and a supported current bulk/API path before any product or demo dependency; preserve the private WHO snapshot only for approved non-commercial research. |
 
 ## Report index
 
@@ -148,6 +151,7 @@ On 2026-09-03 the owner authorised the first non-sensitive publication with `cha
 | `C5` | `P5` | `.harness/reports/20260903T112712Z-P5-operator-validation-ready.md` | Complete; operator kit ready, external process account still required |
 | `C5` | `P5` | `.harness/reports/20260903T114127Z-P5-outreach-authority.md` | Complete; all non-contact work exhausted, outreach approval required |
 | `C5` | `P5` | `.harness/reports/20260903T123318Z-P5-v2-source-reassessment.md` | Complete; internal provenance clarification now precedes external outreach |
+| `C5` | `P5` | `.harness/reports/20260913T134521Z-P5-ctri-data-access-quality.md` | Complete; dated non-commercial WHO mirror only, no product-data-source approval |
 
 ## References
 
@@ -172,3 +176,4 @@ On 2026-09-03 the owner authorised the first non-sensitive publication with `cha
 - `.harness/reports/20260903T112712Z-P5-operator-validation-ready.md`
 - `.harness/reports/20260903T114127Z-P5-outreach-authority.md`
 - `.harness/reports/20260903T123318Z-P5-v2-source-reassessment.md`
+- `.harness/reports/20260913T134521Z-P5-ctri-data-access-quality.md`

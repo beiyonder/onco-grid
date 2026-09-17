@@ -1,6 +1,7 @@
 # Sensitive source material; never publish without an approved sanitized replacement
 chatroom_notes.md
-Oncologist Pain Points_v2.docx
+Oncologist Pain Points*.docx
+ner-2.0.pdf
 
 # Private research inputs and recordings
 .private/
@@ -18,6 +19,11 @@ research/recordings/
 *.pfx
 secrets/
 credentials/
+.vercel/
 
 # Local OS metadata
 .DS_Store
+
+# Local browser verification artifacts
+.playwright-cli/
+output/playwright/

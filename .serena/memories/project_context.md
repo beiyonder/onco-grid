@@ -83,12 +83,18 @@ Owner sign-off is required for changes to goal, scope, non-goals, acceptance thr
 - `GAP-SERENA-LANGUAGE` is closed: the research validator is indexed as Python and Serena health-check passes.
 - `GAP-SETUP` is closed for the research phase through `python3 research/validate_ledger.py`; product setup/build/smoke commands remain a later owner-approved decision.
 - `GAP-MCP-ACTIVATION`: project MCP must be tested after OMP starts from this repository.
-- `GAP-PUBLICATION-SANITIZATION` is mitigated for the approved PR by `.gitignore` and pre-push scanning; both raw source files remain private. All project changes must reach the default branch through pull requests.
+- `GAP-PUBLICATION-SANITIZATION` is mitigated for the approved PR by `.gitignore` and pre-push scanning; both raw source files remain private. All project changes must reach the default branch through pull requests. `.private/` (chatroom, NER PDF) is gitignored and never committed.
 - `GAP-DIRECT-WORKFLOW-OBSERVATION`: desk research and selected caregiver accounts cannot prove local workflow prevalence.
 - `GAP-TUMOUR-BOARD-LOCAL-WORKFLOW` is internally routed: V2 contains no answered tumour-board workflow, and current actor, acknowledgement, person-time, and baseline remain open.
 - `GAP-OUTREACH-AUTHORITY` is paused by the owner; do not send externally without fresh exact confirmation after internal clarification.
 - `GAP-V2-PROVENANCE`: proposed questionnaires, selected accounts, author assumptions, and uncited primer material must be separated; ask the internal analyst whether completed answers exist.
 - The expanded source adds weak caregiver/family psychosocial-support, caregiver-work, multi-provider portability, and digital-touchpoint signals. It does not change Candidate B's rank; Candidate A becomes a stronger fallback.
+- 2026-09-09 session (proposal only, owner sign-off pending): `ner-2.0.pdf` identified via local OCR as KCDO-NCG EMR Requirement v2.0 (Mar 2023), Parts A-D. It is an EMR requirements catalogue, not a product spec; building it would violate the generic-EMR non-goal.
+- 2026-09-09 session (proposal only): team knockout sim ranks O6-safe (site-verified general trial knowledge + referral-task companion, use-case 05, no patient-specific matching) tied with O2 (report-ready ack) on win-weighted score; team-alignment breaks tie to O6-safe with O2 as fallback. Unsafe patient-specific trial matching is rejected as prohibited CDS/treatment recommendation.
+- 2026-09-09 stable external facts: CTRI 2007-2021 landscape (PMC11096683) shows geographic disparity + incomplete/inconsistent fields; Chakraborty 2021 (181 open trials) shows median ~1.55 slots/1000 cases with 35% states zero; Pillamarapu 2019 documents CTRI data-quality defects; ClinicalTrials.gov API v2 supports condition/location/status/phase search; CTRI offers no public API (web search + dataset download + WHO ICTRP mirror only).
+- 2026-09-09 team inputs (pending owner): JS full-stack preferred for build sprint; general-cancer query scope with narrow finder-to-task workflow; commit to trials lane with no fallback; site access limited to async docs via clinical members rather than weekly access; frequency/baseline for trial inquiry remains `OPEN`.
+- Session artifacts (non-sensitive, committable): `research/REGROUP_SYNC_20260909.md`, `research/KNOCKOUT_SIM_20260909.md`, `research/SHALEEN_BRIEF_20260909.md`. Ledger stays PASS 48. `CURRENT` remains `P5` until owner approves any lane change.
+- 2026-09-13 stable extraction fact: with explicit non-commercial WHO terms acceptance, the complete dated `CTRI` WHO query was reconstructed as 114,052 unique trials (112,858 primary CTRI IDs) and 8,133 automated oncology candidates. This is 4,611 below CTRI's 117,469 homepage count; newest mirrored registration lag was 59 days; 79.367% of Recruiting oncology candidates had `Last Refreshed on` older than one year. Record data remain in ignored `.private/ctri-ictrp/2026-09-13/`; WHO terms prohibit commercial/marketing/promotional use; `.harness/reports/20260913T134521Z-P5-ctri-data-access-quality.md` is the aggregate report. This does not approve a product data source or change `CURRENT` from `P5`.
 
 ## References
 
@@ -107,9 +113,13 @@ Owner sign-off is required for changes to goal, scope, non-goals, acceptance thr
 - `.harness/reports/20260903T112712Z-P5-operator-validation-ready.md`
 - `.harness/reports/20260903T114127Z-P5-outreach-authority.md`
 - `.harness/reports/20260903T123318Z-P5-v2-source-reassessment.md`
+- `.harness/reports/20260913T134521Z-P5-ctri-data-access-quality.md`
 - `research/P5_TUMOUR_BOARD_VALIDATION.md`
 - `research/P5_OPERATOR_VALIDATION_KIT.md`
 - `research/PAIN_POINTS_V2_ANALYSIS.md`
 - `RESEARCH_SYNTHESIS.md`
 - `research/evidence.jsonl`
 - `research/OPPORTUNITY_MATRIX.md`
+- `research/REGROUP_SYNC_20260909.md`
+- `research/KNOCKOUT_SIM_20260909.md`
+- `research/SHALEEN_BRIEF_20260909.md`
