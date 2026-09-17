@@ -64,7 +64,7 @@ Exactly one coordinate must be `CURRENT`.
 | `P2` | Evidence collection | Agent | `P1` protocol and schema frozen | Indian workflow maps, theme research, open problem scan, solution landscape, operational measurements, contradiction review | Every retained data point passes the frozen schema; claims retain provenance and transfer limits; each leading theme includes disconfirming evidence | `READY-FOR-SIGNOFF` | Owner reviews the `C2` and `C3` evidence reports. |
 | `P3` | Synthesis | Agent | Evidence-collection threshold is met | Cross-theme evidence matrix and approximately three serious opportunity candidates | Each candidate names actor, trigger, job, burden, workaround, alternative, safety boundary, KPI, uncertainty, and contrary evidence | `READY-FOR-SIGNOFF` | Owner reviews `.harness/reports/20260903T101252Z-P3-synthesis-gate.md`. |
 | `P4` | Problem selection and build readiness | Repository owner | `P3` candidate evidence | One selected discovery lane or a documented decision to continue discovery | Owner accepts the lane, safe boundary, contrary evidence, and remaining local-validation risk | `DONE` | Candidate B selected on 2026-09-03; decision recorded in `.harness/reports/20260903T102128Z-P4-owner-decision.md`. |
-| `P5` | Tumour-board workflow validation | Agent; owner signs product lock | Candidate B selected at `P4` | Evidence-backed problem contract for one exact post-board operational step | Named actor; current system and handoff; exact documentation/communication/ownership/completion failure; non-sensitive aggregate baseline; safe output; human boundary; contradiction update; `C4` gate report | `CURRENT` | Ask the internal clinical analyst to clarify V2 provenance, whether questionnaires produced answers, and whether direct clinician conversations identify the post-board actor or a more pressing workflow. Keep external outreach paused. |
+| `P5` | Tumour-board workflow validation | Agent; owner signs product lock | Candidate B selected at `P4` | Evidence-backed problem contract for one exact post-board operational step | Named actor; current system and handoff; exact documentation/communication/ownership/completion failure; non-sensitive aggregate baseline; safe output; human boundary; contradiction update; `C4` gate report | `CURRENT` | Run structured oncologist sessions with the owner-authorised Trial Relay validation deployment as a comparative discovery instrument. Measure the trial-search/status/referral job and use the results to decide whether to retain, supplement, or replace Candidate B; the original P5 gate remains open. |
 
 ## Current-coordinate acceptance contract
 
@@ -152,6 +152,7 @@ On 2026-09-17 the owner made the GitHub repository private and authorised a priv
 | `C5` | `P5` | `.harness/reports/20260903T114127Z-P5-outreach-authority.md` | Complete; all non-contact work exhausted, outreach approval required |
 | `C5` | `P5` | `.harness/reports/20260903T123318Z-P5-v2-source-reassessment.md` | Complete; internal provenance clarification now precedes external outreach |
 | `C5` | `P5` | `.harness/reports/20260913T134521Z-P5-ctri-data-access-quality.md` | Complete; dated non-commercial WHO mirror only, no product-data-source approval |
+| `C5` | `P5` | `.harness/reports/20260917T133754Z-P5-live-validation-deployment.md` | Complete; real ClinicalTrials.gov snapshot deployed for owner-authorised oncologist validation |
 
 ## References
 
@@ -177,3 +178,4 @@ On 2026-09-17 the owner made the GitHub repository private and authorised a priv
 - `.harness/reports/20260903T114127Z-P5-outreach-authority.md`
 - `.harness/reports/20260903T123318Z-P5-v2-source-reassessment.md`
 - `.harness/reports/20260913T134521Z-P5-ctri-data-access-quality.md`
+- `.harness/reports/20260917T133754Z-P5-live-validation-deployment.md`
