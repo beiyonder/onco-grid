@@ -123,6 +123,8 @@ On 2026-09-03 the owner authorised the first non-sensitive publication with `cha
 
 On 2026-09-17 the owner made the GitHub repository private and authorised a private, owner-controlled live oncologist validation build using real public India-located oncology trial records from the documented ClinicalTrials.gov API. The owner also authorised a Vercel validation deployment and required every remote code change to be pushed through the existing review branch and pull request—never directly to `main`. This is a validation instrument, not product lock: patient and EMR demonstrations remain synthetic; no identifiable patient data, automated patient matching, eligibility recommendation, treatment recommendation, or unapproved CTRI/WHO data use is authorised.
 
+On 2026-09-19 the owner authorised implementation of the Trial Relay experience and visual-language blueprints through small review pull requests. This authorisation covers reversible changes to the existing static validation app; it does not close `P5`, select a production stack, approve new dependencies or data sources, or constitute product lock. The existing clinical, privacy, and human-authority boundaries remain unchanged.
+
 ## Gap register
 
 | Gap | Status | Evidence | Owner | Next action |
@@ -153,6 +155,7 @@ On 2026-09-17 the owner made the GitHub repository private and authorised a priv
 | `C5` | `P5` | `.harness/reports/20260903T123318Z-P5-v2-source-reassessment.md` | Complete; internal provenance clarification now precedes external outreach |
 | `C5` | `P5` | `.harness/reports/20260913T134521Z-P5-ctri-data-access-quality.md` | Complete; dated non-commercial WHO mirror only, no product-data-source approval |
 | `C5` | `P5` | `.harness/reports/20260917T133754Z-P5-live-validation-deployment.md` | Complete; real ClinicalTrials.gov snapshot deployed for owner-authorised oncologist validation |
+| `C2` | `P5` | `.harness/reports/20260919T102253Z-P5-trial-relay-home.md` | Complete; first reversible blueprint implementation slice ready for owner review |
 
 ## References
 
@@ -179,3 +182,4 @@ On 2026-09-17 the owner made the GitHub repository private and authorised a priv
 - `.harness/reports/20260903T123318Z-P5-v2-source-reassessment.md`
 - `.harness/reports/20260913T134521Z-P5-ctri-data-access-quality.md`
 - `.harness/reports/20260917T133754Z-P5-live-validation-deployment.md`
+- `.harness/reports/20260919T102253Z-P5-trial-relay-home.md`
