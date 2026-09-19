@@ -187,10 +187,10 @@ The owner decides whether to retain, simplify, supplement, or stop each major ca
 
 ## Current slice
 
-**Branch:** `feat/trial-profile`
+**Branch:** `feat/trial-room`
 
-**Pull request outcome:** deliver Phase 1 slice 2 — one dominant trial profile with a visible registry source layer, official and brief titles, identifiers, source and snapshot dates, registry and independent site assertions, explicit unknown/conflict language, every retained India site grouped by state and city, safe source contact routing, and progressive disclosure for criteria, provenance, and history.
+**Pull request outcome:** deliver Phase 1 slice 3 — browser-session trial following and a contextual Trial room with immutable pinned source facts, verified participant roles, general operational question threads, official-response authority, and human-recorded outcomes for official answer, informal answer, owned action, proposed source correction, unresolved, or outdated states.
 
-**Acceptance scenario:** open a trial from the first 60 library results; confirm the selected card and profile identifier match; distinguish registry status from an unknown or conflicting site assertion without relying on colour; inspect all retained India sites and their source states; switch Overview/Sites by keyboard; close the profile and return focus plus list position to the originating result on desktop and narrow mobile.
+**Acceptance scenario:** follow a selected trial; open its Trial room; post a general operational question only after confirming it contains no patient information; block an official response from a non-site role; record an official response as the verified site role without changing registry or verification pins; convert a separate thread into a draft owned task with due date; preserve proposed correction and unresolved states without turning silence into a negative site conclusion; complete the flow on desktop and narrow mobile with no inaccessible overflow.
 
-**Explicit non-goals for this slice:** no Trial room conversation, persisted follow state, site-specific confirmation data beyond the retained model, working map, patient-context filter, patient-specific ranking, matching logic, backend, authentication, new data source, or deployment change.
+**Explicit non-goals for this slice:** no persistence beyond the browser session, external messaging, production identity or role enforcement, patient-specific conversation, automatic source mutation, working map, backend, new data source, or deployment change.
