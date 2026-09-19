@@ -1,0 +1,223 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/beiyonder/onco-grid/blob/main/research/evidence.schema.json",
+  "title": "Onco Grid atomic evidence record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "status",
+    "theme",
+    "subproblem",
+    "claim_ids",
+    "claim_type",
+    "actors",
+    "specialty",
+    "setting",
+    "geography",
+    "workflow_moment",
+    "claim",
+    "evidence_type",
+    "source_title",
+    "publisher",
+    "publication_date",
+    "accessed_date",
+    "source_locator",
+    "independent_source_group",
+    "supporting_extract",
+    "method_sample",
+    "limitations",
+    "strength",
+    "india_relevance",
+    "frequency_evidence",
+    "burden_evidence",
+    "current_workaround",
+    "existing_solution",
+    "contradiction",
+    "contradicts_ids",
+    "scope_class",
+    "implication",
+    "unknowns",
+    "tags",
+    "provenance_notes"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^EV-[0-9]{4}$"
+    },
+    "status": {
+      "enum": ["retained", "pending", "rejected"]
+    },
+    "theme": {
+      "enum": ["Find", "Contextualise", "Synthesise", "Act", "Connect", "Outside"]
+    },
+    "subproblem": {
+      "type": "string",
+      "minLength": 1
+    },
+    "claim_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^CL-[A-Z]{1,2}[0-9]{2}$"
+      }
+    },
+    "claim_type": {
+      "enum": [
+        "standard",
+        "workflow",
+        "prevalence",
+        "burden",
+        "preference",
+        "measurement",
+        "solution_capability",
+        "contradiction"
+      ]
+    },
+    "actors": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "specialty": {
+      "type": "string",
+      "minLength": 1
+    },
+    "setting": {
+      "type": "string",
+      "minLength": 1
+    },
+    "geography": {
+      "type": "string",
+      "minLength": 1
+    },
+    "workflow_moment": {
+      "type": "string",
+      "minLength": 1
+    },
+    "claim": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidence_type": {
+      "enum": [
+        "official",
+        "peer_reviewed",
+        "professional_body",
+        "clinician_account",
+        "participant_account",
+        "public_discussion",
+        "vendor_claim",
+        "derived_synthesis"
+      ]
+    },
+    "source_title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "publisher": {
+      "type": "string",
+      "minLength": 1
+    },
+    "publication_date": {
+      "type": "string",
+      "pattern": "^(not reported|[0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?)$"
+    },
+    "accessed_date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "source_locator": {
+      "type": "string",
+      "pattern": "^(https://|repo:).+"
+    },
+    "independent_source_group": {
+      "type": "string",
+      "minLength": 1
+    },
+    "supporting_extract": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 800
+    },
+    "method_sample": {
+      "type": "string",
+      "minLength": 1
+    },
+    "limitations": {
+      "type": "string",
+      "minLength": 1
+    },
+    "strength": {
+      "enum": ["strong", "moderate", "weak", "hypothesis_only"]
+    },
+    "india_relevance": {
+      "enum": ["direct", "transferable", "uncertain", "low"]
+    },
+    "frequency_evidence": {
+      "type": "string",
+      "minLength": 1
+    },
+    "burden_evidence": {
+      "type": "string",
+      "minLength": 1
+    },
+    "current_workaround": {
+      "type": "string",
+      "minLength": 1
+    },
+    "existing_solution": {
+      "type": "string",
+      "minLength": 1
+    },
+    "contradiction": {
+      "type": "string",
+      "minLength": 1
+    },
+    "contradicts_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^EV-[0-9]{4}$"
+      }
+    },
+    "scope_class": {
+      "enum": [
+        "operational_assistance",
+        "general_knowledge",
+        "clinical_interpretation",
+        "clinical_decision_support",
+        "treatment_recommendation",
+        "mixed_or_unclear"
+      ]
+    },
+    "implication": {
+      "type": "string",
+      "minLength": 1
+    },
+    "unknowns": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tags": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9-]*$"
+      }
+    },
+    "provenance_notes": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

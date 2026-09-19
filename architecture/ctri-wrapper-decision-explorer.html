@@ -1,0 +1,942 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>CTRI wrapper decision explorer</title>
+  <style>
+    :root {
+      --bg: #f4f7f5;
+      --surface: #ffffff;
+      --surface-2: #edf4f0;
+      --ink: #14221d;
+      --muted: #53645d;
+      --line: #cbd9d2;
+      --green: #155f47;
+      --green-2: #dff1e8;
+      --blue: #245f8f;
+      --blue-2: #e4f0f8;
+      --amber: #8a5200;
+      --amber-2: #fff2d5;
+      --red: #8d3030;
+      --red-2: #fbe7e5;
+      --violet: #65518d;
+      --violet-2: #eee9f8;
+      --shadow: 0 14px 36px rgba(22, 46, 36, 0.08);
+      --radius: 16px;
+      --max: 1240px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f1714;
+        --surface: #17211d;
+        --surface-2: #1d2a25;
+        --ink: #edf5f1;
+        --muted: #aabbb3;
+        --line: #34473f;
+        --green: #72d0aa;
+        --green-2: #173c30;
+        --blue: #83bde9;
+        --blue-2: #18354a;
+        --amber: #f3bd63;
+        --amber-2: #402f13;
+        --red: #f1a09a;
+        --red-2: #472524;
+        --violet: #c2adeb;
+        --violet-2: #302744;
+        --shadow: none;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.58;
+    }
+    a { color: var(--blue); text-underline-offset: 0.16em; }
+    a:hover { text-decoration-thickness: 2px; }
+    button, input { font: inherit; }
+    :focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
+
+    .masthead {
+      border-bottom: 1px solid var(--line);
+      background:
+        radial-gradient(circle at 12% -10%, rgba(33, 132, 94, .22), transparent 42%),
+        radial-gradient(circle at 88% 0%, rgba(36, 95, 143, .18), transparent 38%),
+        var(--surface);
+    }
+    .masthead-inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 3.5rem 1.5rem 2.8rem;
+    }
+    .eyebrow {
+      margin: 0 0 .8rem;
+      color: var(--green);
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    h1 {
+      max-width: 900px;
+      margin: 0;
+      font-size: clamp(2.15rem, 5vw, 4.4rem);
+      line-height: 1.02;
+      letter-spacing: -.045em;
+    }
+    .lede {
+      max-width: 860px;
+      margin: 1.25rem 0 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.22rem);
+    }
+    .status-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .55rem;
+      margin-top: 1.45rem;
+    }
+    .pill, .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: .3rem .66rem;
+      background: var(--surface-2);
+      color: var(--ink);
+      font-size: .78rem;
+      font-weight: 750;
+    }
+    .badge.fact { background: var(--green-2); color: var(--green); border-color: transparent; }
+    .badge.proposal { background: var(--blue-2); color: var(--blue); border-color: transparent; }
+    .badge.unknown { background: var(--amber-2); color: var(--amber); border-color: transparent; }
+    .badge.stop { background: var(--red-2); color: var(--red); border-color: transparent; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 250px minmax(0, 1fr);
+      gap: 2rem;
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 2rem 1.5rem 5rem;
+    }
+    aside { min-width: 0; }
+    .side {
+      position: sticky;
+      top: 1rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .side h2 {
+      margin: 0;
+      padding: 1rem 1rem .65rem;
+      font-size: .82rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .search-wrap { padding: 0 1rem 1rem; }
+    .search-wrap label { display: block; margin-bottom: .35rem; color: var(--muted); font-size: .76rem; }
+    #doc-search {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: .55rem .65rem;
+      background: var(--bg);
+      color: var(--ink);
+    }
+    .side nav { border-top: 1px solid var(--line); padding: .55rem; }
+    .side nav a {
+      display: block;
+      border-radius: 8px;
+      padding: .48rem .55rem;
+      color: var(--muted);
+      font-size: .84rem;
+      font-weight: 680;
+      text-decoration: none;
+    }
+    .side nav a:hover { background: var(--surface-2); color: var(--ink); }
+    .print-button {
+      width: calc(100% - 2rem);
+      margin: 0 1rem 1rem;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: .55rem;
+      background: var(--surface-2);
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 720;
+    }
+
+    main { min-width: 0; }
+    section {
+      scroll-margin-top: 1rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: clamp(1.1rem, 3vw, 2rem);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+    section.hidden-by-search { display: none; }
+    section > h2 {
+      margin: 0 0 .45rem;
+      font-size: clamp(1.45rem, 3vw, 2.1rem);
+      line-height: 1.15;
+      letter-spacing: -.025em;
+    }
+    section > .section-question { margin: 0 0 1.25rem; color: var(--muted); }
+    h3 { margin: 1.5rem 0 .55rem; font-size: 1.1rem; }
+    h4 { margin: 1.1rem 0 .35rem; }
+    p { margin: .65rem 0; }
+    ul, ol { padding-left: 1.25rem; }
+    li + li { margin-top: .35rem; }
+
+    .decision-banner {
+      border-left: 6px solid var(--green);
+      border-radius: 10px;
+      padding: 1.1rem 1.2rem;
+      background: var(--green-2);
+    }
+    .decision-banner strong { color: var(--green); }
+    .grid-2, .grid-3, .metric-grid {
+      display: grid;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .metric-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 1rem;
+      background: var(--surface-2);
+    }
+    .card h3, .card h4 { margin-top: 0; }
+    .card p:last-child, .card ul:last-child { margin-bottom: 0; }
+    .metric strong {
+      display: block;
+      color: var(--green);
+      font-size: 1.75rem;
+      line-height: 1;
+    }
+    .metric span { color: var(--muted); font-size: .82rem; }
+
+    .callout {
+      margin: 1rem 0;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      padding: .85rem 1rem;
+      background: var(--surface-2);
+    }
+    .callout.warning { border-left: 5px solid var(--amber); background: var(--amber-2); }
+    .callout.stop { border-left: 5px solid var(--red); background: var(--red-2); }
+    .callout.info { border-left: 5px solid var(--blue); background: var(--blue-2); }
+
+    .table-wrap { overflow-x: auto; margin: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; min-width: 720px; font-size: .9rem; }
+    th, td { border-bottom: 1px solid var(--line); padding: .72rem .62rem; text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-size: .76rem; letter-spacing: .045em; text-transform: uppercase; }
+    tr:last-child td { border-bottom: 0; }
+    .recommend-row { background: var(--green-2); }
+
+    .diagram {
+      margin: 1rem 0;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: .8rem;
+      background: #fff;
+      overflow-x: auto;
+    }
+    .diagram svg { display: block; width: 100%; min-width: 760px; height: auto; }
+    .diagram text { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .diagram-caption { margin: .5rem .2rem 0; color: var(--muted); font-size: .82rem; }
+
+    .gate {
+      margin-top: 1rem;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface-2);
+    }
+    .gate summary {
+      cursor: pointer;
+      padding: .9rem 1rem;
+      color: var(--ink);
+      font-weight: 800;
+    }
+    .gate[open] summary { border-bottom: 1px solid var(--line); }
+    .gate .gate-body { padding: .4rem 1rem 1rem; }
+    .gate ol { margin-bottom: 0; }
+
+    .checklist { list-style: none; padding: 0; }
+    .checklist li {
+      position: relative;
+      padding-left: 1.75rem;
+    }
+    .checklist li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: .37rem;
+      width: .9rem;
+      height: .9rem;
+      border: 2px solid var(--line);
+      border-radius: 3px;
+      background: var(--surface);
+    }
+
+    code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    code { border-radius: 5px; padding: .08rem .3rem; background: var(--surface-2); }
+    pre {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 1rem;
+      background: var(--bg);
+      color: var(--ink);
+      font-size: .8rem;
+    }
+    details.source { margin-top: .8rem; }
+    details.source summary { cursor: pointer; color: var(--muted); font-size: .82rem; font-weight: 700; }
+
+    .source-list { padding-left: 1.2rem; }
+    .source-list li { overflow-wrap: anywhere; }
+    .source-list small { display: block; color: var(--muted); }
+    .glossary { display: grid; grid-template-columns: 180px 1fr; gap: .65rem 1rem; }
+    .glossary dt { font-weight: 800; }
+    .glossary dd { margin: 0; color: var(--muted); }
+    .empty-search {
+      display: none;
+      border: 1px dashed var(--line);
+      border-radius: var(--radius);
+      padding: 2rem;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    footer { max-width: var(--max); margin: 0 auto; padding: 0 1.5rem 3rem; color: var(--muted); font-size: .82rem; }
+
+    @media (max-width: 940px) {
+      .layout { grid-template-columns: 1fr; }
+      .side { position: static; }
+      .side nav { display: flex; overflow-x: auto; gap: .25rem; }
+      .side nav a { white-space: nowrap; }
+      .grid-3, .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 640px) {
+      .masthead-inner { padding-top: 2.4rem; }
+      .layout { padding-inline: .8rem; }
+      section { border-radius: 12px; }
+      .grid-2, .grid-3, .metric-grid { grid-template-columns: 1fr; }
+      .glossary { grid-template-columns: 1fr; gap: .15rem; }
+      .glossary dd { margin-bottom: .75rem; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    @media print {
+      :root { color-scheme: light; }
+      body { background: #fff; color: #111; font-size: 10.5pt; }
+      .masthead { background: #fff; }
+      .masthead-inner { padding: 1rem 0; }
+      .layout { display: block; max-width: none; padding: 0; }
+      aside, .print-button, #empty-search { display: none !important; }
+      section { break-inside: avoid; box-shadow: none; border: 1px solid #bbb; margin: 0 0 .7rem; padding: .8rem; }
+      .diagram { break-inside: avoid; }
+      .diagram svg { min-width: 0; }
+      a { color: #111; text-decoration: none; }
+      a[href]::after { content: " (" attr(href) ")"; font-size: .7em; overflow-wrap: anywhere; }
+      details { display: block; }
+      details > * { display: block; }
+    }
+  </style>
+</head>
+<body>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <p class="eyebrow">Pre-architecture decision artifact</p>
+      <h1>CTRI wrapper: access, boundaries, differentiation, and lifecycle</h1>
+      <p class="lede">A concise evidence and decision explorer for the team deciding whether an India clinical-trial knowledge and referral workflow is worth validating. It is not product lock, legal advice, or an approved production architecture.</p>
+      <div class="status-row" aria-label="Artifact status">
+        <span class="pill">Generated 2026-09-13</span>
+        <span class="pill">Audience: product, clinical, research, regulatory</span>
+        <span class="pill">Current coordinate: P5</span>
+        <span class="pill">No patient data</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside aria-label="Document controls">
+      <div class="side">
+        <h2>Reading path</h2>
+        <div class="search-wrap">
+          <label for="doc-search">Filter sections</label>
+          <input id="doc-search" type="search" placeholder="Try: API, licence, lifecycle" autocomplete="off">
+        </div>
+        <nav aria-label="Table of contents">
+          <a href="#overview">60-second answer</a>
+          <a href="#access">Data access</a>
+          <a href="#options">Product options</a>
+          <a href="#context">System context</a>
+          <a href="#flow">Critical flow</a>
+          <a href="#lifecycle">Lifecycle</a>
+          <a href="#regulatory">Regulatory boundary</a>
+          <a href="#questions">Decision gates</a>
+          <a href="#responsibilities">Logical responsibilities</a>
+          <a href="#pilot">Cheapest experiment</a>
+          <a href="#sources">Sources</a>
+          <a href="#review">Recall and review</a>
+        </nav>
+        <button class="print-button" type="button" onclick="window.print()">Print / save PDF</button>
+      </div>
+    </aside>
+
+    <main id="content">
+      <div id="empty-search" class="empty-search" role="status">No section matches this filter. Clear the search field to restore the full artifact.</div>
+
+      <section id="overview" data-search="summary recommendation API rights wrapper current decision">
+        <span class="badge proposal">RECOMMENDATION</span>
+        <h2>60-second answer</h2>
+        <p class="section-question">What should the team remember before committing to a CTRI wrapper?</p>
+
+        <div class="decision-banner">
+          <strong>Do not build a production CTRI scraper or a patient matcher.</strong>
+          Validate a narrower service: source-linked general trial discovery, separately time-stamped site verification, and a human-owned inquiry/referral task. First obtain written data-access and reuse terms.
+        </div>
+
+        <div class="grid-2">
+          <article class="card">
+            <span class="badge fact">FACT</span>
+            <h3>Programmatic access</h3>
+            <p>CTRI has public HTML records, but its current search surfaces require CAPTCHA and CSRF protection. No documented public CTRI API, bulk machine export, open-data licence, or developer terms were found.</p>
+          </article>
+          <article class="card">
+            <span class="badge unknown">OPEN</span>
+            <h3>Permission</h3>
+            <p>Public visibility does not settle automated access, caching, derivative fields, redistribution, or commercial use. Written CTRI/rights-holder terms are a product gate.</p>
+          </article>
+          <article class="card">
+            <span class="badge fact">FACT</span>
+            <h3>Alternative feeds</h3>
+            <p>WHO ICTRP offers CSV/XML and a partner web service, but its terms materially restrict commercial use and storage. ClinicalTrials.gov offers API v2, but does not replace CTRI coverage.</p>
+          </article>
+          <article class="card">
+            <span class="badge stop">BOUNDARY</span>
+            <h3>Clinical scope</h3>
+            <p>General search and operational verification are lower-risk. Patient-note ingestion, eligibility scoring, trial ranking, or treatment-oriented claims cross into clinical decision support and possible SaMD review.</p>
+          </article>
+        </div>
+
+        <div class="callout warning"><strong>Condition that changes the recommendation:</strong> if target users only act on patient-specific eligibility rankings, the current safe concept has no product-market fit; do not smuggle matching into the wrapper.</div>
+      </section>
+
+      <section id="access" data-search="CTRI API programmatic access HTML CAPTCHA WHO ICTRP CSV XML commercial ClinicalTrials.gov">
+        <span class="badge fact">EVIDENCE</span>
+        <h2>Data-access landscape</h2>
+        <p class="section-question">Can CTRI data be accessed programmatically, and which path is supportable?</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Path</th><th>Observed capability</th><th>Rights / reliability</th><th>Decision</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>CTRI web search</strong></td>
+                <td>Public HTML; advanced search posts to PHP with CSRF token and CAPTCHA. CTRI-number lookup also requires human verification.</td>
+                <td>No machine contract, schema notice, rate limit, SLA, or open licence found.</td>
+                <td>Human research and source verification only.</td>
+              </tr>
+              <tr>
+                <td><strong>Parse CTRI HTML</strong></td>
+                <td>Historically feasible; a 2019 study parsed records into SQLite.</td>
+                <td>Technically brittle. Current CAPTCHA must not be bypassed. Permission for bulk/commercial reuse is unknown.</td>
+                <td>Only after written permission.</td>
+              </tr>
+              <tr class="recommend-row">
+                <td><strong>Official CTRI extract or API agreement</strong></td>
+                <td>Not publicly documented.</td>
+                <td>Could define permitted fields, refresh, caching, attribution, correction, support, and commercial use.</td>
+                <td><strong>Preferred production path.</strong></td>
+              </tr>
+              <tr>
+                <td><strong>WHO ICTRP CSV/XML</strong></td>
+                <td>Public download from the search portal; cross-registry data.</td>
+                <td>Terms require attribution/currentness and prohibit marketing, promotional, or commercial use.</td>
+                <td>Permitted research analysis, not assumed commercial backend.</td>
+              </tr>
+              <tr>
+                <td><strong>WHO ICTRP web service</strong></td>
+                <td>Credentialed real-time XML for agreed partners.</td>
+                <td>Research/public-body scope, no local storage, no third-party charge, copyright limits, possible access cost.</td>
+                <td>Poor fit without a separate agreement.</td>
+              </tr>
+              <tr>
+                <td><strong>ClinicalTrials.gov API v2</strong></td>
+                <td>Documented JSON API and bulk download; version endpoint exposes data timestamp.</td>
+                <td>Different source and terms; incomplete CTRI/India-specific coverage; site status remains declarative.</td>
+                <td>Useful cross-registry source, not a CTRI replacement.</td>
+              </tr>
+              <tr>
+                <td><strong>Curated discovery dataset</strong></td>
+                <td>Small set assembled manually with exact links and dates.</td>
+                <td>Not scalable; still requires careful reuse scope. Avoid personal contact replication.</td>
+                <td>Cheapest reversible experiment.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout stop"><strong>Hard stop:</strong> do not solve access by defeating CAPTCHA, replaying protected form tokens, rotating identities, or treating the lack of a robots file as permission.</div>
+      </section>
+
+      <section id="options" data-search="options reskin cross registry site verification patient matcher tradeoffs">
+        <span class="badge proposal">OPTIONS</span>
+        <h2>Four product directions</h2>
+        <p class="section-question">Which idea creates new operational value rather than merely presenting the same registry?</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Option</th><th>User value</th><th>Risk / cost</th><th>Verification</th><th>Call</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>1. Search reskin</strong></td>
+                <td>Cleaner filters and display.</td>
+                <td>Low differentiation; inherits source staleness and access dependence.</td>
+                <td>Usability comparison only.</td>
+                <td>Reject as product.</td>
+              </tr>
+              <tr>
+                <td><strong>2. Cross-registry index</strong></td>
+                <td>Source comparison, declared-ID links, change visibility.</td>
+                <td>Data rights, entity resolution, and freshness remain hard.</td>
+                <td>Measure duplicate/conflict rate and time saved.</td>
+                <td>Foundation, not wedge.</td>
+              </tr>
+              <tr class="recommend-row">
+                <td><strong>3. Site-verified operations layer</strong></td>
+                <td>Answers whether the actual site recently confirmed status/contact and who owns follow-through.</td>
+                <td>Human verification is recurring operational cost; authority and expiry must be explicit.</td>
+                <td>Time to authoritative answer, discrepancy rate, acknowledgement, person-minutes.</td>
+                <td><strong>Recommended hypothesis.</strong></td>
+              </tr>
+              <tr>
+                <td><strong>4. Patient-specific matcher</strong></td>
+                <td>Potentially convenient shortlist.</td>
+                <td>Sensitive data, interpretation errors, CDS/SaMD risk, false inclusion/exclusion, current scope breach.</td>
+                <td>Would require prospective clinical-safety evaluation.</td>
+                <td>Reject for current project.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout info"><strong>Proposed job:</strong> when a clinician or coordinator identifies a potentially relevant trial, obtain an authoritative recent answer from the Indian site and keep the inquiry owner and acknowledgement visible.</div>
+      </section>
+
+      <section id="context" data-search="context actors systems trust boundary CTRI WHO ClinicalTrials site doctor coordinator">
+        <span class="badge proposal">CONCEPTUAL VIEW</span>
+        <h2>System context</h2>
+        <p class="section-question">Who supplies facts, who verifies them, and who acts?</p>
+
+        <div class="diagram">
+          <svg viewBox="0 0 1120 520" role="img" aria-labelledby="context-title context-desc">
+            <title id="context-title">Proposed system context for a CTRI wrapper decision</title>
+            <desc id="context-desc">Official registries and sites provide information to a provenance-first operational layer used by doctors and coordinators. Patient data and eligibility ranking remain out of scope.</desc>
+            <defs>
+              <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#4d655a"/></marker>
+              <style>
+                .box{rx:14;stroke-width:2}.t{font-size:18px;font-weight:700;fill:#14221d}.s{font-size:14px;fill:#53645d}.a{stroke:#4d655a;stroke-width:2.2;fill:none;marker-end:url(#arrow)}.dash{stroke-dasharray:8 7}
+              </style>
+            </defs>
+            <rect x="20" y="40" width="220" height="105" class="box" fill="#e4f0f8" stroke="#245f8f"/>
+            <text x="40" y="75" class="t">CTRI</text><text x="40" y="102" class="s">Registrant-declared Indian</text><text x="40" y="124" class="s">trial records; HTML access</text>
+            <rect x="20" y="185" width="220" height="105" class="box" fill="#e4f0f8" stroke="#245f8f"/>
+            <text x="40" y="220" class="t">ClinicalTrials.gov</text><text x="40" y="247" class="s">NCT records; supported API</text><text x="40" y="269" class="s">and bulk download</text>
+            <rect x="20" y="330" width="220" height="105" class="box" fill="#fff2d5" stroke="#8a5200"/>
+            <text x="40" y="365" class="t">Indian trial site</text><text x="40" y="392" class="s">Authoritative operational</text><text x="40" y="414" class="s">verification by named human</text>
+
+            <rect x="365" y="70" width="390" height="350" class="box" fill="#edf4f0" stroke="#155f47"/>
+            <text x="400" y="112" class="t">Proposed general-information</text><text x="400" y="137" class="t">and operations layer</text>
+            <line x1="400" y1="158" x2="720" y2="158" stroke="#cbd9d2"/>
+            <text x="400" y="193" class="s">• Source snapshots + provenance</text>
+            <text x="400" y="224" class="s">• Deterministic normalisation + review</text>
+            <text x="400" y="255" class="s">• Registry/site states kept separate</text>
+            <text x="400" y="286" class="s">• Site verification + expiry</text>
+            <text x="400" y="317" class="s">• General search + exact citations</text>
+            <text x="400" y="348" class="s">• Human-approved inquiry task + audit</text>
+            <rect x="400" y="370" width="320" height="32" rx="8" fill="#fbe7e5" stroke="#8d3030"/>
+            <text x="420" y="392" class="s" style="fill:#8d3030;font-weight:700">No patient features, ranking, or eligibility</text>
+
+            <rect x="880" y="80" width="220" height="105" class="box" fill="#dff1e8" stroke="#155f47"/>
+            <text x="900" y="115" class="t">Doctor / coordinator</text><text x="900" y="142" class="s">Searches general facts;</text><text x="900" y="164" class="s">approves inquiry</text>
+            <rect x="880" y="250" width="220" height="105" class="box" fill="#eee9f8" stroke="#65518d"/>
+            <text x="900" y="285" class="t">Research office</text><text x="900" y="312" class="s">Owns policy, access, buyer</text><text x="900" y="334" class="s">and verification operation</text>
+            <rect x="880" y="395" width="220" height="80" class="box" fill="#fbe7e5" stroke="#8d3030"/>
+            <text x="900" y="430" class="t">Patient record</text><text x="900" y="456" class="s">Outside current boundary</text>
+
+            <path d="M240 92 C300 92 300 130 365 130" class="a"/><text x="270" y="83" class="s">permissioned data</text>
+            <path d="M240 237 C300 237 300 220 365 220" class="a"/><text x="268" y="253" class="s">API data</text>
+            <path d="M240 382 C300 382 300 340 365 340" class="a"/><text x="260" y="410" class="s">verified assertion</text>
+            <path d="M755 190 C815 190 820 135 880 135" class="a"/><text x="778" y="158" class="s">search</text>
+            <path d="M880 165 C820 165 815 245 755 245" class="a"/><text x="780" y="218" class="s">approved task</text>
+            <path d="M755 315 C810 315 825 305 880 305" class="a"/><text x="780" y="298" class="s">audit / reports</text>
+            <path d="M880 435 C820 435 815 390 755 390" class="a dash"/><text x="770" y="424" class="s" style="fill:#8d3030">blocked boundary</text>
+          </svg>
+          <p class="diagram-caption"><strong>Question answered:</strong> which external systems and actors cross the proposed boundary? Blue is source data, amber is human site verification, green is the proposed layer, red is excluded.</p>
+        </div>
+
+        <details class="source"><summary>Editable diagram source</summary><pre>CTRI [declared records] --------\
+ClinicalTrials.gov [API] ------- > provenance + normalisation + verification + general search + task audit --> doctor/coordinator
+Indian site [human assertion] --/                                                     --> research office
+Patient record --------------------------------------------------------------X outside current boundary</pre></details>
+      </section>
+
+      <section id="flow" data-search="flow sequence ingestion rights schema snapshot normalization verification referral failure outage">
+        <span class="badge proposal">RUNTIME VIEW</span>
+        <h2>Critical success and failure flow</h2>
+        <p class="section-question">How should a source record become a visible operational assertion without pretending to be live?</p>
+
+        <div class="diagram">
+          <svg viewBox="0 0 1180 450" role="img" aria-labelledby="flow-title flow-desc">
+            <title id="flow-title">Source-to-referral flow</title>
+            <desc id="flow-desc">A permission and schema gate precedes snapshotting and normalization. Human review handles uncertain conflicts. Site verification expires. General search can create only a human-approved task.</desc>
+            <defs><marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#4d655a"/></marker><style>.fb{rx:12;stroke-width:2}.ft{font-size:15px;font-weight:700;fill:#14221d}.fs{font-size:12px;fill:#53645d}.fa{stroke:#4d655a;stroke-width:2;fill:none;marker-end:url(#arrow2)}</style></defs>
+            <rect x="20" y="60" width="155" height="72" class="fb" fill="#e4f0f8" stroke="#245f8f"/><text x="42" y="92" class="ft">Authorised source</text><text x="42" y="114" class="fs">record or extract</text>
+            <rect x="220" y="60" width="155" height="72" class="fb" fill="#fff2d5" stroke="#8a5200"/><text x="240" y="92" class="ft">Rights + schema</text><text x="240" y="114" class="fs">gate</text>
+            <rect x="420" y="60" width="155" height="72" class="fb" fill="#edf4f0" stroke="#155f47"/><text x="440" y="92" class="ft">Raw snapshot</text><text x="440" y="114" class="fs">source + retrieved-at</text>
+            <rect x="620" y="60" width="155" height="72" class="fb" fill="#edf4f0" stroke="#155f47"/><text x="640" y="92" class="ft">Normalise</text><text x="640" y="114" class="fs">rules + provenance</text>
+            <rect x="820" y="60" width="155" height="72" class="fb" fill="#dff1e8" stroke="#155f47"/><text x="840" y="92" class="ft">General index</text><text x="840" y="114" class="fs">declared facts only</text>
+            <rect x="1015" y="60" width="145" height="72" class="fb" fill="#dff1e8" stroke="#155f47"/><text x="1035" y="92" class="ft">Search result</text><text x="1035" y="114" class="fs">citation + age</text>
+            <path d="M175 96H220" class="fa"/><path d="M375 96H420" class="fa"/><path d="M575 96H620" class="fa"/><path d="M775 96H820" class="fa"/><path d="M975 96H1015" class="fa"/>
+
+            <rect x="220" y="215" width="155" height="72" class="fb" fill="#fbe7e5" stroke="#8d3030"/><text x="240" y="247" class="ft">Quarantine</text><text x="240" y="269" class="fs">no rights / bad schema</text>
+            <path d="M297 132V215" class="fa"/><text x="308" y="176" class="fs">fail</text>
+            <rect x="620" y="215" width="155" height="72" class="fb" fill="#fff2d5" stroke="#8a5200"/><text x="640" y="247" class="ft">Human review</text><text x="640" y="269" class="fs">duplicate or conflict</text>
+            <path d="M697 132V215" class="fa"/><text x="708" y="176" class="fs">uncertain</text>
+
+            <rect x="820" y="215" width="155" height="72" class="fb" fill="#fff2d5" stroke="#8a5200"/><text x="840" y="247" class="ft">Site verification</text><text x="840" y="269" class="fs">named human + expiry</text>
+            <path d="M897 132V215" class="fa"/>
+            <rect x="1015" y="215" width="145" height="72" class="fb" fill="#eee9f8" stroke="#65518d"/><text x="1035" y="247" class="ft">Inquiry task</text><text x="1035" y="269" class="fs">human approved</text>
+            <path d="M975 251H1015" class="fa"/>
+
+            <path d="M897 287V354 C897 382 820 382 820 340 V287" class="fa"/><text x="838" y="410" class="fs">expiry returns assertion to verification queue</text>
+            <path d="M1088 132V215" class="fa"/><text x="1098" y="175" class="fs">act</text>
+          </svg>
+          <p class="diagram-caption"><strong>Success:</strong> exact source fact plus recent human site assertion. <strong>Failure:</strong> no rights, invalid schema, unresolved identity, source outage, or expired verification remains visible and never becomes “current.”</p>
+        </div>
+
+        <div class="grid-2">
+          <article class="card"><h3>Failure contract</h3><ul><li>Source unavailable: serve last snapshot only with stale banner and retrieval date.</li><li>Schema changed: quarantine affected records; do not publish partial reinterpretation.</li><li>Uncertain duplicate: preserve both records and queue human review.</li><li>No site response: display “no authoritative response,” never “closed.”</li></ul></article>
+          <article class="card"><h3>Correction contract</h3><ul><li>Never overwrite the original registry value.</li><li>Store normalized value and rule/version separately.</li><li>Store site assertion with source, actor, time, and expiry.</li><li>Send source corrections only through an authorised human workflow.</li></ul></article>
+        </div>
+      </section>
+
+      <section id="lifecycle" data-search="state machine lifecycle record verification task transitions expiry">
+        <span class="badge proposal">STATE VIEW</span>
+        <h2>Three lifecycles, not one status</h2>
+        <p class="section-question">Which state belongs to the registry, the verifier, and the referral task?</p>
+
+        <div class="diagram">
+          <svg viewBox="0 0 1160 530" role="img" aria-labelledby="life-title life-desc">
+            <title id="life-title">Separate source, site verification, and task lifecycles</title>
+            <desc id="life-desc">The source record lifecycle, site verification lifecycle, and human task lifecycle advance independently and remain auditable.</desc>
+            <defs><marker id="arrow3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#4d655a"/></marker><style>.lb{rx:10;stroke-width:2}.lt{font-size:14px;font-weight:700;fill:#14221d}.ls{font-size:12px;fill:#53645d}.la{stroke:#4d655a;stroke-width:2;fill:none;marker-end:url(#arrow3)}</style></defs>
+            <text x="25" y="42" class="lt" style="font-size:18px;fill:#245f8f">A. Source record</text>
+            <rect x="25" y="62" width="145" height="58" class="lb" fill="#e4f0f8" stroke="#245f8f"/><text x="48" y="97" class="lt">discovered</text>
+            <rect x="215" y="62" width="145" height="58" class="lb" fill="#e4f0f8" stroke="#245f8f"/><text x="245" y="97" class="lt">rights approved</text>
+            <rect x="405" y="62" width="145" height="58" class="lb" fill="#e4f0f8" stroke="#245f8f"/><text x="447" y="97" class="lt">fetched</text>
+            <rect x="595" y="62" width="145" height="58" class="lb" fill="#e4f0f8" stroke="#245f8f"/><text x="630" y="97" class="lt">normalized</text>
+            <rect x="785" y="62" width="145" height="58" class="lb" fill="#dff1e8" stroke="#155f47"/><text x="827" y="97" class="lt">published</text>
+            <rect x="975" y="62" width="145" height="58" class="lb" fill="#fff2d5" stroke="#8a5200"/><text x="1005" y="97" class="lt">stale / changed</text>
+            <path d="M170 91H215" class="la"/><path d="M360 91H405" class="la"/><path d="M550 91H595" class="la"/><path d="M740 91H785" class="la"/><path d="M930 91H975" class="la"/><path d="M1047 120 C1047 150 670 150 670 120" class="la"/>
+
+            <text x="25" y="205" class="lt" style="font-size:18px;fill:#8a5200">B. Site verification assertion</text>
+            <rect x="25" y="225" width="145" height="58" class="lb" fill="#fff2d5" stroke="#8a5200"/><text x="55" y="260" class="lt">not checked</text>
+            <rect x="215" y="225" width="145" height="58" class="lb" fill="#fff2d5" stroke="#8a5200"/><text x="235" y="260" class="lt">attempted</text>
+            <rect x="405" y="205" width="175" height="58" class="lb" fill="#dff1e8" stroke="#155f47"/><text x="426" y="240" class="lt">verified recruiting</text>
+            <rect x="405" y="276" width="175" height="58" class="lb" fill="#fbe7e5" stroke="#8d3030"/><text x="424" y="311" class="lt">verified not recruiting</text>
+            <rect x="625" y="205" width="175" height="58" class="lb" fill="#fff2d5" stroke="#8a5200"/><text x="650" y="240" class="lt">no response</text>
+            <rect x="625" y="276" width="175" height="58" class="lb" fill="#fff2d5" stroke="#8a5200"/><text x="650" y="311" class="lt">discrepancy</text>
+            <rect x="850" y="240" width="175" height="58" class="lb" fill="#eee9f8" stroke="#65518d"/><text x="902" y="275" class="lt">expired</text>
+            <path d="M170 254H215" class="la"/><path d="M360 245H405" class="la"/><path d="M360 265 C385 265 385 305 405 305" class="la"/><path d="M360 254 C590 254 590 234 625 234" class="la"/><path d="M580 305H625" class="la"/><path d="M580 234 C820 234 820 260 850 260" class="la"/><path d="M800 305 C825 305 825 278 850 278" class="la"/><path d="M937 298 C937 360 98 360 98 283" class="la"/>
+
+            <text x="25" y="410" class="lt" style="font-size:18px;fill:#65518d">C. Human inquiry / referral task</text>
+            <rect x="25" y="430" width="145" height="58" class="lb" fill="#eee9f8" stroke="#65518d"/><text x="70" y="465" class="lt">draft</text>
+            <rect x="215" y="430" width="145" height="58" class="lb" fill="#eee9f8" stroke="#65518d"/><text x="242" y="465" class="lt">approved</text>
+            <rect x="405" y="430" width="145" height="58" class="lb" fill="#eee9f8" stroke="#65518d"/><text x="463" y="465" class="lt">sent</text>
+            <rect x="595" y="430" width="145" height="58" class="lb" fill="#dff1e8" stroke="#155f47"/><text x="625" y="465" class="lt">acknowledged</text>
+            <rect x="785" y="430" width="145" height="58" class="lb" fill="#dff1e8" stroke="#155f47"/><text x="830" y="465" class="lt">closed</text>
+            <rect x="975" y="430" width="145" height="58" class="lb" fill="#fbe7e5" stroke="#8d3030"/><text x="995" y="465" class="lt">unable to contact</text>
+            <path d="M170 459H215" class="la"/><path d="M360 459H405" class="la"/><path d="M550 459H595" class="la"/><path d="M740 459H785" class="la"/><path d="M550 473 C760 520 930 500 975 470" class="la"/>
+          </svg>
+          <p class="diagram-caption"><strong>Invariant:</strong> a registry state never automatically becomes a site assertion, and a site assertion never automatically becomes an eligibility decision.</p>
+        </div>
+
+        <div class="callout warning"><strong>Forbidden states:</strong> <code>eligible</code>, <code>best_match</code>, <code>recommended</code>, or an inferred clinical reason. The trial team owns formal eligibility.</div>
+      </section>
+
+      <section id="regulatory" data-search="regulatory doctor wrapper SaMD CDSCO ICMR ethics recruitment permission privacy disclaimer">
+        <span class="badge unknown">RISK ASSESSMENT</span>
+        <h2>Regulatory and policy boundary</h2>
+        <p class="section-question">Is there a rule that prevents doctors from using a wrapper?</p>
+
+        <p><span class="badge fact">OBSERVED</span> No reviewed Indian rule or CTRI page categorically prohibits a doctor from using a wrapper that displays public general trial information. The consequential questions concern the product operator and intended use—not the doctor's ability to open a website.</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Capability</th><th>Risk posture</th><th>Control before use</th></tr></thead>
+            <tbody>
+              <tr><td>Exact public fields + source link/date</td><td>General information; lower clinical risk</td><td>Written reuse rights, fidelity, attribution, non-endorsement, correction path</td></tr>
+              <tr><td>Deterministic normalization/conflict flag</td><td>Data-quality assistance</td><td>Original value preserved, rule version, human review, no silent merge</td></tr>
+              <tr><td>Human site verification</td><td>Operational assertion</td><td>Named source, authority, method, timestamp, expiry, audit</td></tr>
+              <tr><td>Doctor-approved inquiry task</td><td>Operational workflow</td><td>Role-based access, approved contact route, no patient data in initial scope</td></tr>
+              <tr><td>Patient-facing recruitment message</td><td>Clinical-research recruitment</td><td>Sponsor/site authority and relevant Ethics Committee-approved content/process</td></tr>
+              <tr><td>Notes/test ingestion</td><td>Sensitive health data + interpretation</td><td>Outside redesign; privacy, consent/authority, security, clinical governance</td></tr>
+              <tr><td>Eligibility score or ranked trials</td><td>Clinical decision support; possible SaMD</td><td>Outside current scope; written CDSCO classification/regulatory advice</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid-3">
+          <article class="card"><h3>CTRI</h3><p>Registry inclusion is not approval or endorsement. Information is registrant-supplied. A wrapper must not imply CTRI/ICMR validation.</p></article>
+          <article class="card"><h3>CDSCO</h3><p>Standalone software meeting the notified medical-device definition is regulated. Intended use and error consequences drive classification; CDSCO is the competent classifier.</p></article>
+          <article class="card"><h3>ICMR / Ethics Committee</h3><p>Recruitment advertisements, notices, methods, payments, privacy, and undue inducement belong in ethics review. Registry text is not blanket permission to solicit patients.</p></article>
+        </div>
+
+        <div class="callout stop"><strong>Point of risk:</strong> freeze the wording of product claims before regulatory classification. “Search public trials” and “recommend the best trial for this patient” are different products.</div>
+        <p><small>This artifact is an evidence-backed risk map, not legal or regulatory advice. Written CTRI data terms and qualified Indian review remain required before a production or commercial commitment.</small></p>
+      </section>
+
+      <section id="questions" data-search="questions gates finalize idea product evidence data rights intended use business pilot architecture">
+        <span class="badge unknown">DECISION GATES</span>
+        <h2>Questions to answer before idea or architecture lock</h2>
+        <p class="section-question">Which answers can invalidate the idea or materially change the architecture?</p>
+
+        <details class="gate" open>
+          <summary>Gate A — Problem evidence</summary>
+          <div class="gate-body"><ol>
+            <li>Which exact role owns the job: treating oncologist, research coordinator, tumour-board coordinator, site PI, or research office?</li>
+            <li>What event triggers a search, and how many times did it occur in the last four weeks?</li>
+            <li>What happened in the last five de-identified searches: sources, elapsed time, calls, failure, workaround, outcome?</li>
+            <li>Is the dominant failure discovery, stale contact/status, screening, eligibility, travel/affordability, or referral follow-through?</li>
+            <li>Would a role, SOP, or shared directory solve it more safely and cheaply than software?</li>
+          </ol></div>
+        </details>
+
+        <details class="gate" open>
+          <summary>Gate B — Data authority and rights</summary>
+          <div class="gate-body"><ol start="6">
+            <li>Which source owns each field: CTRI, ClinicalTrials.gov, sponsor, or local site?</li>
+            <li>Is written permission available for automated access, caching, derivatives, redistribution, and commercial use?</li>
+            <li>Which fields are essential, and can names, personal contacts, and uploaded documents be omitted?</li>
+            <li>What are refresh cadence, lag, outage behavior, schema-change notice, and correction route?</li>
+            <li>How are duplicate registrations linked, and who reviews uncertain matches?</li>
+          </ol></div>
+        </details>
+
+        <details class="gate" open>
+          <summary>Gate C — Safe intended use</summary>
+          <div class="gate-body"><ol start="11">
+            <li>What exact words appear in pitch, interface, label, and instructions: search, verified contact, likely eligible, or recommended?</li>
+            <li>Does any output depend on diagnosis, stage, biomarker, treatment history, laboratory result, or performance status?</li>
+            <li>Could sorting, badges, or alerts reasonably be interpreted as eligibility or treatment advice?</li>
+            <li>Will the product send recruitment material, and who approves the exact content?</li>
+            <li>What written legal, Ethics Committee, hospital, and CDSCO classification reviews are required?</li>
+          </ol></div>
+        </details>
+
+        <details class="gate">
+          <summary>Gate D — Operating model and incentives</summary>
+          <div class="gate-body"><ol start="16">
+            <li>Who verifies sites, through which authorised channel, how often, and with what evidence?</li>
+            <li>What happens when registry, sponsor, and site disagree—or nobody responds?</li>
+            <li>Who pays: hospital, network, sponsor, site, research programme, or another party?</li>
+            <li>Why will sites maintain status: fewer unsuitable calls, better referrals, portfolio visibility, or a measured benefit?</li>
+            <li>What is fully loaded verification cost per active trial/site and monthly support burden?</li>
+          </ol></div>
+        </details>
+
+        <details class="gate">
+          <summary>Gate E — Lifecycle, reliability, and governance</summary>
+          <div class="gate-body"><ol start="21">
+            <li>What states and transitions are allowed for source record, verification assertion, and task?</li>
+            <li>When does verification expire, and how is history retained without appearing current?</li>
+            <li>What happens on source outage, schema change, record disappearance, invalid data, or unresolved conflict?</li>
+            <li>Which actions require human approval, role-based access, immutable audit, and institutional review?</li>
+            <li>What data are retained, where, for how long, and how are correction and deletion handled?</li>
+          </ol></div>
+        </details>
+
+        <details class="gate">
+          <summary>Gate F — Pilot and sign-off</summary>
+          <div class="gate-body"><ol start="26">
+            <li>Which bounded indication, geography, site set, and users create a valid 60–90-day test?</li>
+            <li>What are the primary KPI, guardrails, and explicit stop thresholds?</li>
+            <li>What comparator is credible: baseline workflow, SOP, shared spreadsheet, or tool?</li>
+            <li>What result proves aggregation is insufficient but verification plus handoff is valuable?</li>
+            <li>Who has authority to accept evidence and lock product scope?</li>
+          </ol></div>
+        </details>
+
+        <div class="callout warning"><strong>Architecture gate:</strong> do not select framework, database, deployment topology, or integrations until the permitted source, intended-use claim, patient-data boundary, verification owner, buyer, record volume, refresh cadence, and audit requirement are named.</div>
+      </section>
+
+      <section id="responsibilities" data-search="logical architecture containers responsibilities data store source adapter index application audit no stack">
+        <span class="badge proposal">PROVISIONAL LOGICAL MODEL</span>
+        <h2>Responsibilities if the gates pass</h2>
+        <p class="section-question">What is the simplest logical decomposition without prematurely selecting a stack?</p>
+
+        <div class="grid-3">
+          <article class="card"><h3>Source adapter</h3><p>Uses only authorised access. Captures source ID, raw value, retrieval time, version, and access result. Stops on rights or schema failure.</p></article>
+          <article class="card"><h3>Provenance store</h3><p>Retains immutable source snapshots and normalized values separately. The official registry remains system of record for registry facts.</p></article>
+          <article class="card"><h3>Normalization reviewer</h3><p>Runs deterministic mappings. Queues uncertain identities, duplicates, and conflicts for a human; never invents missing facts.</p></article>
+          <article class="card"><h3>General search</h3><p>Indexes disease, geography, phase, declared status, provenance, and verified operational state—never patient features.</p></article>
+          <article class="card"><h3>Verification workbench</h3><p>Lets an authorised steward record site assertion, method, evidence, time, discrepancy, and expiry.</p></article>
+          <article class="card"><h3>Task and audit ledger</h3><p>Records human approval, owner, sent/acknowledged/closed status, and immutable events without deciding eligibility.</p></article>
+        </div>
+
+        <h3>Quality-attribute scenarios still needing thresholds</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Driver</th><th>Stimulus</th><th>Required response</th><th>Threshold status</th></tr></thead>
+            <tbody>
+              <tr><td>Provenance</td><td>User opens any field</td><td>Show original source, retrieval date, normalized rule, and site assertion separately</td><td>Invariant; exact UX unselected</td></tr>
+              <tr><td>Freshness</td><td>Verification expires or source changes</td><td>Remove “current” presentation and queue review without deleting history</td><td>Expiry interval unknown</td></tr>
+              <tr><td>Reliability</td><td>Source fails or schema changes</td><td>Quarantine affected ingest; visibly serve last valid snapshot as stale</td><td>Allowed staleness unknown</td></tr>
+              <tr><td>Safety</td><td>User enters patient details or asks for ranking</td><td>Reject or redirect to general search; do not retain input</td><td>Required current boundary</td></tr>
+              <tr><td>Audit</td><td>Verification or task state changes</td><td>Record actor, timestamp, old/new state, reason, and source</td><td>Retention unknown</td></tr>
+              <tr><td>Operations</td><td>Site gives no response</td><td>Record attempt and expiry; never infer recruiting state</td><td>Retry policy unknown</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout info"><strong>Simplest viable shape:</strong> one application boundary and one owned data store are sufficient until scale or team boundaries prove otherwise. This is a design principle, not a stack decision.</div>
+      </section>
+
+      <section id="pilot" data-search="pilot experiment KPI falsifier 60 90 day manual curation verification">
+        <span class="badge proposal">CHEAPEST USEFUL EXPERIMENT</span>
+        <h2>Validate the service before the software</h2>
+        <p class="section-question">What experiment reduces product, data-access, and operating-model uncertainty at the same time?</p>
+
+        <ol>
+          <li>Choose one target role, one centre/network, and one bounded cancer/region query set.</li>
+          <li>Manually assemble a small source-linked record set; do not scrape or store patient data.</li>
+          <li>Ask the authorised site contact to verify the operational state and preferred referral route.</li>
+          <li>Give target users a simple searchable view and human-owned inquiry log.</li>
+          <li>Compare against the current workflow and a shared-sheet/SOP alternative.</li>
+          <li>Stop unless both burden and maintainable verification value are observed.</li>
+        </ol>
+
+        <div class="metric-grid">
+          <article class="card metric"><strong>Time</strong><span>Median time to authoritative site answer</span></article>
+          <article class="card metric"><strong>Freshness</strong><span>Share verified within approved expiry window</span></article>
+          <article class="card metric"><strong>Conflict</strong><span>Registry-versus-site discrepancy rate</span></article>
+          <article class="card metric"><strong>Handoff</strong><span>Inquiry acknowledgement and human closure</span></article>
+        </div>
+
+        <h3>Falsifiers</h3>
+        <ul class="checklist">
+          <li>Searches are too rare or fast to create material burden.</li>
+          <li>Stale status/contact is not a meaningful cause of failed referrals.</li>
+          <li>The dominant constraint is trial scarcity, eligibility, cost, or travel rather than information.</li>
+          <li>A role, SOP, or shared sheet performs as well with lower operating cost.</li>
+          <li>Authorised data access cannot support the planned use.</li>
+          <li>Site verification cannot be kept current affordably.</li>
+          <li>Users require patient-specific ranking, which is outside scope.</li>
+        </ul>
+      </section>
+
+      <section id="sources" data-search="sources evidence CTRI WHO CDSCO ICMR ClinicalTrials.gov">
+        <span class="badge fact">SOURCES</span>
+        <h2>Evidence and authority</h2>
+        <p class="section-question">Which facts are direct, which are proposals, and what remains unresolved?</p>
+
+        <ul class="source-list">
+          <li><a href="https://ctri.nic.in/Clinicaltrials/advancesearchmain.php">CTRI Advanced Search</a><small>Official HTML form; CAPTCHA, CSRF, and server-rendered search observed 2026-09-13.</small></li>
+          <li><a href="https://ctri.nic.in/Clinicaltrials/searchbyctri.php">CTRI search by number</a><small>Official human-verification lookup observed 2026-09-13.</small></li>
+          <li><a href="https://ctri.nic.in/Clinicaltrials/disclaimer.php">CTRI disclaimer</a><small>Registrant-supplied information; no CTRI/ICMR endorsement or validity warranty.</small></li>
+          <li><a href="https://ctri.nic.in/Clinicaltrials/faq.php">CTRI FAQ</a><small>Public records, captured fields, responsibility, and monthly upload to WHO ICTRP.</small></li>
+          <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6712861/">Pillamarapu et al., 2019</a><small>Historical programmatic HTML extraction and CTRI data-quality audit; not current access permission.</small></li>
+          <li><a href="https://www.who.int/tools/clinical-trials-registry-platform/network/who-data-set/downloading-records-from-the-ictrp-database">WHO ICTRP download formats and terms</a><small>CSV/XML availability, attribution/currentness duties, and commercial-use restriction.</small></li>
+          <li><a href="https://www.who.int/publications/m/item/who-ictrp-web-service---conditions-of-use">WHO ICTRP web-service conditions</a><small>Credentialed XML service, research/public-body scope, storage and charging restrictions.</small></li>
+          <li><a href="https://clinicaltrials.gov/api/v2/version">ClinicalTrials.gov API v2 version</a><small>Official live JSON endpoint; version and data timestamp observed 2026-09-13.</small></li>
+          <li><a href="https://clinicaltrials.gov/data-api/about-api">ClinicalTrials.gov API documentation</a><small>Official API and download documentation.</small></li>
+          <li><a href="https://cdsco.gov.in/opencms/export/sites/CDSCO_WEB/Pdf-documents/MDFA13feb.pdf">CDSCO Medical Devices FAQ, 2024</a><small>Standalone-software and intended-use classification boundary; not a classification of this proposal.</small></li>
+          <li><a href="https://cdsco.gov.in/opencms/resources/UploadCDSCOWeb/2022/m_device/mdr%2C%202017%20%281%29.pdf">Medical Devices Rules, 2017</a><small>Official consolidated rules accessed 2026-09-13.</small></li>
+          <li><a href="https://www.icmr.gov.in/icmrobject/custom_data/pdf/resource-guidelines/ICMR_Ethical_Guidelines_2017.pdf">ICMR National Ethical Guidelines, 2017</a><small>Ethics review of recruitment procedures, advertisements, privacy, payments, and inducement.</small></li>
+          <li><a href="../research/CLINICAL_TRIAL_WORKFLOW_CLARIFICATION_20260913.md">Structured research note</a><small>Question-level analysis, actor/state model, sources, and evidence limitations.</small></li>
+        </ul>
+
+        <div class="callout warning"><strong>Authority boundary:</strong> public sources and this artifact are research evidence. CTRI/rights-holder terms, CDSCO classification, Ethics Committee decisions, hospital policy, and owner sign-off remain authoritative for their domains.</div>
+      </section>
+
+      <section id="review" data-search="review glossary mental model recall questions">
+        <span class="badge proposal">MENTAL MODEL</span>
+        <h2>Recall and review</h2>
+        <p class="section-question">Can the team explain the decision without reopening every source?</p>
+
+        <dl class="glossary">
+          <dt>Registry fact</dt><dd>A value submitted to and displayed by a source registry. It remains attributed to that source.</dd>
+          <dt>Normalized value</dt><dd>A deterministic derivative for search. It never replaces the original value and carries a rule version.</dd>
+          <dt>Site assertion</dt><dd>A time-bounded operational statement from an authorised named human/site source.</dd>
+          <dt>Freshness</dt><dd>Time and evidence context—not a claim that a record is clinically correct or a site has capacity.</dd>
+          <dt>General discovery</dt><dd>Search by trial attributes without using an individual's clinical facts.</dd>
+          <dt>Eligibility</dt><dd>A protocol-based patient-specific determination owned by the trial team and outside the current product.</dd>
+        </dl>
+
+        <h3>Immediate retrieval questions</h3>
+        <ol>
+          <li>Why is public CTRI HTML not yet a production data contract?</li>
+          <li>Why can WHO ICTRP be machine-readable but unsuitable for a commercial cached product?</li>
+          <li>Which three state machines must remain separate?</li>
+          <li>What event turns the wrapper into possible CDS/SaMD?</li>
+          <li>Which measurement would falsify the site-verification wedge fastest?</li>
+        </ol>
+
+        <details class="gate"><summary>Reveal concise answers</summary><div class="gate-body"><ol>
+          <li>CAPTCHA/CSRF, no supported API/SLA/open licence found, and reuse permission is unresolved.</li>
+          <li>Its published terms restrict commercial use; web-service terms also restrict storage and charging.</li>
+          <li>Source record, site verification assertion, and human inquiry/referral task.</li>
+          <li>Patient-specific inputs or outputs that interpret, score eligibility, rank trials, or guide treatment.</li>
+          <li>Low inquiry burden, low stale-contact impact, or an unaffordable verification operation.</li>
+        </ol></div></details>
+
+        <div class="callout info"><strong>One-line memory:</strong> the potential value is not “CTRI, but prettier”; it is permissioned provenance plus maintainable human site verification and closed-loop operational handoff.</div>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <p>Artifact status: proposal and evidence map. No application stack, deployment topology, production dependency, patient-data workflow, or clinical recommendation system has been selected.</p>
+  </footer>
+
+  <script>
+    (() => {
+      const input = document.getElementById('doc-search');
+      const sections = Array.from(document.querySelectorAll('main section'));
+      const empty = document.getElementById('empty-search');
+      if (!input) return;
+      input.addEventListener('input', () => {
+        const query = input.value.trim().toLowerCase();
+        let shown = 0;
+        sections.forEach((section) => {
+          const haystack = (section.dataset.search + ' ' + section.textContent).toLowerCase();
+          const visible = !query || haystack.includes(query);
+          section.classList.toggle('hidden-by-search', !visible);
+          if (visible) shown += 1;
+        });
+        empty.style.display = shown === 0 ? 'block' : 'none';
+      });
+    })();
+  </script>
+</body>
+</html>
