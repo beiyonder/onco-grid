@@ -788,14 +788,44 @@ function renderCase() {
   updateCriteriaCount();
 }
 
+function renderPatientWorkspaceState(t=trialById(caseSelectedTrialId)||trialById(selectedTrialId)||trials[0]) {
+  if(!t||!$('#patient-recent-work'))return;
+  const prefix=`${t.id}:`;
+  const reviewed=[...criterionDecisions.entries()].filter(([key,value])=>key.startsWith(prefix)&&value!=='not_reviewed').length;
+  const linkedHandoffs=inquiries.filter(inquiry=>inquiry.trialId===t.id&&!['closed','unable'].includes(inquiry.status));
+  $('#patient-review-count').textContent='1 clinician-selected trial';
+  $('#patient-referral-count').textContent=`${linkedHandoffs.length} open handoff${linkedHandoffs.length===1?'':'s'}`;
+  const work=[
+    {tone:'human',title:'Trial selected by clinician',meta:`${t.id} · ${t.title}`,state:'Human choice'},
+    {tone:'human',title:'Criterion review in progress',meta:`${reviewed} of 4 criterion states recorded by Dr M. Shah`,state:reviewed===4?'Reviewed':'In progress'},
+    currentArtifactName
+      ?{tone:'source',title:'Source artifact opened',meta:`${currentArtifactName} · synthetic EMR read-through`,state:'Source viewed'}
+      :{tone:'source',title:'Original records available',meta:'4 synthetic EMR references · source content not copied into workflow state',state:'4 sources'},
+    linkedHandoffs.length
+      ?{tone:'task',title:'Referral or inquiry handoff open',meta:`${linkedHandoffs[0].id} · ${statusHuman[linkedHandoffs[0].status]||linkedHandoffs[0].status} · owner ${linkedHandoffs[0].owner}`,state:formatDate(linkedHandoffs[0].due)}
+      :{tone:'task',title:'No open referral handoff',meta:'A human-approved packet or general inquiry creates the next owned task.',state:'Not started'}
+  ];
+  if(packetDrafted)work.unshift({tone:'task',title:'Referral packet manifest drafted',meta:'Explicit synthetic EMR references · human release still required',state:'Draft'});
+  if(boardDecisionRecorded)work.unshift({tone:'human',title:'Human board disposition recorded',meta:'Signed decision reference retained in the synthetic EMR workflow',state:'Recorded'});
+  $('#patient-recent-work').innerHTML=work.map(item=>`
+    <div class="patient-work-item">
+      <span class="patient-work-trace ${item.tone}"></span>
+      <span class="patient-work-copy"><strong>${escapeHTML(item.title)}</strong><span>${escapeHTML(item.meta)}</span></span>
+      <span class="patient-work-state">${escapeHTML(item.state)}</span>
+    </div>`).join('');
+}
+
+
 function updateCriteriaCount() {
   const prefix=`${caseSelectedTrialId}:`;
   const reviewed=[...criterionDecisions.entries()].filter(([key,value])=>key.startsWith(prefix)&&value!=='not_reviewed').length;
   $('#criteria-review-count').textContent=`${reviewed} of 4`;
+  renderPatientWorkspaceState();
 }
 
 function openArtifact(name) {
   currentArtifactName=name;
+  renderPatientWorkspaceState();
   $('#artifact-dialog-title').textContent=name;
   $('#artifact-dialog-body').innerHTML=`<div class="detail-grid"><div class="fact"><label>EMR source</label><strong>Oncology EMR · synthetic</strong></div><div class="fact"><label>Record status</label><strong>Final / available</strong></div><div class="fact"><label>Source date</label><strong>28 Aug–11 Sep 2026</strong></div><div class="fact wide"><label>Source assertion preview</label><p>This demonstration intentionally omits realistic clinical prose. A production workspace opens the original EMR artifact and keeps any extracted assertion linked to its exact source location.</p></div><div class="notice wide"><strong>No interpretation:</strong> Trial Relay does not infer diagnosis, stage, response, risk, or suitability from this artifact.</div></div>`;
   $('#artifact-dialog').showModal();
@@ -811,6 +841,7 @@ function openPacket() {
 function renderBoard() {
   const t=trialById(caseSelectedTrialId)||trials[0];
   $('#board-trial-title').textContent=plainText(t.title);
+  renderPatientWorkspaceState(t);
   if(!boardDecisionRecorded) return;
   $('#board-decision-state').textContent='Human decision recorded · ready for write-back';
   $('#board-decision-copy').innerHTML='<strong>Operational disposition:</strong> Authorise coordinator to contact the verified site for formal trial-team screening. Clinical decision content remains in the signed EMR record.';
@@ -1204,6 +1235,7 @@ function renderInquiries() {
   const filter=$('#inquiry-filter')?.value || 'all';
   const rows=inquiries.filter(i=>filter==='all'||(filter==='open'&&!['closed','unable'].includes(i.status))||(filter==='closed'&&['closed','unable'].includes(i.status)));
   renderHome();
+  renderPatientWorkspaceState();
   const wrap=$('#inquiry-table-wrap');
   if(!rows.length){wrap.innerHTML='<div class="empty-state" style="margin:14px"><h2>No inquiries in this state</h2><p>Change the filter or create a general site inquiry from a trial record.</p></div>';return;}
   wrap.innerHTML=`<table class="inquiry-table"><thead><tr><th>Trial</th><th>Question</th><th>Owner</th><th>Due</th><th>State</th><th>Next action</th></tr></thead><tbody>${rows.map(i=>{const t=trialById(i.trialId);const next=i.status==='draft'?'Approve':i.status==='approved'?'Mark sent':i.status==='sent'?'Mark acknowledged':i.status==='acknowledged'?'Close':'Closed';return `<tr><td class="inquiry-trial" data-label="Trial"><strong>${t?.title||'Synthetic trial'}</strong><span>${i.id} · ${i.trialId}</span></td><td data-label="Question">${i.question}</td><td data-label="Owner">${i.owner}</td><td data-label="Due">${formatDate(i.due)}</td><td data-label="State"><span class="status-pill ${i.status==='closed'?'good':i.status==='sent'?'warn':'neutral'}"><span class="status-dot"></span>${statusHuman[i.status]}</span></td><td data-label="Next"><div class="stage-control"><button class="button small ${i.status==='acknowledged'?'success':''}" type="button" data-advance="${i.id}" ${['closed','unable'].includes(i.status)?'disabled':''}>${next}</button>${!['closed','unable'].includes(i.status)?`<button class="button small ghost" type="button" data-unable="${i.id}">Unable</button>`:''}</div></td></tr>`}).join('')}</tbody></table>`;

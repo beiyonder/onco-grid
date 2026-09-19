@@ -164,7 +164,8 @@ On 2026-09-19 the owner authorised the agent to push and merge future implementa
 | `C2` | `P5` | `.harness/reports/20260919T112052Z-P5-trial-room.md` | Complete; merged through pull request `#6` |
 | `C2` | `P5` | `.harness/reports/20260919T113355Z-P5-unified-inbox.md` | Complete; merged through pull request `#7` |
 | `C2` | `P5` | `.harness/reports/20260919T114432Z-P5-inbox-context-resolution.md` | Complete; merged through pull request `#8` |
-| `C2` | `P5` | `.harness/reports/20260919T115701Z-P5-notification-rules.md` | Complete; Phase 2 notification rules ready for autonomous merge |
+| `C2` | `P5` | `.harness/reports/20260919T115701Z-P5-notification-rules.md` | Complete; merged through pull request `#9` |
+| `C2` | `P5` | `.harness/reports/20260919T120627Z-P5-patient-workspace.md` | Complete; Phase 3 patient workspace ready for autonomous merge |
 
 ## References
 
@@ -199,3 +200,4 @@ On 2026-09-19 the owner authorised the agent to push and merge future implementa
 - `.harness/reports/20260919T113355Z-P5-unified-inbox.md`
 - `.harness/reports/20260919T114432Z-P5-inbox-context-resolution.md`
 - `.harness/reports/20260919T115701Z-P5-notification-rules.md`
+- `.harness/reports/20260919T120627Z-P5-patient-workspace.md`

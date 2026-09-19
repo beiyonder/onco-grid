@@ -189,55 +189,72 @@
 
         <section class="view" id="view-case" data-view="case" aria-labelledby="case-title">
           <div class="view-header">
-            <div class="view-heading"><h1 id="case-title">Patient workspace</h1><p>Review original synthetic EMR records beside a trial chosen by the clinician. Every criterion remains a human judgement.</p></div>
-            <div class="header-actions"><span class="priority-badge p0">P0 · EMR integrated</span><button class="button" type="button" id="return-to-search"><svg class="icon"><use href="#i-compass"/></svg>Choose another trial</button></div>
+            <div class="view-heading"><h1 id="case-title">Patient workspace</h1><p>Review one authorised synthetic patient context, its original EMR references, and human-owned trial work without inference or recommendation.</p></div>
+            <div class="header-actions"><span class="priority-badge p0">Synthetic · EMR read-through</span><button class="button" type="button" id="return-to-search"><svg class="icon"><use href="#i-compass"/></svg>Choose trial manually</button></div>
           </div>
-          <div class="case-identity">
+          <div class="case-identity patient-entity">
             <div class="patient-monogram">SYN</div>
-            <div class="case-identity-copy"><strong>Synthetic case SYN-2047</strong><span>Launched from EMR encounter ENC-DEMO-8821 · access context expires with this session</span></div>
-            <div class="case-identity-meta"><span class="status-pill good"><span class="status-dot"></span>EMR connected</span><span class="tag">4 source artifacts</span><span class="tag">3 clinician-confirmed facts</span></div>
+            <div class="case-identity-copy"><span class="patient-entity-label">Synthetic patient identity</span><strong>Synthetic case SYN-2047</strong><span>EMR encounter ENC-DEMO-8821 · Western Oncology Unit · access expires with this browser session</span></div>
+            <div class="case-identity-meta"><span class="status-pill good"><span class="status-dot"></span>Authorised read-through</span><span class="tag">Synthetic only</span></div>
           </div>
-          <div class="safety-strip"><svg class="icon"><use href="#i-shield"/></svg><strong>Read-through context.</strong><span>EMR facts are displayed with provenance and are not used to rank, score, or automatically qualify trials.</span><span class="spacer"></span><span>Synthetic only</span></div>
-          <div class="case-grid">
+          <div class="patient-context-grid" aria-label="Patient workspace context">
+            <div><span>Treating team</span><strong>Dr M. Shah · Western Oncology Unit</strong></div>
+            <div><span>Source availability</span><strong>4 of 4 synthetic EMR references</strong></div>
+            <div><span>Trials under review</span><strong id="patient-review-count">1 clinician-selected trial</strong></div>
+            <div><span>Open referrals</span><strong id="patient-referral-count">0 open handoffs</strong></div>
+          </div>
+          <div class="safety-strip"><svg class="icon"><use href="#i-shield"/></svg><strong>EMR remains the clinical system of record.</strong><span>Trial Relay displays source-linked synthetic facts and human workflow state. It does not infer diagnosis, stage, response, progression, risk, trial fit, or eligibility.</span><span class="spacer"></span><span>Synthetic workspace</span></div>
+          <div class="patient-authority-key" aria-label="Patient information authority">
+            <div class="source"><span>Source artifact</span><strong>Original EMR reference</strong></div>
+            <div class="confirmed"><span>Clinician confirmed</span><strong>Human-reviewed workspace fact</strong></div>
+            <div class="unknown"><span>Missing or unknown</span><strong>Creates retrieval or clarification work</strong></div>
+            <div class="conflict"><span>Conflicting assertions</span><strong>Remain separate until a human resolves them</strong></div>
+          </div>
+          <nav class="patient-section-nav" aria-label="Patient workspace sections"><span>Summary and records</span><span>Trials under review</span><span>Activity and next steps</span></nav>
+          <div class="case-grid patient-workspace-grid">
             <div class="case-stack">
-              <article class="panel">
-                <div class="panel-head"><div><h2>Facts reviewed by a clinician</h2><p>Accepted by Dr M. Shah for this workspace</p></div><span class="spacer"></span><span class="status-pill good"><span class="status-dot"></span>Human reviewed</span></div>
+              <div class="patient-section-heading"><span>01</span><div><strong>Summary and records</strong><small>Source artifacts and clinician-confirmed facts</small></div></div>
+              <article class="panel patient-layer confirmed-layer">
+                <div class="panel-head"><div><h2>Clinician-confirmed workspace facts</h2><p>Accepted by Dr M. Shah; no system inference</p></div><span class="spacer"></span><span class="status-pill good"><span class="status-dot"></span>4 human confirmations</span></div>
                 <div class="panel-body"><div class="human-fact-list">
-                  <div class="human-fact"><label>Diagnosis</label><strong>Non-small cell lung cancer</strong><span>Source: pathology report · confirmed</span></div>
-                  <div class="human-fact"><label>Recorded disease state</label><strong>Stage IV</strong><span>Source: oncology encounter · confirmed</span></div>
-                  <div class="human-fact"><label>Recorded biomarker</label><strong>PD-L1 TPS 60%</strong><span>Source: diagnostic report · confirmed</span></div>
-                  <div class="human-fact"><label>Performance status</label><strong>ECOG 1</strong><span>Source: clinician note · not reinterpreted</span></div>
+                  <div class="human-fact"><label>Clinician-confirmed diagnosis</label><strong>Non-small cell lung cancer</strong><span>Pathology report · confirmed by Dr M. Shah</span></div>
+                  <div class="human-fact"><label>Clinician-confirmed recorded state</label><strong>Stage IV</strong><span>Oncology encounter · source wording retained</span></div>
+                  <div class="human-fact"><label>Clinician-confirmed biomarker</label><strong>PD-L1 TPS 60%</strong><span>Molecular diagnostic report · method not reinterpreted</span></div>
+                  <div class="human-fact"><label>Clinician-confirmed performance status</label><strong>ECOG 1</strong><span>Clinician note · not recalculated</span></div>
                 </div></div>
               </article>
-              <article class="panel">
-                <div class="panel-head"><div><h2>Original EMR records</h2><p>Open the source record; do not rely on copied text alone</p></div><span class="spacer"></span><span class="priority-badge p0">read from EMR</span></div>
+              <article class="panel patient-layer source-layer">
+                <div class="panel-head"><div><h2>Original EMR references</h2><p>Open the source artifact; copied labels are not authoritative alone</p></div><span class="spacer"></span><span class="priority-badge p0">source layer</span></div>
                 <div class="artifact-list">
-                  <div class="artifact-row"><div class="artifact-icon"><svg class="icon"><use href="#i-file"/></svg></div><div class="artifact-copy"><strong>Pathology report · final</strong><span>DiagnosticReport · 28 Aug 2026 · reporting laboratory</span></div><button class="button small artifact-action" type="button" data-preview-artifact="Pathology report">Open source</button></div>
-                  <div class="artifact-row"><div class="artifact-icon"><svg class="icon"><use href="#i-file"/></svg></div><div class="artifact-copy"><strong>Molecular diagnostic report</strong><span>DocumentReference · 02 Sep 2026 · linked PDF</span></div><button class="button small artifact-action" type="button" data-preview-artifact="Molecular report">Open source</button></div>
-                  <div class="artifact-row"><div class="artifact-icon"><svg class="icon"><use href="#i-activity"/></svg></div><div class="artifact-copy"><strong>Treatment administration timeline</strong><span>MedicationAdministration · clinician-reviewed history</span></div><button class="button small artifact-action" type="button" data-preview-artifact="Treatment timeline">Open source</button></div>
-                  <div class="artifact-row"><div class="artifact-icon"><svg class="icon"><use href="#i-file"/></svg></div><div class="artifact-copy"><strong>Latest laboratory report</strong><span>Observation panel · 11 Sep 2026 · source values only</span></div><button class="button small artifact-action" type="button" data-preview-artifact="Laboratory report">Open source</button></div>
+                  <div class="artifact-row"><div class="artifact-icon"><svg class="icon"><use href="#i-file"/></svg></div><div class="artifact-copy"><strong>Pathology report · final</strong><span>DiagnosticReport · 28 Aug 2026 · reporting laboratory</span></div><span class="artifact-state">Source artifact</span><button class="button small artifact-action" type="button" data-preview-artifact="Pathology report">Open source</button></div>
+                  <div class="artifact-row"><div class="artifact-icon"><svg class="icon"><use href="#i-file"/></svg></div><div class="artifact-copy"><strong>Molecular diagnostic report</strong><span>DocumentReference · 02 Sep 2026 · linked PDF</span></div><span class="artifact-state">Source artifact</span><button class="button small artifact-action" type="button" data-preview-artifact="Molecular report">Open source</button></div>
+                  <div class="artifact-row"><div class="artifact-icon"><svg class="icon"><use href="#i-activity"/></svg></div><div class="artifact-copy"><strong>Treatment administration timeline</strong><span>MedicationAdministration · clinician-reviewed history</span></div><span class="artifact-state">Source artifact</span><button class="button small artifact-action" type="button" data-preview-artifact="Treatment timeline">Open source</button></div>
+                  <div class="artifact-row"><div class="artifact-icon"><svg class="icon"><use href="#i-file"/></svg></div><div class="artifact-copy"><strong>Latest laboratory report</strong><span>Observation panel · 11 Sep 2026 · source values only</span></div><span class="artifact-state">Source artifact</span><button class="button small artifact-action" type="button" data-preview-artifact="Laboratory report">Open source</button></div>
                 </div>
               </article>
-              <article class="panel">
-                <div class="panel-head"><div><h2>Care timeline</h2><p>Recorded events; no inferred response or progression</p></div></div>
+              <details class="panel patient-history">
+                <summary><span>Recorded EMR timeline</span><small>Source events only · no inferred response or progression</small></summary>
                 <div class="panel-body"><div class="timeline">
                   <div class="timeline-item"><strong>Latest oncology encounter recorded</strong><span>12 Sep 2026 · Encounter ENC-DEMO-8821</span></div>
                   <div class="timeline-item"><strong>Molecular diagnostic report filed</strong><span>02 Sep 2026 · source document linked</span></div>
-                  <div class="timeline-item"><strong>Pathology report finalised</strong><span>28 Aug 2026 · clinician confirmed diagnosis</span></div>
+                  <div class="timeline-item"><strong>Pathology report finalised</strong><span>28 Aug 2026 · clinician confirmation recorded separately</span></div>
                   <div class="timeline-item"><strong>Referral encounter opened</strong><span>25 Aug 2026 · source institution</span></div>
                 </div></div>
-              </article>
+              </details>
             </div>
             <div class="case-stack">
-              <article class="panel">
-                <div class="trial-review-head"><div class="detail-overline"><span class="tag">Clinician selected</span><span class="priority-badge p0">no system ranking</span></div><h2 id="case-selected-trial-title">Selected trial</h2><p id="case-selected-trial-meta">Choose a record in Explore trials.</p></div>
-                <div class="review-warning"><svg class="icon"><use href="#i-warning"/></svg><span>Each status below is entered by a clinician. Trial Relay does not calculate an overall match or eligibility result.</span></div>
+              <div class="patient-section-heading"><span>02</span><div><strong>Trials under review</strong><small>Clinician selected · no patient-specific ranking</small></div></div>
+              <article class="panel patient-layer review-layer">
+                <div class="trial-review-head"><div class="detail-overline"><span class="tag">Clinician selected</span><span class="priority-badge p0">no system ranking</span></div><h2 id="case-selected-trial-title">Selected trial</h2><p id="case-selected-trial-meta">Choose a record in Trials.</p></div>
+                <div class="review-warning"><svg class="icon"><use href="#i-warning"/></svg><span>Each criterion state is entered by a clinician. Trial Relay does not calculate a match score or overall eligibility result.</span></div>
                 <div class="criteria-list" id="case-criteria-list"></div>
                 <div class="review-footer"><p><strong id="criteria-review-count">0 of 4</strong> criteria reviewed by a human. No aggregate eligibility status is generated.</p><button class="button" id="add-to-board" type="button"><svg class="icon"><use href="#i-board"/></svg>Add to board</button><button class="button primary" id="prepare-packet" type="button"><svg class="icon"><use href="#i-briefcase"/></svg>Prepare referral packet</button></div>
               </article>
+              <div class="patient-section-heading"><span>03</span><div><strong>Activity and next steps</strong><small>Recent source access and human-owned work</small></div></div>
+              <article class="panel"><div class="panel-head"><div><h2>Recent work</h2><p>Latest activity in this synthetic workspace</p></div></div><div class="patient-recent-work" id="patient-recent-work"></div></article>
               <article class="panel">
-                <div class="panel-head"><div><h2>Operational handoff</h2><p>EMR write-back preview</p></div><span class="spacer"></span><span class="status-pill neutral"><span class="status-dot"></span>Draft</span></div>
-                <div class="panel-body"><ul class="rule-list"><li><span class="check">1</span><span>Clinician selects the trial and records criterion judgements.</span></li><li><span class="check">2</span><span>Coordinator prepares a bounded packet manifest from explicitly selected source artifacts.</span></li><li><span class="check">3</span><span>Authorised human approves release and site route.</span></li><li><span class="check">4</span><span>Task status and packet reference write back to the EMR; source documents remain in the EMR.</span></li></ul><button class="button" style="width:100%;margin-top:13px" type="button" id="preview-writeback"><svg class="icon"><use href="#i-upload"/></svg>Preview EMR write-back</button></div>
+                <div class="panel-head"><div><h2>Operational handoff boundary</h2><p>EMR write-back preview</p></div><span class="spacer"></span><span class="status-pill neutral"><span class="status-dot"></span>Human controlled</span></div>
+                <div class="panel-body"><ul class="rule-list"><li><span class="check">1</span><span>Clinician selects the trial and records criterion judgements.</span></li><li><span class="check">2</span><span>Coordinator prepares a bounded manifest from explicitly selected source references.</span></li><li><span class="check">3</span><span>Authorised human approves release and recipient route.</span></li><li><span class="check">4</span><span>Only task state and packet reference write back; source records remain in the EMR.</span></li></ul><button class="button" style="width:100%;margin-top:13px" type="button" id="preview-writeback"><svg class="icon"><use href="#i-upload"/></svg>Preview EMR write-back</button></div>
               </article>
             </div>
           </div>
