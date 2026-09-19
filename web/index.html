@@ -893,6 +893,108 @@
     .boundary-option p { margin: 3px 0 0; color: var(--muted); font-size: 8px; }
     .boundary-option.blocked p { color: #71464a; }
 
+    .home-view { padding: clamp(30px, 5vw, 64px); }
+    .home-frame { width: min(1240px, 100%); margin: 0 auto; }
+    .home-heading { max-width: 760px; margin-bottom: 28px; }
+    .home-kicker { margin: 0 0 9px; color: var(--navy-2); font-size: 10px; font-weight: 820; letter-spacing: .1em; text-transform: uppercase; }
+    .home-heading h1 { margin: 0; font-family: var(--font-reading); font-size: clamp(38px, 5vw, 58px); font-weight: 620; line-height: 1.02; letter-spacing: -.045em; }
+    .home-heading > p:last-child { max-width: 650px; margin: 13px 0 0; color: var(--muted); font-size: 14px; }
+    .home-layout { display: grid; grid-template-columns: minmax(0,1.4fr) minmax(300px,.6fr); gap: clamp(20px, 3vw, 38px); align-items: start; }
+    .journey-grid { display: grid; grid-template-columns: minmax(0,1.08fr) minmax(0,.92fr); gap: 16px; }
+    .journey-entry {
+      position: relative;
+      isolation: isolate;
+      display: flex;
+      min-width: 0;
+      min-height: 238px;
+      flex-direction: column;
+      align-items: flex-start;
+      overflow: hidden;
+      border: 1px solid var(--rule);
+      border-radius: 18px;
+      padding: 25px;
+      background: rgba(251,252,251,.96);
+      color: var(--ink);
+      text-align: left;
+      box-shadow: var(--shadow);
+      transition: border-color 140ms ease, box-shadow 180ms ease, transform 140ms ease;
+    }
+    .journey-entry::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      inset: 14px -28px -35px 32%;
+      border: 1px solid rgba(36,93,134,.18);
+      border-radius: 50% 0 0 0;
+      background: var(--blue-soft);
+      opacity: .72;
+      transform: rotate(-3deg);
+    }
+    .journey-entry.patient::before { border-color: rgba(104,82,119,.17); background: var(--plum-soft); transform: rotate(3deg); }
+    .journey-entry::after { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; background: var(--navy-2); }
+    .journey-entry.patient::after { background: var(--plum); }
+    .journey-entry:hover { border-color: #9eaea7; box-shadow: 0 18px 45px rgba(34,53,45,.12); transform: translateY(-2px); }
+    .journey-entry > * { position: relative; z-index: 1; }
+    .journey-icon { display: grid; width: 42px; height: 42px; place-items: center; margin-bottom: 30px; border: 1px solid #bfd3e1; border-radius: 11px; background: #f5f9fc; color: var(--navy-2); }
+    .journey-entry.patient .journey-icon { border-color: #d4c8db; background: #f7f3f9; color: var(--plum); }
+    .journey-label { color: var(--muted); font-size: 9px; font-weight: 820; letter-spacing: .09em; text-transform: uppercase; }
+    .journey-entry h2 { max-width: 330px; margin: 6px 0 7px; font-family: var(--font-reading); font-size: clamp(23px, 2.3vw, 31px); font-weight: 620; line-height: 1.05; letter-spacing: -.03em; }
+    .journey-entry p { max-width: 410px; margin: 0; color: var(--ink-2); font-size: 11px; }
+    .journey-foot { display: flex; width: 100%; align-items: center; gap: 12px; margin-top: auto; padding-top: 24px; }
+    .journey-meta { color: var(--muted); font-family: var(--font-data); font-size: 9px; }
+    .journey-action { display: inline-flex; align-items: center; gap: 5px; margin-left: auto; color: var(--navy); font-size: 10px; font-weight: 800; }
+    .journey-entry.patient .journey-action { color: var(--plum); }
+    .journey-action .icon { width: 15px; height: 15px; }
+    .home-boundary { display: flex; align-items: flex-start; gap: 10px; margin-top: 14px; padding: 12px 4px; color: var(--muted); font-size: 10px; }
+    .home-boundary .icon { color: var(--green); }
+    .home-boundary strong { color: var(--ink-2); }
+    .work-rail { overflow: hidden; border: 1px solid var(--rule); border-radius: 16px; background: rgba(251,252,251,.94); box-shadow: var(--shadow); }
+    .work-rail-head { display: flex; align-items: flex-end; gap: 12px; padding: 18px 18px 13px; }
+    .work-rail-head h2 { margin: 0; font-family: var(--font-reading); font-size: 21px; font-weight: 620; }
+    .work-rail-head p { margin: 2px 0 0; color: var(--muted); font-size: 9px; }
+    .work-rail-head .status-pill { margin-left: auto; }
+    .work-stream { display: grid; border-top: 1px solid var(--rule); }
+    .work-item { display: grid; min-height: 76px; grid-template-columns: 4px minmax(0,1fr) auto; gap: 11px; align-items: center; border: 0; border-bottom: 1px solid var(--rule); padding: 11px 15px 11px 0; background: transparent; color: var(--ink); text-align: left; }
+    .work-item:hover { background: var(--paper-2); }
+    .work-trace { align-self: stretch; border-radius: 0 4px 4px 0; background: var(--navy-2); }
+    .work-trace.amber { background: var(--amber); }
+    .work-trace.green { background: var(--green); }
+    .work-trace.plum { background: var(--plum); }
+    .work-copy { min-width: 0; }
+    .work-copy small { display: block; color: var(--muted); font-size: 8px; font-weight: 790; letter-spacing: .07em; text-transform: uppercase; }
+    .work-copy strong { display: block; margin: 2px 0; font-size: 11px; }
+    .work-copy span { display: block; overflow: hidden; color: var(--muted); font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+    .work-count { min-width: 28px; color: var(--ink-2); font-family: var(--font-data); font-size: 12px; font-weight: 760; text-align: right; }
+    .work-rail-foot { padding: 13px 16px 15px; background: var(--paper-2); }
+    .source-foot { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 8px; }
+    .source-foot .icon { width: 14px; height: 14px; color: var(--navy-2); }
+    .validation-tools { margin-top: 11px; border-top: 1px solid var(--rule); padding-top: 10px; }
+    .validation-tools summary { cursor: pointer; color: var(--ink-2); font-size: 9px; font-weight: 780; }
+    .validation-links { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+    .validation-link { min-height: 32px; border: 1px solid var(--rule); border-radius: 7px; padding: 5px 8px; background: var(--paper); color: var(--muted); font-size: 8px; font-weight: 720; }
+    .validation-link:hover { border-color: var(--rule-dark); color: var(--ink-2); }
+    .inbox-groups { display: flex; width: max-content; max-width: 100%; gap: 4px; margin-bottom: 13px; overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; padding: 4px; background: var(--paper-2); }
+    .inbox-group { display: flex; min-width: 120px; min-height: 44px; align-items: center; justify-content: space-between; gap: 14px; border: 0; border-radius: 7px; padding: 8px 10px; background: transparent; color: var(--muted); font-size: 10px; font-weight: 760; }
+    .inbox-group:hover { background: var(--paper); color: var(--ink-2); }
+    .inbox-group.active { background: var(--paper); color: var(--navy); box-shadow: 0 2px 8px rgba(34,53,45,.07); }
+    .inbox-group strong { font-family: var(--font-data); font-size: 11px; }
+    @media (max-width: 1120px) {
+      .home-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 720px) {
+      .home-view { padding: 28px 14px 36px; }
+      .journey-grid { grid-template-columns: 1fr; }
+      .journey-entry { min-height: 210px; padding: 21px; }
+      .journey-icon { margin-bottom: 22px; }
+      .inbox-groups { width: 100%; }
+      .inbox-group { min-width: 105px; flex: 1; }
+    }
+    @media (max-width: 480px) {
+      .home-heading h1 { font-size: 37px; }
+      .home-heading > p:last-child { font-size: 12px; }
+      .work-item { grid-template-columns: 4px minmax(0,1fr) auto; }
+    }
+
     @media (max-width: 1120px) {
       .guide-intro, .alert-layout, .candidate-layout { grid-template-columns: 1fr; }
     }
@@ -913,6 +1015,8 @@
 <body>
   <svg class="sr-only" aria-hidden="true">
     <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 11 9-8 9 8"/><path d="M5 10v11h14V10M9 21v-7h6v7"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"/></symbol>
     <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15 9-2 5-5 2 2-5 5-2Z"/></symbol>
     <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
     <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4 20-7Z"/><path d="M22 2 11 13"/></symbol>
@@ -944,23 +1048,14 @@
     <aside class="sidebar" aria-label="Primary navigation">
       <div class="brand" aria-label="Trial Relay home">
         <div class="brand-mark" aria-hidden="true"></div>
-        <div class="brand-name">Trial Relay<small>OncoGrid prototype</small></div>
+        <div class="brand-name">Trial Relay<small>OncoGrid validation</small></div>
       </div>
-      <div class="side-section-label">Workspace</div>
+      <div class="side-section-label">Navigate</div>
       <nav class="side-nav">
-        <button class="nav-button" type="button" data-target="guide" aria-label="How to use"><svg class="icon"><use href="#i-list"/></svg><span>How to use</span></button>
-        <button class="nav-button active" type="button" data-target="explore" aria-label="Explore trials"><svg class="icon"><use href="#i-compass"/></svg><span>Explore trials</span></button>
-        <button class="nav-button" type="button" data-target="case" aria-label="Case review"><svg class="icon"><use href="#i-user"/></svg><span>Case review</span><span class="nav-count">1</span></button>
-        <button class="nav-button" type="button" data-target="candidates" aria-label="Candidate review"><svg class="icon"><use href="#i-briefcase"/></svg><span>Candidate review</span><span class="nav-count">4</span></button>
-        <button class="nav-button" type="button" data-target="verification" aria-label="Verification queue"><svg class="icon"><use href="#i-check"/></svg><span>Verification queue</span><span class="nav-count" id="verify-count">3</span></button>
-        <button class="nav-button" type="button" data-target="inquiries" aria-label="Referrals and inquiries"><svg class="icon"><use href="#i-send"/></svg><span>Referrals & inquiries</span><span class="nav-count" id="inquiry-count">2</span></button>
-        <button class="nav-button" type="button" data-target="alerts" aria-label="Alerts"><svg class="icon"><use href="#i-bell"/></svg><span>Alerts</span><span class="nav-count" id="alert-count">4</span></button>
-        <button class="nav-button" type="button" data-target="board" aria-label="Tumour board"><svg class="icon"><use href="#i-board"/></svg><span>Tumour board</span><span class="nav-count">1</span></button>
-        <button class="nav-button" type="button" data-target="activity" aria-label="Audit activity"><svg class="icon"><use href="#i-activity"/></svg><span>Audit activity</span></button>
-        <button class="nav-button" type="button" data-target="integrations" aria-label="EMR integration"><svg class="icon"><use href="#i-plug"/></svg><span>EMR integration</span></button>
-        <button class="nav-button" type="button" data-target="analytics" aria-label="Operations analytics"><svg class="icon"><use href="#i-chart"/></svg><span>Operations analytics</span></button>
-        <button class="nav-button" type="button" data-target="sources" aria-label="Registry sources"><svg class="icon"><use href="#i-database"/></svg><span>Registry sources</span></button>
-        <button class="nav-button" type="button" data-target="priorities" aria-label="Feature priorities"><svg class="icon"><use href="#i-layers"/></svg><span>Feature priorities</span></button>
+        <button class="nav-button active" type="button" data-target="home" aria-label="Home" aria-current="page"><svg class="icon"><use href="#i-home"/></svg><span>Home</span></button>
+        <button class="nav-button" type="button" data-target="explore" aria-label="Trials"><svg class="icon"><use href="#i-compass"/></svg><span>Trials</span></button>
+        <button class="nav-button" type="button" data-target="case" aria-label="Patients"><svg class="icon"><use href="#i-user"/></svg><span>Patients</span></button>
+        <button class="nav-button" type="button" data-target="alerts" aria-label="Inbox"><svg class="icon"><use href="#i-bell"/></svg><span>Inbox</span><span class="nav-count" id="alert-count">4</span></button>
       </nav>
       <div class="sidebar-foot">
         <div class="demo-note"><strong>Validation workspace</strong>Trial records are real public ClinicalTrials.gov data. Patient, EMR, board, and workflow examples remain synthetic. State resets on reload.</div>
@@ -970,7 +1065,7 @@
     <div class="workspace">
       <header class="topbar">
         <div class="mobile-brand">Trial Relay</div>
-        <div class="crumb"><strong id="crumb-title">Explore trials</strong><span>India oncology research operations</span></div>
+        <div class="crumb"><strong id="crumb-title">Home</strong><span>India oncology research operations</span></div>
         <button class="command-trigger" id="command-trigger" type="button" aria-label="Focus trial search">
           <svg class="icon"><use href="#i-search"/></svg><span class="command-copy">Search trials, locations, or protocol terms</span><kbd>/</kbd>
         </button>
@@ -990,6 +1085,60 @@
       <div class="registry-data-bar" id="registry-data-bar" role="status"><strong>Loading real India oncology trial records…</strong><span>ClinicalTrials.gov registry snapshot</span><span class="spacer"></span><a id="registry-source-link" href="https://clinicaltrials.gov/data-api/about-api" target="_blank" rel="noopener noreferrer">Data source</a></div>
 
       <main>
+        <section class="view home-view active" id="view-home" data-view="home" aria-labelledby="home-title">
+          <div class="home-frame">
+            <header class="home-heading">
+              <p class="home-kicker">Oncologist-led · coordinator-operable</p>
+              <h1 id="home-title">What do you want to do?</h1>
+              <p>Start with a trial or an authorised synthetic patient workspace. Trial Relay keeps source evidence, people, questions, and the next operational step connected without making a clinical decision.</p>
+            </header>
+            <div class="home-layout">
+              <div>
+                <div class="journey-grid" aria-label="Start a Trial Relay journey">
+                  <button class="journey-entry trial" type="button" data-home-target="explore">
+                    <span class="journey-icon"><svg class="icon"><use href="#i-compass"/></svg></span>
+                    <span class="journey-label">Trial workspace</span>
+                    <h2>Find or follow a trial</h2>
+                    <p>Search India-located oncology trials, inspect the registry source, and keep site confirmation separate from registry status.</p>
+                    <span class="journey-foot"><span class="journey-meta" id="home-trial-count">Loading registry records</span><span class="journey-action">Open Trials <svg class="icon"><use href="#i-arrow"/></svg></span></span>
+                  </button>
+                  <button class="journey-entry patient" type="button" data-home-target="case">
+                    <span class="journey-icon"><svg class="icon"><use href="#i-user"/></svg></span>
+                    <span class="journey-label">Patient workspace</span>
+                    <h2>Work with a patient</h2>
+                    <p>Open source-linked synthetic EMR records, choose a trial manually, and record a human review without a score or recommendation.</p>
+                    <span class="journey-foot"><span class="journey-meta">1 synthetic workspace</span><span class="journey-action">Open Patients <svg class="icon"><use href="#i-arrow"/></svg></span></span>
+                  </button>
+                </div>
+                <div class="home-boundary" role="note"><svg class="icon"><use href="#i-shield"/></svg><span><strong>General discovery and synthetic patient work only.</strong> Real trial records come from a dated ClinicalTrials.gov snapshot. Site availability remains unverified until a named authorised source confirms it.</span></div>
+              </div>
+              <aside class="work-rail" aria-labelledby="work-summary-title">
+                <div class="work-rail-head"><div><h2 id="work-summary-title">Recent work</h2><p>Updates and owned next steps</p></div><span class="status-pill neutral"><span class="status-dot"></span>Validation</span></div>
+                <div class="work-stream">
+                  <button class="work-item" type="button" data-home-target="alerts"><span class="work-trace"></span><span class="work-copy"><small>Updates</small><strong>Operational changes to review</strong><span>Registry, site and handoff events</span></span><span class="work-count" id="home-unread-count">4</span></button>
+                  <button class="work-item" type="button" data-home-target="verification"><span class="work-trace amber"></span><span class="work-copy"><small>Task</small><strong>Site confirmation due</strong><span>Unknown stays unknown until verified</span></span><span class="work-count" id="home-verification-count">3</span></button>
+                  <button class="work-item" type="button" data-home-target="inquiries"><span class="work-trace green"></span><span class="work-copy"><small>Messages</small><strong>Referral and site enquiries</strong><span>Named owners and acknowledgement</span></span><span class="work-count" id="home-inquiry-count">2</span></button>
+                  <button class="work-item" type="button" data-home-target="candidates"><span class="work-trace plum"></span><span class="work-copy"><small>Patient work</small><strong>Human-created reviews</strong><span>No automatic patient finder</span></span><span class="work-count">4</span></button>
+                </div>
+                <div class="work-rail-foot">
+                  <div class="source-foot"><svg class="icon"><use href="#i-database"/></svg><span id="home-source-date">Loading source date</span></div>
+                  <details class="validation-tools">
+                    <summary>Validation tools</summary>
+                    <div class="validation-links">
+                      <button class="validation-link" type="button" data-home-target="guide">How it works</button>
+                      <button class="validation-link" type="button" data-home-target="activity">Audit</button>
+                      <button class="validation-link" type="button" data-home-target="integrations">EMR demo</button>
+                      <button class="validation-link" type="button" data-home-target="analytics">Operations</button>
+                      <button class="validation-link" type="button" data-home-target="sources">Source health</button>
+                      <button class="validation-link" type="button" data-home-target="priorities">Feature review</button>
+                    </div>
+                  </details>
+                </div>
+              </aside>
+            </div>
+          </div>
+        </section>
+
         <section class="view" id="view-guide" data-view="guide" aria-labelledby="guide-title">
           <div class="view-header"><div class="view-heading"><h1 id="guide-title">How to use Trial Relay</h1><p>Follow one case from the EMR to a trial-site answer. Every important choice stays with a person.</p></div><div class="header-actions"><span class="priority-badge p0">Usage guide</span><button class="button primary" type="button" id="start-guided-use"><svg class="icon"><use href="#i-compass"/></svg>Start with trial search</button></div></div>
           <div class="guide-intro"><div class="guide-summary"><h2>One clear path, three human owners</h2><p>The oncologist chooses what to review. The coordinator checks the site and manages the handoff. The trial team makes the final eligibility decision.</p></div><div class="guide-boundary"><strong>Automatic patient matching is not active.</strong><span>The safe workflow helps people review evidence and complete the handoff. It never tells a patient or doctor that someone qualifies.</span></div></div>
@@ -1007,9 +1156,9 @@
           <div class="panel" style="margin-top:13px"><div class="panel-head"><div><h2>What the system does not do</h2><p>The trial team still decides formal eligibility</p></div><span class="spacer"></span><button class="button small" id="open-guide-priorities" type="button">See all P0–P2 features</button></div><div class="panel-body"><div class="boundary-choice"><div class="boundary-option allowed"><strong>Included: clinician-led candidate review</strong><p>A clinician adds a case, reviews each criterion, links the source, and sends a packet for formal site screening.</p></div><div class="boundary-option blocked"><strong>Not included: recommendation engine that finds qualifying patients</strong><p>Scanning EMR records, deciding who qualifies, or ranking trials is patient-specific clinical decision support and remains outside the project boundary.</p></div></div></div></div>
         </section>
 
-        <section class="view active" id="view-explore" data-view="explore" aria-labelledby="explore-title">
+        <section class="view" id="view-explore" data-view="explore" aria-labelledby="explore-title">
           <div class="view-header">
-            <div class="view-heading"><h1 id="explore-title">Find a trial and check the site</h1><p>Search trial details, see where each fact came from, and check what the site most recently confirmed.</p></div>
+            <div class="view-heading"><h1 id="explore-title">Trial library</h1><p>Search India-located oncology trials, inspect the registry source, and check what a site has separately confirmed.</p></div>
             <div class="header-actions"><span class="priority-badge p0">P0 workflow</span><button class="button" id="refresh-results" type="button"><svg class="icon"><use href="#i-refresh"/></svg>Refresh view</button></div>
           </div>
 
@@ -1033,7 +1182,7 @@
 
         <section class="view" id="view-case" data-view="case" aria-labelledby="case-title">
           <div class="view-header">
-            <div class="view-heading"><h1 id="case-title">Review a case with a trial</h1><p>Open the original EMR records next to a trial chosen by the clinician. The clinician reviews every criterion.</p></div>
+            <div class="view-heading"><h1 id="case-title">Patient workspace</h1><p>Review original synthetic EMR records beside a trial chosen by the clinician. Every criterion remains a human judgement.</p></div>
             <div class="header-actions"><span class="priority-badge p0">P0 · EMR integrated</span><button class="button" type="button" id="return-to-search"><svg class="icon"><use href="#i-compass"/></svg>Choose another trial</button></div>
           </div>
           <div class="case-identity">
@@ -1120,8 +1269,13 @@
         </section>
 
         <section class="view" id="view-alerts" data-view="alerts" aria-labelledby="alerts-title">
-          <div class="view-header"><div class="view-heading"><h1 id="alerts-title">Alerts for trials your team follows</h1><p>Tell the right person when a registry, site, referral, board, or EMR task changes. Each alert shows its source and who needs to act.</p></div><div class="header-actions"><span class="priority-badge p0">Operational alerts</span><button class="button" id="mark-alerts-read" type="button"><svg class="icon"><use href="#i-check"/></svg>Mark all read</button><button class="button primary" id="new-alert-rule" type="button"><svg class="icon"><use href="#i-bell"/></svg>New alert rule</button></div></div>
-          <div class="safety-strip"><svg class="icon"><use href="#i-shield"/></svg><strong>Status alerts, not clinical advice.</strong><span>Alerts report a source change or a human workflow event. They do not say that a trial is right for a patient.</span></div>
+          <div class="view-header"><div class="view-heading"><h1 id="alerts-title">Inbox</h1><p>Updates, messages, and assigned work stay connected to the trial, patient, or handoff that created them.</p></div><div class="header-actions"><span class="priority-badge p0">Operational only</span><button class="button" id="mark-alerts-read" type="button"><svg class="icon"><use href="#i-check"/></svg>Mark all read</button><button class="button primary" id="new-alert-rule" type="button"><svg class="icon"><use href="#i-bell"/></svg>New alert rule</button></div></div>
+          <div class="safety-strip"><svg class="icon"><use href="#i-shield"/></svg><strong>Status updates, not clinical advice.</strong><span>Inbox items report a source change or a human workflow event. They never say that a trial is right for a patient.</span></div>
+          <div class="inbox-groups" aria-label="Inbox groups">
+            <button class="inbox-group active" type="button" aria-current="page"><span>Updates</span><strong id="inbox-update-count">4</strong></button>
+            <button class="inbox-group" type="button" data-context-target="inquiries"><span>Messages</span><strong id="inquiry-count">2</strong></button>
+            <button class="inbox-group" type="button" data-context-target="verification"><span>Tasks</span><strong id="verify-count">3</strong></button>
+          </div>
           <div class="alert-layout">
             <article class="panel"><div class="panel-head"><div><h2>Alert inbox</h2><p>Unread first · grouped by trial and workflow</p></div><span class="spacer"></span><select class="sort-select" id="alert-filter"><option value="all">All alerts</option><option value="trial">Trial status</option><option value="verification">Site verification</option><option value="handoff">Referral and EMR</option></select></div><div class="alert-list" id="alerts-list"></div></article>
             <div class="case-stack">
@@ -1800,6 +1954,19 @@
       $('#board-lifecycle').innerHTML='<div class="board-stage done"><span class="board-stage-marker">1</span><div><strong>Case selected</strong><span>Treating oncologist · 13 Sep</span></div></div><div class="board-stage done"><span class="board-stage-marker">2</span><div><strong>Packet sources reviewed</strong><span>Presenter · synthetic artifacts</span></div></div><div class="board-stage done"><span class="board-stage-marker">3</span><div><strong>Board discussion completed</strong><span>Human participants</span></div></div><div class="board-stage done"><span class="board-stage-marker">4</span><div><strong>Decision reference signed</strong><span>MDT-DEMO-2026-0916-01</span></div></div><div class="board-stage current"><span class="board-stage-marker">5</span><div><strong>EMR task pending</strong><span>Owner and acknowledgement ready</span></div></div>';
     }
 
+    function renderHome() {
+      const unread=alerts.filter(alert=>alert.unread).length;
+      const attention=trials.filter(trial=>trial.due||trial.discrepancy).length;
+      const openInquiries=inquiries.filter(inquiry=>!['closed','unable'].includes(inquiry.status)).length;
+      const snapshotDate=registrySnapshotMeta?.dataTimestamp?.slice(0,10);
+      $('#home-trial-count').textContent=`${trials.length} registry record${trials.length===1?'':'s'}`;
+      $('#home-unread-count').textContent=unread;
+      $('#home-verification-count').textContent=attention;
+      $('#home-inquiry-count').textContent=openInquiries;
+      $('#inbox-update-count').textContent=unread;
+      $('#home-source-date').textContent=snapshotDate?`ClinicalTrials.gov snapshot · ${formatDate(snapshotDate)}`:'Synthetic fallback while registry snapshot loads';
+    }
+
     function renderAlerts() {
       const filter=$('#alert-filter')?.value||'all';
       const rows=alerts.filter(alert=>filter==='all'||alert.type===filter);
@@ -1820,6 +1987,7 @@
         if(selectedTrialId===button.dataset.unfollow) renderDetail(trialById(selectedTrialId));
         showToast(`Stopped alerts for ${button.dataset.unfollow}.`);
       }));
+      renderHome();
     }
 
     function renderCandidates() {
@@ -1840,6 +2008,7 @@
       $('#verification-conflict-count').textContent=conflicts;
       $('#verification-open-pill').innerHTML=`<span class="status-dot"></span>${queue.length} open`;
       $('#verify-selected').disabled=queue.length===0;
+      renderHome();
       $('#verification-list').innerHTML=queue.map((t,i)=>`<button class="queue-item ${t.id===selectedVerificationId?'active':''}" type="button" data-id="${t.id}"><span class="queue-rank">${String(i+1).padStart(2,'0')}</span><span class="queue-title"><strong>${t.title}</strong><span>${t.id} · ${t.city}</span></span><span class="queue-cell"><span>Registry</span><strong>${t.registryStatus}</strong></span><span class="queue-cell"><span>Site</span><strong>${t.verifyLabel}</strong></span>${statusPill(t)}</button>`).join('');
       $$('.queue-item').forEach(btn=>btn.addEventListener('click',()=>{selectedVerificationId=btn.dataset.id;renderVerification();}));
       const t=trialById(selectedVerificationId);
@@ -1855,6 +2024,7 @@
       const filter=$('#inquiry-filter')?.value || 'all';
       const rows=inquiries.filter(i=>filter==='all'||(filter==='open'&&!['closed','unable'].includes(i.status))||(filter==='closed'&&['closed','unable'].includes(i.status)));
       $('#inquiry-count').textContent=inquiries.filter(i=>!['closed','unable'].includes(i.status)).length;
+      renderHome();
       const wrap=$('#inquiry-table-wrap');
       if(!rows.length){wrap.innerHTML='<div class="empty-state" style="margin:14px"><h2>No inquiries in this state</h2><p>Change the filter or create a general site inquiry from a trial record.</p></div>';return;}
       wrap.innerHTML=`<table class="inquiry-table"><thead><tr><th>Trial</th><th>Question</th><th>Owner</th><th>Due</th><th>State</th><th>Next action</th></tr></thead><tbody>${rows.map(i=>{const t=trialById(i.trialId);const next=i.status==='draft'?'Approve':i.status==='approved'?'Mark sent':i.status==='sent'?'Mark acknowledged':i.status==='acknowledged'?'Close':'Closed';return `<tr><td class="inquiry-trial" data-label="Trial"><strong>${t?.title||'Synthetic trial'}</strong><span>${i.id} · ${i.trialId}</span></td><td data-label="Question">${i.question}</td><td data-label="Owner">${i.owner}</td><td data-label="Due">${formatDate(i.due)}</td><td data-label="State"><span class="status-pill ${i.status==='closed'?'good':i.status==='sent'?'warn':'neutral'}"><span class="status-dot"></span>${statusHuman[i.status]}</span></td><td data-label="Next"><div class="stage-control"><button class="button small ${i.status==='acknowledged'?'success':''}" type="button" data-advance="${i.id}" ${['closed','unable'].includes(i.status)?'disabled':''}>${next}</button>${!['closed','unable'].includes(i.status)?`<button class="button small ghost" type="button" data-unable="${i.id}">Unable</button>`:''}</div></td></tr>`}).join('')}</tbody></table>`;
@@ -1894,11 +2064,30 @@
       else showToast('Copy is unavailable in this browser context.');
     }
 
+    const viewLabels={
+      home:'Home',guide:'How to use',explore:'Trials',case:'Patients',candidates:'Patient reviews',
+      verification:'Verification tasks',inquiries:'Messages and referrals',alerts:'Inbox',board:'Tumour board',
+      activity:'Audit activity',integrations:'EMR integration',analytics:'Operations analytics',
+      sources:'Registry sources',priorities:'Feature priorities'
+    };
+    const primaryViewFor={
+      home:'home',guide:'home',priorities:'home',integrations:'home',analytics:'home',sources:'home',activity:'home',
+      explore:'explore',verification:'alerts',inquiries:'alerts',case:'case',candidates:'case',board:'case',alerts:'alerts'
+    };
+
     function switchView(target){
-      $$('.nav-button').forEach(b=>b.classList.toggle('active',b.dataset.target===target));
-      $$('.view').forEach(v=>v.classList.toggle('active',v.dataset.view===target));
-      const active=$(`.nav-button[data-target="${target}"] span:not(.nav-count)`);
-      $('#crumb-title').textContent=active?.textContent||'Trial Relay';
+      if(!viewLabels[target]) target='home';
+      const moveFocus=Boolean(document.activeElement?.closest('.view'));
+      const primaryTarget=primaryViewFor[target]||target;
+      $$('.nav-button').forEach(button=>{
+        const active=button.dataset.target===primaryTarget;
+        button.classList.toggle('active',active);
+        if(active) button.setAttribute('aria-current','page');
+        else button.removeAttribute('aria-current');
+      });
+      $$('.view').forEach(view=>view.classList.toggle('active',view.dataset.view===target));
+      $('#crumb-title').textContent=viewLabels[target];
+      document.title=`${viewLabels[target]} — Trial Relay`;
       history.replaceState(null,'',`#${target}`);
       window.scrollTo({top:0,behavior:'instant'});
       if(target==='case')renderCase();
@@ -1909,6 +2098,13 @@
       if(target==='board')renderBoard();
       if(target==='activity')renderAudit();
       if(target==='sources')renderSources();
+      if(moveFocus){
+        const heading=$(`.view[data-view="${target}"] h1`);
+        if(heading){
+          heading.setAttribute('tabindex','-1');
+          heading.focus({preventScroll:true});
+        }
+      }
     }
 
     $('#inquiry-form').addEventListener('submit',(event)=>{
@@ -2037,6 +2233,7 @@
     $('#alert-filter').addEventListener('change',renderAlerts);
     $$('.close-dialog').forEach(button=>button.addEventListener('click',()=>button.closest('dialog').close()));
     $$('.nav-button').forEach(button=>button.addEventListener('click',()=>switchView(button.dataset.target)));
+    $$('[data-home-target],[data-context-target]').forEach(button=>button.addEventListener('click',()=>switchView(button.dataset.homeTarget||button.dataset.contextTarget)));
     ['trial-search','cancer-filter','verify-filter','state-filter','sort-results'].forEach(id=>$('#'+id).addEventListener(id==='trial-search'?'input':'change',renderTrials));
     $('#clear-filters').addEventListener('click',clearFilters);
     $('#command-trigger').addEventListener('click',()=>{switchView('explore');setTimeout(()=>$('#trial-search').focus(),0);});
@@ -2061,7 +2258,7 @@
     $('#state-filter').value='all';
     $('#sort-results').value='confidence';
     renderTrials();renderCase();renderCandidates();renderVerification();renderInquiries();renderAlerts();renderBoard();renderAudit();renderSources();
-    if(['guide','explore','case','candidates','verification','inquiries','alerts','board','activity','integrations','analytics','sources','priorities'].includes(initialHash))switchView(initialHash);
+    switchView(viewLabels[initialHash]?initialHash:'home');
     loadRegistrySnapshot();
   </script>
 </body>
