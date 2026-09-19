@@ -535,6 +535,23 @@
     </form>
   </dialog>
 
+  <dialog id="trial-outcome-dialog" aria-labelledby="trial-outcome-title">
+    <form id="trial-outcome-form">
+      <div class="dialog-head"><div><h2 id="trial-outcome-title">Record authorised trial-team outcome</h2><p id="trial-outcome-context">Packet · screening context</p></div><button class="icon-button close-dialog" type="button" aria-label="Close trial-team outcome form"><svg class="icon"><use href="#i-x"/></svg></button></div>
+      <div class="dialog-body">
+        <div class="notice" style="margin-bottom:13px"><strong>Display the trial team's decision; never make one.</strong> Record exactly the authorised screening outcome, its source role and date. Trial Relay does not calculate, reinterpret, or recommend.</div>
+        <div class="form-grid">
+          <div class="form-row"><label for="trial-outcome-value">Trial-team screening outcome</label><select class="select" id="trial-outcome-value" required><option value="eligible">Eligible — trial-team decision</option><option value="ineligible">Ineligible — trial-team decision</option><option value="more_info">More information required</option><option value="deferred">Screening deferred</option><option value="unable">Unable to contact</option></select></div>
+          <div class="form-row"><label for="trial-outcome-source">Authorised source role</label><select class="select" id="trial-outcome-source" required><option>Site principal investigator</option><option>Site trial coordinator</option><option>Sponsor trial operations</option></select></div>
+          <div class="form-row"><label for="trial-outcome-date">Recorded on</label><input class="field" id="trial-outcome-date" type="date" required></div>
+          <div class="form-row full"><label for="trial-outcome-note">Source-authored outcome note</label><textarea class="field" id="trial-outcome-note" maxlength="280" required placeholder="Record the authorised outcome or required next information without adding a Trial Relay interpretation."></textarea></div>
+          <div class="form-row full"><label class="checkbox-row"><input id="trial-outcome-authority" type="checkbox" required><span>I confirm this outcome came from the named authorised trial-team source and is recorded without reinterpretation.</span></label></div>
+        </div>
+      </div>
+      <div class="dialog-foot"><button class="button close-dialog" type="button">Cancel</button><button class="button success" type="submit"><svg class="icon"><use href="#i-check"/></svg>Record trial-team outcome</button></div>
+    </form>
+  </dialog>
+
   <dialog id="writeback-dialog" aria-labelledby="writeback-dialog-title">
     <div class="dialog-head"><div><h2 id="writeback-dialog-title">EMR write-back preview</h2><p>Dry-run payload · no external system is contacted</p></div><button class="icon-button close-dialog" type="button" aria-label="Close write-back preview"><svg class="icon"><use href="#i-x"/></svg></button></div>
     <div class="dialog-body" id="writeback-body"><div class="compare-grid"><div class="compare-card"><span class="tag">Task</span><h3>Operational handoff</h3><div class="compare-row"><label>Subject</label><strong>Patient/SYN-2047</strong></div><div class="compare-row"><label>Owner</label><strong>Research coordinator</strong></div><div class="compare-row"><label>Intent</label><strong>order · operational</strong></div><div class="compare-row"><label>Status</label><strong>draft</strong></div></div><div class="compare-card"><span class="tag">DocumentReference</span><h3>Packet manifest</h3><div class="compare-row"><label>Content</label><strong>References only</strong></div><div class="compare-row"><label>Clinical source copied</label><strong>No</strong></div><div class="compare-row"><label>Security label</label><strong>Restricted care team</strong></div><div class="compare-row"><label>Expiry</label><strong>Policy controlled</strong></div></div></div><div class="notice" style="margin-top:12px"><strong>Transaction:</strong> write-back uses the EMR version/precondition. A conflict preserves the local draft and requires human reconciliation; it never silently overwrites the EMR.</div></div>
