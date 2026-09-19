@@ -91,6 +91,8 @@ let boardDecisionRecorded = false;
 const criterionDecisions = new Map();
 const trialRoomThreads = new Map();
 let trialRoomSequence = 1;
+let currentInboxKind = 'updates';
+const inboxReadIds = new Set();
 let inquiries = [
   {id:'INQ-1042', trialId:'DEMO-CTRI-003', question:'Resolve registry discrepancy', owner:'A. Rao', due:'2026-09-14', route:'Site trial office', status:'sent', created:'2026-09-12'},
   {id:'INQ-1038', trialId:'DEMO-CTRI-002', question:'Confirm site recruitment', owner:'Trial office', due:'2026-09-15', route:'Registry public-query channel', status:'acknowledged', created:'2026-09-07'}
@@ -785,7 +787,8 @@ function renderBoard() {
 }
 
 function renderHome() {
-  const unread=alerts.filter(alert=>alert.unread).length;
+  const inboxItems=buildInboxItems();
+  const unread=inboxItems.filter(item=>item.unread).length;
   const attention=trials.filter(trial=>trial.due||trial.discrepancy).length;
   const openInquiries=inquiries.filter(inquiry=>!['closed','unable'].includes(inquiry.status)).length;
   const snapshotDate=registrySnapshotMeta?.dataTimestamp?.slice(0,10);
@@ -793,20 +796,202 @@ function renderHome() {
   $('#home-unread-count').textContent=unread;
   $('#home-verification-count').textContent=attention;
   $('#home-inquiry-count').textContent=openInquiries;
-  $('#inbox-update-count').textContent=unread;
+  $('#inbox-update-count').textContent=inboxItems.filter(item=>item.kind==='updates').length;
+  $('#inbox-message-count').textContent=inboxItems.filter(item=>item.kind==='messages').length;
+  $('#inbox-task-count').textContent=inboxItems.filter(item=>item.kind==='tasks').length;
   $('#home-source-date').textContent=snapshotDate?`ClinicalTrials.gov snapshot · ${formatDate(snapshotDate)}`:'Synthetic fallback while registry snapshot loads';
 }
 
+function buildInboxItems() {
+  const items=[];
+  const verificationTrialIds=new Set(trials.filter(trial=>trial.due||trial.discrepancy).map(trial=>trial.id));
+  const dueLabel=value=>{
+    if(!value)return 'Not scheduled';
+    if(value<today)return `Overdue · ${formatDate(value)}`;
+    if(value===today)return `Due today · ${formatDate(value)}`;
+    return `Due ${formatDate(value)}`;
+  };
+  alerts.forEach(alert=>{
+    if(alert.title.startsWith('Trial room:'))return;
+    const trial=trials.find(candidate=>`${alert.title} ${alert.body}`.includes(candidate.id));
+    const linkedInquiry=inquiries.find(inquiry=>alert.body.includes(inquiry.id));
+    if(alert.type==='verification'&&trial&&verificationTrialIds.has(trial.id))return;
+    const kind=alert.type==='handoff'?'messages':'updates';
+    items.push({
+      id:`alert:${alert.id}`,
+      alertId:alert.id,
+      kind,
+      title:alert.title,
+      body:alert.body,
+      context:trial?`${trial.id} · ${trial.city}`:linkedInquiry?`${linkedInquiry.id} · ${linkedInquiry.trialId}`:alert.type==='handoff'?'Handoff or EMR task':'Operational workflow',
+      owner:alert.recipients.join(', '),
+      due:'No deadline',
+      source:alert.source,
+      tone:alert.tone,
+      unread:alert.unread&&!inboxReadIds.has(`alert:${alert.id}`),
+      targetView:alert.type==='handoff'?'inquiries':alert.type==='verification'?'verification':'explore',
+      trialId:trial?.id||trialById(linkedInquiry?.trialId)?.id,
+      inquiryId:linkedInquiry?.id
+    });
+  });
+  for(const [trialId,threads] of trialRoomThreads.entries()){
+    const trial=trialById(trialId);
+    threads.forEach(thread=>{
+      if(thread.resolution==='task')return;
+      const resolved=thread.resolution&&!['unresolved'].includes(thread.resolution);
+      items.push({
+        id:`thread:${thread.id}`,
+        kind:'messages',
+        title:thread.resolution?roomResolutionLabels[thread.resolution]:'Question awaiting response',
+        body:thread.resolutionNote||thread.question,
+        context:`${trialId}${trial?` · ${trial.city}`:''}`,
+        owner:resolved?'No next action':'Verified site coordinator',
+        due:resolved?'Resolved this session':'No due date assigned',
+        source:thread.resolution?`${thread.resolvedRole} · Trial room`:`${thread.authorRole} · Trial room`,
+        tone:thread.resolution==='answer'?'good':thread.resolution==='correction'?'bad':thread.resolution==='unresolved'?'warn':'neutral',
+        unread:!inboxReadIds.has(`thread:${thread.id}`),
+        targetView:'room',
+        trialId,
+        threadId:thread.id
+      });
+    });
+  }
+  inquiries.forEach(inquiry=>{
+    if(['closed','unable'].includes(inquiry.status))return;
+    const representedByAlert=alerts.some(alert=>alert.body.includes(inquiry.id));
+    if(inquiry.status==='acknowledged'&&representedByAlert)return;
+    const trial=trialById(inquiry.trialId);
+    const kind=inquiry.status==='acknowledged'?'messages':'tasks';
+    items.push({
+      id:`inquiry:${inquiry.id}`,
+      kind,
+      title:inquiry.status==='acknowledged'?'Referral or inquiry acknowledged':`${statusHuman[inquiry.status]||inquiry.status} handoff`,
+      body:inquiry.question,
+      context:`${inquiry.id} · ${inquiry.trialId}`,
+      owner:inquiry.owner||'Unassigned',
+      due:dueLabel(inquiry.due),
+      source:`${inquiry.route} · human workflow state`,
+      tone:inquiry.due<today?'bad':inquiry.status==='sent'?'warn':'neutral',
+      unread:kind==='messages'&&!inboxReadIds.has(`inquiry:${inquiry.id}`),
+      targetView:'inquiries',
+      trialId:trial?.id,
+      inquiryId:inquiry.id
+    });
+  });
+  trials.filter(trial=>trial.due||trial.discrepancy).forEach(trial=>{
+    items.push({
+      id:`verification:${trial.id}`,
+      kind:'tasks',
+      title:trial.discrepancy?'Resolve registry and site conflict':'Confirm current India-site state',
+      body:trial.discrepancy?`${trial.verifyLabel}; registry remains ${trial.registryStatus}.`:`${trial.verifyLabel}. Obtain an authorised site assertion or keep the state unknown.`,
+      context:`${trial.id} · ${trial.city}, ${trial.state}`,
+      owner:'Research coordinator',
+      due:'Not scheduled',
+      source:`${trial.source} · registry updated ${formatDate(trial.registryUpdated)}`,
+      tone:trial.discrepancy?'bad':'warn',
+      unread:false,
+      targetView:'verification',
+      trialId:trial.id
+    });
+  });
+  return items;
+}
+
 function renderAlerts() {
-  const filter=$('#alert-filter')?.value||'all';
-  const rows=alerts.filter(alert=>filter==='all'||alert.type===filter);
-  const unread=alerts.filter(alert=>alert.unread).length;
+  const items=buildInboxItems();
+  const counts={
+    updates:items.filter(item=>item.kind==='updates').length,
+    messages:items.filter(item=>item.kind==='messages').length,
+    tasks:items.filter(item=>item.kind==='tasks').length
+  };
+  $('#inbox-update-count').textContent=counts.updates;
+  $('#inbox-message-count').textContent=counts.messages;
+  $('#inbox-task-count').textContent=counts.tasks;
+  const unread=items.filter(item=>item.unread).length;
   $('#alert-count').textContent=unread;
-  $('#alerts-list').innerHTML=rows.length?rows.map(alert=>`<div class="alert-item ${alert.unread?'unread':''}"><div class="alert-symbol ${alert.tone==='bad'?'bad':alert.tone==='warn'?'warn':''}">${icon(alert.type==='trial'?'database':alert.type==='verification'?'check':'send')}</div><div class="alert-copy"><strong>${alert.title}</strong><p>${alert.body}</p><span>${alert.source}</span><div class="recipient-row">${alert.recipients.map(role=>`<span class="recipient">${role}</span>`).join('')}</div></div><div class="alert-actions"><span class="status-pill ${alert.unread?'good':'neutral'}"><span class="status-dot"></span>${alert.unread?'Unread':'Read'}</span><button class="button small" type="button" data-read-alert="${alert.id}" ${alert.unread?'':'disabled'}>Mark read</button></div></div>`).join(''):'<div class="empty-state" style="margin:14px"><h2>No alerts in this view</h2><p>Change the filter or follow another synthetic trial.</p></div>';
-  $$('[data-read-alert]').forEach(button=>button.addEventListener('click',()=>{
-    const alert=alerts.find(item=>item.id===button.dataset.readAlert);
-    if(alert) alert.unread=false;
+  $$('[data-inbox-kind]').forEach(button=>{
+    const active=button.dataset.inboxKind===currentInboxKind;
+    button.classList.toggle('active',active);
+    button.setAttribute('aria-selected',String(active));
+  });
+  const labels={
+    updates:['Updates','Source and workflow changes · unread first'],
+    messages:['Messages','Human responses and conversation states · newest first'],
+    tasks:['Tasks','Owned next steps · overdue and assigned work first']
+  };
+  $('#inbox-stream-title').textContent=labels[currentInboxKind][0];
+  $('#inbox-stream-summary').textContent=labels[currentInboxKind][1];
+  const rows=items
+    .filter(item=>item.kind===currentInboxKind)
+    .sort((a,b)=>Number(b.unread)-Number(a.unread)||Number(b.due.startsWith('Overdue'))-Number(a.due.startsWith('Overdue')));
+  $('#mark-alerts-read').disabled=!rows.some(item=>item.unread);
+  const visibleRows=rows.slice(0,60);
+  $('#inbox-visible-count').innerHTML=`<span class="status-dot"></span>${rows.length} visible`;
+  const stream=$('#inbox-stream');
+  stream.innerHTML=visibleRows.length?visibleRows.map(item=>`
+    <article class="inbox-row ${item.unread?'unread':''}" role="listitem" data-inbox-id="${item.id}">
+      <div class="inbox-row-symbol ${item.tone==='bad'?'bad':item.tone==='warn'?'warn':item.tone==='good'?'good':''}">${icon(item.kind==='updates'?'database':item.kind==='messages'?'send':'check')}</div>
+      <div class="inbox-row-content">
+        <div class="inbox-row-title"><span>${item.kind.slice(0,-1)}</span><strong>${escapeHTML(item.title)}</strong></div>
+        <p>${escapeHTML(item.body)}</p>
+        <dl class="inbox-row-facts">
+          <div><dt>Context</dt><dd>${escapeHTML(item.context)}</dd></div>
+          <div><dt>Owner</dt><dd>${escapeHTML(item.owner)}</dd></div>
+          <div><dt>Due state</dt><dd>${escapeHTML(item.due)}</dd></div>
+          <div><dt>Source</dt><dd>${escapeHTML(item.source)}</dd></div>
+        </dl>
+      </div>
+      <div class="inbox-row-actions">
+        <span class="status-pill ${item.unread?'good':item.tone==='bad'?'bad':'neutral'}"><span class="status-dot"></span>${item.unread?'Unread':item.kind==='tasks'?item.due:'Read'}</span>
+        <button class="button small" type="button" data-inbox-open="${item.id}">Open context</button>
+        ${item.unread?`<button class="button small ghost" type="button" data-inbox-read="${item.id}">Mark read</button>`:''}
+      </div>
+    </article>`).join('')+(rows.length>visibleRows.length?`<div class="notice"><strong>${rows.length-visibleRows.length} more tasks.</strong> Open the attached verification or handoff context to work the complete queue.</div>`:''):`<div class="empty-state"><div class="empty-symbol">${icon(currentInboxKind==='updates'?'database':currentInboxKind==='messages'?'send':'check')}</div><h2>No ${labels[currentInboxKind][0].toLowerCase()}</h2><p>This browser-session workspace has no items in this Inbox view.</p></div>`;
+  const markRead=item=>{
+    inboxReadIds.add(item.id);
+    if(item.alertId){
+      const alert=alerts.find(candidate=>candidate.id===item.alertId);
+      if(alert)alert.unread=false;
+    }
+  };
+  $$('[data-inbox-read]',stream).forEach(button=>button.addEventListener('click',()=>{
+    const item=items.find(candidate=>candidate.id===button.dataset.inboxRead);
+    if(item)markRead(item);
     renderAlerts();
+  }));
+  $$('[data-inbox-open]',stream).forEach(button=>button.addEventListener('click',()=>{
+    const item=items.find(candidate=>candidate.id===button.dataset.inboxOpen);
+    if(!item)return;
+    markRead(item);
+    if(item.targetView==='room'&&item.trialId){
+      $('#trial-search').value=item.trialId;
+      $('#cancer-filter').value='all';
+      $('#verify-filter').value='all';
+      $('#state-filter').value='all';
+      selectedTrialId=item.trialId;
+      profileOriginId=item.trialId;
+      profileOpen=true;
+      activeTab='room';
+      renderTrials();
+      switchView('explore');
+      $(`#thread-${item.threadId}`)?.focus({preventScroll:false});
+    }else if(item.targetView==='verification'&&item.trialId){
+      selectedVerificationId=item.trialId;
+      switchView('verification');
+    }else if(item.targetView==='inquiries'){
+      switchView('inquiries');
+    }else if(item.trialId){
+      $('#trial-search').value=item.trialId;
+      selectedTrialId=item.trialId;
+      profileOriginId=item.trialId;
+      profileOpen=true;
+      activeTab='overview';
+      renderTrials();
+      switchView('explore');
+    }else{
+      renderAlerts();
+      showToast('This item has no more specific linked context in the current validation data.');
+    }
   }));
   const followed=trials.filter(trial=>followedTrialIds.has(trial.id));
   $('#followed-count').textContent=followed.length;
@@ -814,7 +999,7 @@ function renderAlerts() {
   $$('[data-unfollow]').forEach(button=>button.addEventListener('click',()=>{
     followedTrialIds.delete(button.dataset.unfollow);
     renderAlerts();
-    if(selectedTrialId===button.dataset.unfollow) renderDetail(trialById(selectedTrialId));
+    if(selectedTrialId===button.dataset.unfollow&&profileOpen)renderDetail(trialById(selectedTrialId));
     showToast(`Stopped alerts for ${button.dataset.unfollow}.`);
   }));
   renderHome();
@@ -832,7 +1017,6 @@ function renderVerification() {
   const conflicts=queue.filter(t=>t.discrepancy).length;
   const verifiedThisWeek=trials.filter(t=>t.verifyKey!=='no_authoritative_response').length;
   if(queue.length && !queue.some(t=>t.id===selectedVerificationId)) selectedVerificationId=queue[0].id;
-  $('#verify-count').textContent=queue.length;
   $('#verification-attention-count').textContent=queue.length;
   $('#verification-week-count').textContent=verifiedThisWeek;
   $('#verification-conflict-count').textContent=conflicts;
@@ -853,7 +1037,6 @@ function renderVerification() {
 function renderInquiries() {
   const filter=$('#inquiry-filter')?.value || 'all';
   const rows=inquiries.filter(i=>filter==='all'||(filter==='open'&&!['closed','unable'].includes(i.status))||(filter==='closed'&&['closed','unable'].includes(i.status)));
-  $('#inquiry-count').textContent=inquiries.filter(i=>!['closed','unable'].includes(i.status)).length;
   renderHome();
   const wrap=$('#inquiry-table-wrap');
   if(!rows.length){wrap.innerHTML='<div class="empty-state" style="margin:14px"><h2>No inquiries in this state</h2><p>Change the filter or create a general site inquiry from a trial record.</p></div>';return;}
@@ -1060,8 +1243,23 @@ $$('[data-open-candidate]').forEach(button=>button.addEventListener('click',()=>
   }
 }));
 $('#new-alert-rule').addEventListener('click',()=>{$('#alert-safe').checked=false;$('#alert-rule-dialog').showModal();});
-$('#mark-alerts-read').addEventListener('click',()=>{alerts.forEach(alert=>alert.unread=false);renderAlerts();showToast('All operational alerts marked read.');});
-$('#alert-filter').addEventListener('change',renderAlerts);
+$('#mark-alerts-read').addEventListener('click',()=>{
+  const visibleItems=buildInboxItems().filter(item=>item.kind===currentInboxKind);
+  visibleItems.forEach(item=>{
+    inboxReadIds.add(item.id);
+    if(item.alertId){
+      const alert=alerts.find(candidate=>candidate.id===item.alertId);
+      if(alert)alert.unread=false;
+    }
+  });
+  renderAlerts();
+  showToast(`${visibleItems.length} visible ${currentInboxKind} marked read.`);
+});
+$$('[data-inbox-kind]').forEach(button=>button.addEventListener('click',()=>{
+  currentInboxKind=button.dataset.inboxKind;
+  renderAlerts();
+  $('#inbox-stream-title').focus({preventScroll:true});
+}));
 $$('.close-dialog').forEach(button=>button.addEventListener('click',()=>button.closest('dialog').close()));
 $$('.nav-button').forEach(button=>button.addEventListener('click',()=>switchView(button.dataset.target)));
 $$('[data-home-target],[data-context-target]').forEach(button=>button.addEventListener('click',()=>switchView(button.dataset.homeTarget||button.dataset.contextTarget)));

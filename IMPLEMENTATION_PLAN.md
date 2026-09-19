@@ -187,10 +187,10 @@ The owner decides whether to retain, simplify, supplement, or stop each major ca
 
 ## Current slice
 
-**Branch:** `feat/trial-room`
+**Branch:** `feat/unified-inbox`
 
-**Pull request outcome:** deliver Phase 1 slice 3 — browser-session trial following and a contextual Trial room with immutable pinned source facts, verified participant roles, general operational question threads, official-response authority, and human-recorded outcomes for official answer, informal answer, owned action, proposed source correction, unresolved, or outdated states.
+**Pull request outcome:** deliver Phase 2 slice 1 — one Inbox surface with Updates, Messages, and Tasks views over a single normalized stream. Each row names its event, attached context, owner, due state, source, read state, and exact source-context route; Trial room outcomes and task conversions appear once rather than duplicating their generated alerts or handoffs.
 
-**Acceptance scenario:** follow a selected trial; open its Trial room; post a general operational question only after confirming it contains no patient information; block an official response from a non-site role; record an official response as the verified site role without changing registry or verification pins; convert a separate thread into a draft owned task with due date; preserve proposed correction and unresolved states without turning silence into a negative site conclusion; complete the flow on desktop and narrow mobile with no inaccessible overflow.
+**Acceptance scenario:** load the current browser-session workspace and distinguish update, message, and task counts; confirm every visible row includes context, owner, due state, and source; mark Updates read without clearing unread Messages; see owned overdue handoffs before unscheduled verification work; open an inquiry, verification task, and Trial room response into the correct source context; resolve a followed Trial room thread and observe exactly one canonical Message row; retain a 60-row task rendering cap and zero horizontal overflow on desktop and narrow mobile.
 
-**Explicit non-goals for this slice:** no persistence beyond the browser session, external messaging, production identity or role enforcement, patient-specific conversation, automatic source mutation, working map, backend, new data source, or deployment change.
+**Explicit non-goals for this slice:** no inline resolution workbench, notification-rule redesign, persistence, external delivery, production identity or authorization, patient-specific content, backend, new data source, or deployment change.
