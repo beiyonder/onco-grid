@@ -93,6 +93,20 @@ const criterionDecisions = new Map();
 const criterionSources = new Map();
 const criterionReviewMeta = new Map();
 let currentCriterionCount = 0;
+const criterionSourceOptions = [
+  ['Pathology report','Pathology report · 28 Aug 2026'],
+  ['Molecular report','Molecular report · 02 Sep 2026'],
+  ['Treatment timeline','Treatment timeline · clinician-reviewed history'],
+  ['Laboratory report','Laboratory report · 11 Sep 2026'],
+  ['No source linked','No source linked · missing or unknown']
+];
+const criterionSourceFor = criterionKey => {
+  const index=Number(criterionKey.split(':').at(-1));
+  return criterionSources.get(criterionKey)||criterionSourceOptions[Math.min(index,criterionSourceOptions.length-2)][0];
+};
+const missingInfoTasks = [];
+let missingInfoTaskSequence = 1;
+let pendingCriterionTaskKey = null;
 const trialRoomThreads = new Map();
 let trialRoomSequence = 1;
 let currentInboxKind = 'updates';
@@ -804,13 +818,6 @@ function renderCase() {
   $('#board-trial-title').textContent=plainText(t.title);
   const criteria=protocolCriteriaFor(t);
   currentCriterionCount=criteria.length;
-  const sourceOptions=[
-    ['Pathology report','Pathology report · 28 Aug 2026'],
-    ['Molecular report','Molecular report · 02 Sep 2026'],
-    ['Treatment timeline','Treatment timeline · clinician-reviewed history'],
-    ['Laboratory report','Laboratory report · 11 Sep 2026'],
-    ['No source linked','No source linked · missing or unknown']
-  ];
   const nextActions={
     not_reviewed:'Review exact protocol wording and linked source',
     confirmed:'No missing-information action recorded',
@@ -823,15 +830,16 @@ function renderCase() {
     ${criteria.map((criterion,index)=>{
       const key=`${t.id}:${index}`;
       const decision=criterionDecisions.get(key)||'not_reviewed';
-      const defaultSource=sourceOptions[Math.min(index,sourceOptions.length-2)][0];
-      const source=criterionSources.get(key)||defaultSource;
+      const source=criterionSourceFor(key);
       const meta=criterionReviewMeta.get(key);
+      const criterionTasks=missingInfoTasks.filter(task=>task.criterionKey===key);
+      const linkedTask=criterionTasks.find(task=>task.status==='open')||criterionTasks.at(-1);
       return `
-        <div class="criterion-row" data-criterion-row="${key}">
+        <div class="criterion-row" data-criterion-row="${key}" tabindex="-1">
           <div class="criterion-copy"><span class="criterion-number">${String(index+1).padStart(2,'0')}</span><strong>Exact registry wording</strong><blockquote>${escapeHTML(criterion)}</blockquote></div>
-          <div class="criterion-source-control"><label><span>Clinician-linked EMR source</span><select class="criterion-select" data-criterion-source-key="${key}">${sourceOptions.map(([value,label])=>`<option value="${value}" ${source===value?'selected':''}>${label}</option>`).join('')}</select></label><button class="button small ghost" type="button" data-criterion-open-source="${source}" ${source==='No source linked'?'disabled':''}>${icon('link')}Open source</button></div>
+          <div class="criterion-source-control"><label><span>Clinician-linked EMR source</span><select class="criterion-select" data-criterion-source-key="${key}">${criterionSourceOptions.map(([value,label])=>`<option value="${value}" ${source===value?'selected':''}>${label}</option>`).join('')}</select></label><button class="button small ghost" type="button" data-criterion-open-source="${source}" ${source==='No source linked'?'disabled':''}>${icon('link')}Open source</button></div>
           <div class="criterion-review-control"><label><span>Human-entered state</span><select class="criterion-select" data-criterion-key="${key}"><option value="not_reviewed" ${decision==='not_reviewed'?'selected':''}>Not reviewed</option><option value="confirmed" ${decision==='confirmed'?'selected':''}>Confirmed by clinician</option><option value="not_met" ${decision==='not_met'?'selected':''}>Not met — human decision</option><option value="clarify" ${decision==='clarify'?'selected':''}>Needs clarification</option></select></label><span class="criterion-review-meta">${meta?`${escapeHTML(meta.reviewer)} · ${escapeHTML(meta.date)}`:'Awaiting treating oncologist'}</span></div>
-          <div class="criterion-next ${decision}"><span>Next action</span><strong>${nextActions[decision]}</strong></div>
+          <div class="criterion-next ${decision}"><span>Next action</span><strong>${nextActions[decision]}</strong>${linkedTask?`<div class="criterion-task-summary ${linkedTask.status}"><strong>${escapeHTML(linkedTask.id)} · ${escapeHTML(linkedTask.type)}</strong><span>${escapeHTML(linkedTask.owner)} · ${linkedTask.status==='open'?`due ${formatDate(linkedTask.due)}`:linkedTask.status}</span>${linkedTask.status==='open'?`<button class="button small ghost" type="button" data-open-missing-task-inbox="${linkedTask.id}">Open in Inbox</button>`:decision==='clarify'?`<button class="button small ghost" type="button" data-create-missing-task="${key}">Create follow-up task</button>`:''}</div>`:decision==='clarify'?`<button class="button small" type="button" data-create-missing-task="${key}">${icon('check')}Create missing-information task</button>`:''}</div>
         </div>`;
     }).join('')}`;
   $$('[data-criterion-key]').forEach(select=>select.addEventListener('change',()=>{
@@ -853,7 +861,7 @@ function renderCase() {
   $$('[data-criterion-source-key]').forEach(select=>select.addEventListener('change',()=>{
     const key=select.dataset.criterionSourceKey;
     if(currentRole!=='oncologist'){
-      select.value=criterionSources.get(key)||sourceOptions[Math.min(Number(key.split(':').at(-1)),sourceOptions.length-2)][0];
+      select.value=criterionSourceFor(key);
       showToast('Only the treating oncologist role can link the source used for criterion review.');
       return;
     }
@@ -865,7 +873,46 @@ function renderCase() {
     showToast('Source link recorded by the treating oncologist. Source content was not interpreted.');
   }));
   $$('[data-criterion-open-source]').forEach(button=>button.addEventListener('click',()=>openArtifact(button.dataset.criterionOpenSource)));
+  $$('[data-create-missing-task]').forEach(button=>button.addEventListener('click',()=>openMissingInformationTask(button.dataset.createMissingTask)));
+  $$('[data-open-missing-task-inbox]').forEach(button=>button.addEventListener('click',()=>{
+    currentInboxKind='tasks';
+    selectedInboxItemId=`missing:${button.dataset.openMissingTaskInbox}`;
+    renderAlerts();
+    switchView('alerts');
+    $('#inbox-inspector-heading')?.focus({preventScroll:false});
+  }));
   updateCriteriaCount();
+}
+
+function openMissingInformationTask(criterionKey) {
+  if(currentRole==='auditor'){
+    showToast('The read-only auditor role cannot create missing-information tasks.');
+    return;
+  }
+  const trial=trialById(caseSelectedTrialId);
+  if(!trial){
+    showToast('The selected trial context is unavailable.');
+    return;
+  }
+  const criterionIndex=Number(criterionKey.split(':').at(-1));
+  const criterion=protocolCriteriaFor(trial)[criterionIndex];
+  if(!criterion||criterionDecisions.get(criterionKey)!=='clarify'){
+    showToast('Record Needs clarification before creating a missing-information task.');
+    return;
+  }
+  const source=criterionSourceFor(criterionKey);
+  pendingCriterionTaskKey=criterionKey;
+  $('#missing-info-context').textContent=`Synthetic case SYN-2047 · ${trial.id} · criterion ${criterionIndex+1}`;
+  $('#missing-task-provenance').innerHTML=`<div><span>Exact criterion</span><strong>${escapeHTML(criterion)}</strong></div><div><span>Clinician-linked source</span><strong>${escapeHTML(source)}</strong></div><div><span>Current human state</span><strong>Needs clarification · ${escapeHTML(criterionReviewMeta.get(criterionKey)?.reviewer||'Treating oncologist')}</strong></div>`;
+  $('#missing-task-type').value='Request missing source record';
+  $('#missing-task-owner').value='A. Rao — research coordinator';
+  const due=new Date(`${today}T00:00:00Z`);
+  due.setUTCDate(due.getUTCDate()+2);
+  $('#missing-task-due').value=due.toISOString().slice(0,10);
+  $('#missing-task-note').value='';
+  $('#missing-task-safe').checked=false;
+  $('#missing-info-dialog').showModal();
+  $('#missing-task-type').focus();
 }
 
 function renderPatientWorkspaceState(t=trialById(caseSelectedTrialId)||trialById(selectedTrialId)||trials[0]) {
@@ -885,6 +932,11 @@ function renderPatientWorkspaceState(t=trialById(caseSelectedTrialId)||trialById
       ?{tone:'task',title:'Referral or inquiry handoff open',meta:`${linkedHandoffs[0].id} · ${statusHuman[linkedHandoffs[0].status]||linkedHandoffs[0].status} · owner ${linkedHandoffs[0].owner}`,state:formatDate(linkedHandoffs[0].due)}
       :{tone:'task',title:'No open referral handoff',meta:'A human-approved packet or general inquiry creates the next owned task.',state:'Not started'}
   ];
+  const patientTasks=missingInfoTasks.filter(task=>task.trialId===t.id);
+  if(patientTasks.length){
+    const latest=patientTasks.at(-1);
+    work.unshift({tone:'task',title:'Missing-information task',meta:`${latest.id} · ${latest.type} · owner ${latest.owner}`,state:latest.status==='open'?formatDate(latest.due):latest.status});
+  }
   if(packetDrafted)work.unshift({tone:'task',title:'Referral packet manifest drafted',meta:'Explicit synthetic EMR references · human release still required',state:'Draft'});
   if(boardDecisionRecorded)work.unshift({tone:'human',title:'Human board disposition recorded',meta:'Signed decision reference retained in the synthetic EMR workflow',state:'Recorded'});
   $('#patient-recent-work').innerHTML=work.map(item=>`
@@ -1021,6 +1073,24 @@ function buildInboxItems() {
       inquiryId:inquiry.id
     });
   });
+  missingInfoTasks.filter(task=>task.status==='open').forEach(task=>{
+    items.push({
+      id:`missing:${task.id}`,
+      kind:'tasks',
+      title:task.type,
+      body:task.note,
+      context:`SYN-2047 · ${task.trialId} · criterion ${task.criterionIndex+1}`,
+      owner:task.owner,
+      due:dueLabel(task.due),
+      source:`${task.source} · clinician-linked criterion evidence`,
+      tone:task.due<today?'bad':'warn',
+      unread:false,
+      targetView:'patient-task',
+      trialId:task.trialId,
+      criterionKey:task.criterionKey,
+      missingTaskId:task.id
+    });
+  });
   trials.filter(trial=>trial.due||trial.discrepancy).forEach(trial=>{
     items.push({
       id:`verification:${trial.id}`,
@@ -1043,6 +1113,7 @@ function buildInboxItems() {
 function inboxInspectorMarkup(item) {
   const linkedInquiry=inquiries.find(inquiry=>inquiry.id===item.inquiryId);
   const linkedTrial=trialById(item.trialId);
+  const linkedMissing=missingInfoTasks.find(task=>task.id===item.missingTaskId);
   const nextInquiryState=linkedInquiry?{draft:'approved',approved:'sent',sent:'acknowledged',acknowledged:'closed'}[linkedInquiry.status]:null;
   const nextInquiryLabel=nextInquiryState?{
     approved:'Approve draft',
@@ -1065,11 +1136,13 @@ function inboxInspectorMarkup(item) {
       </div>
       ${linkedInquiry?`<div class="inbox-inspector-state"><span>Handoff state</span><strong>${statusHuman[linkedInquiry.status]||linkedInquiry.status}</strong><small>${linkedInquiry.id} · ${linkedInquiry.route} · owner ${linkedInquiry.owner}</small></div>`:''}
       ${item.targetView==='verification'&&linkedTrial?`<div class="inbox-inspector-state"><span>Source comparison</span><strong>Registry: ${linkedTrial.registryStatus} · Site: ${linkedTrial.verifyLabel}</strong><small>${linkedTrial.source} updated ${formatDate(linkedTrial.registryUpdated)}. Unknown remains unknown until an authorised source responds.</small></div>`:''}
+      ${linkedMissing?`<div class="inbox-inspector-state"><span>Missing-information task</span><strong>${linkedMissing.status==='open'?'Open · answer remains unknown':linkedMissing.status}</strong><small>${linkedMissing.id} · criterion ${linkedMissing.criterionIndex+1} · ${linkedMissing.source} · created by ${linkedMissing.createdBy}</small></div>`:''}
       <div class="inbox-inspector-actions">
         ${item.unread?`<button class="button" type="button" data-inbox-read="${item.id}">${icon('check')}Mark read</button>`:''}
         ${nextInquiryLabel?`<button class="button primary" type="button" data-inbox-advance="${linkedInquiry.id}">${icon('arrow')}${nextInquiryLabel}</button>`:''}
         ${linkedInquiry&&['draft','approved','sent'].includes(linkedInquiry.status)?`<button class="button danger" type="button" data-inbox-unable="${linkedInquiry.id}">${icon('warning')}Unable to contact</button>`:''}
         ${item.targetView==='verification'&&item.trialId?`<button class="button primary" type="button" data-inbox-verify="${item.trialId}">${icon('check')}Record verification</button>`:''}
+        ${linkedMissing&&linkedMissing.status==='open'?`<button class="button primary" type="button" data-complete-missing-task="${linkedMissing.id}">${icon('check')}Mark task complete</button><button class="button danger" type="button" data-unable-missing-task="${linkedMissing.id}">${icon('warning')}Unable to obtain</button>`:''}
         <button class="button" type="button" data-inbox-open="${item.id}">${icon('arrow')}Go to full context</button>
       </div>
       <div class="inbox-inspector-boundary">${icon('shield')}<span>Only a human-recorded operational action changes workflow state. Opening or reading this item never changes a registry assertion, site confirmation, or clinical conclusion.</span></div>
@@ -1229,6 +1302,22 @@ function renderAlerts() {
     },{once:true});
     openVerification(button.dataset.inboxVerify);
   }));
+  const resolveMissingTask=(taskId,status)=>{
+    const task=missingInfoTasks.find(candidate=>candidate.id===taskId);
+    if(!task||task.status!=='open')return;
+    task.status=status;
+    task.closedBy=roleProfiles[currentRole].name;
+    task.closedAt=formatDate(today);
+    auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:`${today} session`,actor:task.closedBy,title:`Missing-information task ${status}`,note:`${task.id} · ${task.criterionKey} · criterion state unchanged`,type:'task'});
+    selectedInboxItemId=null;
+    renderCase();
+    renderAlerts();
+    renderAudit();
+    focusInboxOrigin('',false);
+    showToast(`${task.id} marked ${status}. The criterion remains Needs clarification until the treating oncologist changes it.`);
+  };
+  $$('[data-complete-missing-task]',stream).forEach(button=>button.addEventListener('click',()=>resolveMissingTask(button.dataset.completeMissingTask,'complete')));
+  $$('[data-unable-missing-task]',stream).forEach(button=>button.addEventListener('click',()=>resolveMissingTask(button.dataset.unableMissingTask,'unable to obtain')));
   $$('[data-inbox-read]',stream).forEach(button=>button.addEventListener('click',()=>{
     const item=items.find(candidate=>candidate.id===button.dataset.inboxRead);
     const inspectorOpen=item&&selectedInboxItemId===item.id;
@@ -1257,6 +1346,11 @@ function renderAlerts() {
       switchView('verification');
     }else if(item.targetView==='inquiries'){
       switchView('inquiries');
+    }else if(item.targetView==='patient-task'&&item.trialId){
+      caseSelectedTrialId=item.trialId;
+      renderCase();
+      switchView('case');
+      $(`[data-criterion-row="${item.criterionKey}"]`)?.focus({preventScroll:false});
     }else if(item.trialId){
       $('#trial-search').value=item.trialId;
       selectedTrialId=item.trialId;
@@ -1434,6 +1528,55 @@ $('#packet-form').addEventListener('submit',(event)=>{
   renderInquiries();
   renderAudit();
   showToast(`${id} created as a draft. Source documents remain in the EMR; human release is required.`);
+});
+
+$('#missing-info-form').addEventListener('submit',(event)=>{
+  event.preventDefault();
+  if(!event.currentTarget.reportValidity())return;
+  if(currentRole==='auditor'||!pendingCriterionTaskKey){
+    showToast('A writable authorised role and criterion context are required.');
+    return;
+  }
+  const trial=trialById(caseSelectedTrialId);
+  if(!trial){
+    showToast('The selected trial context is unavailable.');
+    return;
+  }
+  const criterionIndex=Number(pendingCriterionTaskKey.split(':').at(-1));
+  const criterion=protocolCriteriaFor(trial)[criterionIndex];
+  if(!criterion||criterionDecisions.get(pendingCriterionTaskKey)!=='clarify'){
+    showToast('The criterion is no longer in Needs clarification.');
+    return;
+  }
+  const duplicate=missingInfoTasks.find(task=>task.criterionKey===pendingCriterionTaskKey&&task.status==='open');
+  if(duplicate){
+    showToast(`${duplicate.id} already owns this missing-information work.`);
+    return;
+  }
+  const task={
+    id:`MISS-${String(missingInfoTaskSequence++).padStart(3,'0')}`,
+    trialId:trial.id,
+    criterionKey:pendingCriterionTaskKey,
+    criterionIndex,
+    criterion,
+    source:criterionSourceFor(pendingCriterionTaskKey),
+    type:$('#missing-task-type').value,
+    owner:$('#missing-task-owner').value.split(' — ')[0],
+    due:$('#missing-task-due').value,
+    note:$('#missing-task-note').value.trim(),
+    status:'open',
+    createdBy:roleProfiles[currentRole].name,
+    createdAt:formatDate(today)
+  };
+  missingInfoTasks.push(task);
+  auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:`${today} session`,actor:task.createdBy,title:'Missing-information task created',note:`${task.id} · ${task.criterionKey} · ${task.owner} · answer remains unknown`,type:'task'});
+  pendingCriterionTaskKey=null;
+  $('#missing-info-dialog').close();
+  renderCase();
+  renderAlerts();
+  renderAudit();
+  $(`[data-open-missing-task-inbox="${task.id}"]`)?.focus({preventScroll:true});
+  showToast(`${task.id} assigned to ${task.owner}. The criterion remains Needs clarification; no answer was inferred.`);
 });
 
 $('#board-form').addEventListener('submit',(event)=>{
