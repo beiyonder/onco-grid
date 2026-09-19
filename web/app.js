@@ -137,7 +137,7 @@ const formatDate = (value) => {
   return Number.isNaN(parsed.getTime())?value:new Intl.DateTimeFormat('en-IN',{day:'2-digit',month:'short',year:'numeric'}).format(parsed);
 };
 const statusPill = (trial) => `<span class="status-pill ${trial.verifyTone}"><span class="status-dot"></span>${trial.verifyLabel}</span>`;
-const statusHuman = {draft:'Draft',approved:'Human approved',sent:'Sent',acknowledged:'Acknowledged',closed:'Closed',unable:'Unable to contact'};
+const statusHuman = {draft:'Draft',approved:'Human approved',sent:'Sent',acknowledged:'Acknowledged',screening:'Trial-team screening',correction:'Correction required',closed:'Closed',unable:'Unable to contact'};
 const roleProfiles = {
   coordinator:{initials:'AR',name:'A. Rao',label:'Research coordinator',institution:'Metro Cancer Centre',verified:true},
   oncologist:{initials:'MS',name:'Dr M. Shah',label:'Treating oncologist',institution:'Metro Cancer Centre',verified:true},
@@ -1085,13 +1085,13 @@ function buildInboxItems() {
   inquiries.forEach(inquiry=>{
     if(['closed','unable'].includes(inquiry.status))return;
     const representedByAlert=alerts.some(alert=>alert.body.includes(inquiry.id));
-    if(inquiry.status==='acknowledged'&&representedByAlert)return;
+    if(['acknowledged','screening'].includes(inquiry.status)&&representedByAlert)return;
     const trial=trialById(inquiry.trialId);
-    const kind=inquiry.status==='acknowledged'?'messages':'tasks';
+    const kind=['acknowledged','screening'].includes(inquiry.status)?'messages':'tasks';
     items.push({
       id:`inquiry:${inquiry.id}`,
       kind,
-      title:inquiry.status==='acknowledged'?'Referral or inquiry acknowledged':`${statusHuman[inquiry.status]||inquiry.status} handoff`,
+      title:inquiry.status==='acknowledged'?'Referral or inquiry acknowledged':inquiry.status==='screening'?'Trial-team screening':`${statusHuman[inquiry.status]||inquiry.status} handoff`,
       body:inquiry.question,
       context:`${inquiry.id} · ${inquiry.trialId}`,
       owner:inquiry.owner||'Unassigned',
@@ -1146,11 +1146,18 @@ function inboxInspectorMarkup(item) {
   const linkedTrial=trialById(item.trialId);
   const linkedMissing=missingInfoTasks.find(task=>task.id===item.missingTaskId);
   const linkedPacket=referralPackets.find(packet=>packet.id===linkedInquiry?.packetId);
-  const nextInquiryState=linkedInquiry?{draft:'approved',approved:'sent',sent:'acknowledged',acknowledged:'closed'}[linkedInquiry.status]:null;
+  const lifecycleStates=['draft','approved','sent','acknowledged','screening','closed'];
+  const packetLifecycle=linkedPacket?`<div class="packet-lifecycle" aria-label="Referral lifecycle">${lifecycleStates.map((state,index)=>{
+    const reached=linkedPacket.history.some(event=>event.state===state);
+    const current=linkedPacket.status===state;
+    return `<div class="packet-stage ${reached?'done':''} ${current?'current':''}"><span>${index+1}</span><strong>${statusHuman[state]}</strong></div>`;
+  }).join('')}</div><details class="packet-history"><summary>Actor, timestamp, and source history</summary><div>${linkedPacket.history.map(event=>`<p><strong>${statusHuman[event.state]||event.state}</strong><span>${escapeHTML(event.actor)} · ${escapeHTML(event.at)} · ${escapeHTML(event.source)}</span></p>`).join('')}</div></details>`:'';
+  const nextInquiryState=linkedInquiry?{draft:'approved',approved:'sent',sent:'acknowledged',acknowledged:'screening',screening:'closed'}[linkedInquiry.status]:null;
   const nextInquiryLabel=nextInquiryState?{
     approved:'Approve draft',
     sent:'Mark sent',
     acknowledged:'Record acknowledgement',
+    screening:'Begin trial-team screening',
     closed:'Close handoff'
   }[nextInquiryState]:null;
   return `
@@ -1168,6 +1175,7 @@ function inboxInspectorMarkup(item) {
       </div>
       ${linkedInquiry?`<div class="inbox-inspector-state"><span>Handoff state</span><strong>${statusHuman[linkedInquiry.status]||linkedInquiry.status}</strong><small>${linkedInquiry.id} · ${linkedInquiry.route} · owner ${linkedInquiry.owner}</small></div>`:''}
       ${linkedPacket?`<div class="inbox-inspector-state"><span>Referral packet</span><strong>${linkedPacket.id} · ${linkedPacket.version} · ${statusHuman[linkedPacket.status]||linkedPacket.status}</strong><small>${linkedPacket.sources.length} explicit source references · expires ${formatDate(linkedPacket.expiry)} · ${linkedPacket.approval?`approved by ${linkedPacket.approval.actor}`:'not approved · not released'}</small></div>`:''}
+      ${packetLifecycle}
       ${item.targetView==='verification'&&linkedTrial?`<div class="inbox-inspector-state"><span>Source comparison</span><strong>Registry: ${linkedTrial.registryStatus} · Site: ${linkedTrial.verifyLabel}</strong><small>${linkedTrial.source} updated ${formatDate(linkedTrial.registryUpdated)}. Unknown remains unknown until an authorised source responds.</small></div>`:''}
       ${linkedMissing?`<div class="inbox-inspector-state"><span>Missing-information task</span><strong>${linkedMissing.status==='open'?'Open · answer remains unknown':linkedMissing.status}</strong><small>${linkedMissing.id} · criterion ${linkedMissing.criterionIndex+1} · ${linkedMissing.source} · created by ${linkedMissing.createdBy}</small></div>`:''}
       <div class="inbox-inspector-actions">
@@ -1176,6 +1184,7 @@ function inboxInspectorMarkup(item) {
         ${linkedInquiry&&['draft','approved','sent'].includes(linkedInquiry.status)?`<button class="button danger" type="button" data-inbox-unable="${linkedInquiry.id}">${icon('warning')}Unable to contact</button>`:''}
         ${item.targetView==='verification'&&item.trialId?`<button class="button primary" type="button" data-inbox-verify="${item.trialId}">${icon('check')}Record verification</button>`:''}
         ${linkedMissing&&linkedMissing.status==='open'?`<button class="button primary" type="button" data-complete-missing-task="${linkedMissing.id}">${icon('check')}Mark task complete</button><button class="button danger" type="button" data-unable-missing-task="${linkedMissing.id}">${icon('warning')}Unable to obtain</button>`:''}
+        ${linkedPacket&&['approved','sent','acknowledged','screening'].includes(linkedPacket.status)?`<button class="button danger" type="button" data-request-packet-correction="${linkedPacket.id}">${icon('warning')}Request correction</button>`:''}
         <button class="button" type="button" data-inbox-open="${item.id}">${icon('arrow')}Go to full context</button>
       </div>
       <div class="inbox-inspector-boundary">${icon('shield')}<span>Only a human-recorded operational action changes workflow state. Opening or reading this item never changes a registry assertion, site confirmation, or clinical conclusion.</span></div>
@@ -1321,6 +1330,13 @@ function renderAlerts() {
     renderAlerts();
     focusInboxOrigin('',false);
   }));
+  $$('[data-request-packet-correction]',stream).forEach(button=>button.addEventListener('click',()=>{
+    const originId=selectedInboxItemId;
+    requestPacketCorrection(button.dataset.requestPacketCorrection);
+    selectedInboxItemId=originId;
+    renderAlerts();
+    focusInboxOrigin(originId,true);
+  }));
   $$('[data-inbox-verify]',stream).forEach(button=>button.addEventListener('click',()=>{
     pendingInboxFocusId=selectedInboxItemId;
     const dialog=$('#verification-dialog');
@@ -1445,7 +1461,7 @@ function renderInquiries() {
   renderPatientWorkspaceState();
   const wrap=$('#inquiry-table-wrap');
   if(!rows.length){wrap.innerHTML='<div class="empty-state" style="margin:14px"><h2>No inquiries in this state</h2><p>Change the filter or create a general site inquiry from a trial record.</p></div>';return;}
-  wrap.innerHTML=`<table class="inquiry-table"><thead><tr><th>Trial</th><th>Question</th><th>Owner</th><th>Due</th><th>State</th><th>Next action</th></tr></thead><tbody>${rows.map(i=>{const t=trialById(i.trialId);const next=i.status==='draft'?'Approve':i.status==='approved'?'Mark sent':i.status==='sent'?'Mark acknowledged':i.status==='acknowledged'?'Close':'Closed';return `<tr><td class="inquiry-trial" data-label="Trial"><strong>${t?.title||'Synthetic trial'}</strong><span>${i.id} · ${i.trialId}</span></td><td data-label="Question">${i.question}</td><td data-label="Owner">${i.owner}</td><td data-label="Due">${formatDate(i.due)}</td><td data-label="State"><span class="status-pill ${i.status==='closed'?'good':i.status==='sent'?'warn':'neutral'}"><span class="status-dot"></span>${statusHuman[i.status]}</span></td><td data-label="Next"><div class="stage-control"><button class="button small ${i.status==='acknowledged'?'success':''}" type="button" data-advance="${i.id}" ${['closed','unable'].includes(i.status)?'disabled':''}>${next}</button>${!['closed','unable'].includes(i.status)?`<button class="button small ghost" type="button" data-unable="${i.id}">Unable</button>`:''}</div></td></tr>`}).join('')}</tbody></table>`;
+  wrap.innerHTML=`<table class="inquiry-table"><thead><tr><th>Trial</th><th>Question</th><th>Owner</th><th>Due</th><th>State</th><th>Next action</th></tr></thead><tbody>${rows.map(i=>{const t=trialById(i.trialId);const next={draft:'Approve',approved:'Mark sent',sent:'Mark acknowledged',acknowledged:'Begin screening',screening:'Close handoff'}[i.status]||'Closed';const canAdvance=['draft','approved','sent','acknowledged','screening'].includes(i.status);const canUnable=['draft','approved','sent'].includes(i.status);return `<tr><td class="inquiry-trial" data-label="Trial"><strong>${t?.title||'Synthetic trial'}</strong><span>${i.id} · ${i.trialId}${i.version?` · ${i.version}`:''}</span></td><td data-label="Question">${i.question}</td><td data-label="Owner">${i.owner}</td><td data-label="Due">${formatDate(i.due)}</td><td data-label="State"><span class="status-pill ${i.status==='closed'?'good':i.status==='sent'?'warn':'neutral'}"><span class="status-dot"></span>${statusHuman[i.status]}</span></td><td data-label="Next"><div class="stage-control"><button class="button small ${i.status==='screening'?'success':''}" type="button" data-advance="${i.id}" ${canAdvance?'':'disabled'}>${next}</button>${canUnable?`<button class="button small ghost" type="button" data-unable="${i.id}">Unable</button>`:''}</div></td></tr>`}).join('')}</tbody></table>`;
   $$('[data-advance]',wrap).forEach(btn=>btn.addEventListener('click',()=>advanceInquiry(btn.dataset.advance)));
   $$('[data-unable]',wrap).forEach(btn=>btn.addEventListener('click',()=>setInquiryUnable(btn.dataset.unable)));
 }
@@ -1453,7 +1469,7 @@ function renderInquiries() {
 function advanceInquiry(id){
   const item=inquiries.find(inquiry=>inquiry.id===id);
   if(!item)return;
-  const next={draft:'approved',approved:'sent',sent:'acknowledged',acknowledged:'closed'}[item.status];
+  const next={draft:'approved',approved:'sent',sent:'acknowledged',acknowledged:'screening',screening:'closed'}[item.status];
   if(!next)return;
   const packet=referralPackets.find(candidate=>candidate.id===item.packetId);
   if(packet&&next==='sent'&&!packet.approval){
@@ -1463,6 +1479,8 @@ function advanceInquiry(id){
   const before=item.status;
   const actor=roleProfiles[currentRole].name;
   item.status=next;
+  item.history??=[];
+  item.history.push({state:next,actor,at:formatDate(today),source:'Human handoff action'});
   if(packet){
     packet.status=next;
     if(next==='approved')packet.approval={actor,at:formatDate(today),version:packet.version};
@@ -1482,6 +1500,8 @@ function setInquiryUnable(id){
   if(!item)return;
   const actor=roleProfiles[currentRole].name;
   item.status='unable';
+  item.history??=[];
+  item.history.push({state:'unable',actor,at:formatDate(today),source:'Unable-to-contact outcome'});
   const packet=referralPackets.find(candidate=>candidate.id===item.packetId);
   if(packet){
     packet.status='unable';
@@ -1492,6 +1512,24 @@ function setInquiryUnable(id){
   renderAlerts();
   renderAudit();
   showToast(`${id} closed as unable to contact. No clinical or site conclusion was inferred.`);
+}
+
+function requestPacketCorrection(packetId){
+  const packet=referralPackets.find(candidate=>candidate.id===packetId);
+  const inquiry=inquiries.find(candidate=>candidate.packetId===packetId);
+  if(!packet||!inquiry||!['approved','sent','acknowledged','screening'].includes(packet.status))return;
+  const actor=roleProfiles[currentRole].name;
+  packet.status='correction';
+  packet.approval=null;
+  packet.history.push({state:'correction',actor,at:formatDate(today),source:'Human correction request · prior approval invalidated'});
+  inquiry.status='correction';
+  inquiry.history??=[];
+  inquiry.history.push({state:'correction',actor,at:formatDate(today),source:'Packet correction request'});
+  auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:`${today} session`,actor,title:'Referral packet correction required',note:`${packet.id} · ${packet.version} · approval invalidated · create a new version`,type:'packet'});
+  renderInquiries();
+  renderAlerts();
+  renderAudit();
+  showToast(`${packet.id} ${packet.version} requires correction. Its approval was invalidated; create a new packet version.`);
 }
 
 function renderAudit(){
@@ -1622,7 +1660,7 @@ $('#packet-form').addEventListener('submit',(event)=>{
     history:[{state:'draft',actor:roleProfiles[currentRole].name,at:formatDate(today),source:'Explicit packet manifest'}]
   };
   referralPackets.push(packet);
-  inquiries.unshift({id,packetId:id,version:packet.version,trialId:trial.id,site,question:`Review and approve ${packet.version} referral packet for ${packet.purpose.toLowerCase()}`,owner,due:packet.expiry,route:packet.recipient,status:'draft',created:today});
+  inquiries.unshift({id,packetId:id,version:packet.version,trialId:trial.id,site,question:`Review and approve ${packet.version} referral packet for ${packet.purpose.toLowerCase()}`,owner,due:packet.expiry,route:packet.recipient,status:'draft',created:today,history:[{state:'draft',actor:packet.createdBy,at:formatDate(today),source:'Versioned packet draft'}]});
   auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:`${today} session`,actor:packet.createdBy,title:'Versioned referral packet drafted',note:`${id} · ${packet.version} · ${sources.length} source references · not approved · not released`,type:'packet'});
   $('#packet-dialog').close();
   renderInquiries();

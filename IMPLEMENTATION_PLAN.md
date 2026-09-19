@@ -187,10 +187,10 @@ The owner decides whether to retain, simplify, supplement, or stop each major ca
 
 ## Current slice
 
-**Branch:** `feat/referral-packet`
+**Branch:** `feat/referral-lifecycle`
 
-**Pull request outcome:** deliver Phase 4 slice 1 — a versioned referral packet draft with explicit purpose, selected real-registry trial and retained India site, authorised recipient, owner, expiry, exact synthetic EMR source manifest, clinician-review progress, approval state, actor/history, and a hard draft-not-release boundary. Each later draft becomes a new unapproved version.
+**Pull request outcome:** deliver Phase 4 slice 2 — a version-bound referral lifecycle `Draft → Human approved → Sent → Acknowledged → Trial-team screening → Closed`, with one permissible next action, actor/date/source history for every transition, Inbox reclassification without duplication, unable-to-contact, and a correction path that invalidates approval and requires a new packet version.
 
-**Acceptance scenario:** prepare a packet for the selected trial; inspect `v1.0`, eight retained India-site choices, clinician-review count, Draft/not approved state, default expiry, and three selected source references; reject an empty manifest; create a two-source draft and verify its complete object, Recent work entry, canonical Inbox Task, and inspector statement `not approved · not released`; reopen the builder and observe `v2.0` starts as a separate unapproved draft; retain coherent desktop/mobile dialogs.
+**Acceptance scenario:** create `REF-2201 v1.0`; inspect six lifecycle stages and Draft history; approve it and verify approval actor/date/version; send only after approval; record acknowledgement and observe canonical move from Tasks to Messages; begin screening and retain exactly one canonical row; close the handoff with all six stages/history events; separately approve then request correction, confirm status Correction required and null approval, and reopen Patients to see `v2.0` as a fresh unapproved draft; verify mobile lifecycle readability.
 
-**Explicit non-goals for this slice:** no automatic approval or release, file copying, clinical summarization, external transmission, packet editing after approval, full lifecycle redesign, trial-team outcome, real patient data, backend, persistence, authentication, new data source, or deployment change.
+**Explicit non-goals for this slice:** no automatic transition, actual packet transmission, clinical screening outcome, patient eligibility conclusion, packet editing in place, real patient data, backend, persistence, authentication, new data source, or deployment change.

@@ -1197,6 +1197,21 @@ dialog::backdrop { background: rgba(16, 34, 45, .56); backdrop-filter: blur(2px)
 .inbox-inspector-facts span, .inbox-inspector-state > span { color: var(--muted); font-size: 7px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
 .inbox-inspector-facts strong, .inbox-inspector-state strong { overflow-wrap: anywhere; font-size: 10px; }
 .inbox-inspector-state small { color: var(--muted); font-size: 8px; }
+.packet-lifecycle { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: 4px; }
+.packet-stage { position: relative; display: grid; gap: 3px; justify-items: center; border: 1px solid var(--rule); border-radius: 7px; padding: 7px 4px; background: rgba(251,252,251,.62); color: var(--muted); text-align: center; }
+.packet-stage > span { display: grid; width: 20px; height: 20px; place-items: center; border-radius: 50%; background: var(--paper-2); font-family: var(--font-data); font-size: 7px; }
+.packet-stage strong { font-size: 7px; line-height: 1.2; }
+.packet-stage.done { border-color: #b9d7ca; color: var(--green); }
+.packet-stage.done > span { background: var(--green-soft); }
+.packet-stage.current { border-color: var(--navy-2); background: var(--paper); box-shadow: inset 0 -3px 0 var(--navy-2); color: var(--navy); }
+.packet-history { border: 1px solid rgba(36,93,134,.22); border-radius: 8px; background: rgba(251,252,251,.58); }
+.packet-history summary { cursor: pointer; padding: 8px 10px; color: var(--navy); font-size: 9px; font-weight: 760; }
+.packet-history[open] summary { border-bottom: 1px solid rgba(36,93,134,.18); }
+.packet-history > div { display: grid; }
+.packet-history p { display: grid; gap: 1px; margin: 0; border-bottom: 1px solid rgba(36,93,134,.14); padding: 7px 10px; }
+.packet-history p:last-child { border-bottom: 0; }
+.packet-history strong { font-size: 9px; }
+.packet-history span { color: var(--muted); font-size: 8px; }
 .inbox-inspector-actions { display: flex; flex-wrap: wrap; gap: 7px; }
 .inbox-inspector-boundary { display: flex; align-items: flex-start; gap: 7px; border: 1px solid #b9d7ca; border-radius: 8px; padding: 8px 9px; background: var(--green-soft); color: var(--green); }
 .inbox-inspector-boundary span { color: var(--ink-2); font-size: 9px; }
@@ -1355,5 +1370,6 @@ dialog::backdrop { background: rgba(16, 34, 45, .56); backdrop-filter: blur(2px)
   .inbox-inspector { padding: 14px; }
   .inbox-inspector > header { flex-direction: column-reverse; }
   .inbox-inspector-facts { grid-template-columns: 1fr; }
+  .packet-lifecycle { grid-template-columns: repeat(3,minmax(0,1fr)); }
   .inbox-inspector-actions { display: grid; grid-template-columns: 1fr; }
 }
