@@ -185,12 +185,49 @@ Observe oncology users attempting the smallest end-to-end scenario without instr
 
 The owner decides whether to retain, simplify, supplement, or stop each major capability. No implementation artifact alone closes `P5` or establishes product lock.
 
+## Implementation status
+
+| Phase | Implemented slices | Merge evidence | State |
+|---|---|---|---|
+| Phase 0 | Home/navigation; static source split | Pull requests `#2`–`#3` | **FACT — implemented** |
+| Phase 1 | Trial library; source-first profile; follow and Trial room | Pull requests `#4`–`#6` | **FACT — implemented** |
+| Phase 2 | Unified Inbox; contextual resolution; safe notification rules | Pull requests `#7`–`#9` | **FACT — implemented** |
+| Phase 3 | Synthetic patient workspace; clinician criterion review; missing-information tasks | Pull requests `#10`–`#12` | **FACT — implemented** |
+| Phase 4 | Versioned packet; lifecycle; tumour-board reference; authorised trial-team outcome | Pull requests `#13`–`#16` | **FACT — implemented** |
+| Phase 5 | Geographic lens; relationship paths; responsive/reduced/print modes | Pull requests `#17`–`#19` | **FACT — implemented** |
+| Phase 6 | Direct oncology-user observation and product-lock decision | No qualifying user-session evidence yet | **OPEN — evidence required** |
+
+Implementation completion does not close `P5`. The validation app remains a private comparative-discovery instrument, and every patient, EMR, board, packet, message, role, task, and outcome example remains synthetic.
+
+## Phase 6 validation-ready protocol
+
+Use only synthetic case `SYN-2047` and the dated public ClinicalTrials.gov snapshot. Do not enter, paste, photograph, record, or retain identifiable patient or participant information.
+
+Run two unprompted scenarios with treating oncologists and operational coordinators or trial navigators:
+
+1. **Trial-first:** find an India-located oncology trial for a condition/location chosen by the participant; distinguish registry status from independent site confirmation; inspect the exact source/date; follow the trial; ask one general operational question; find the resulting state in Inbox.
+2. **Patient-to-handoff:** open the synthetic patient workspace; choose a trial manually from the general library; link one source and record one human criterion state; create a missing-information task; prepare a versioned draft packet; identify the packet owner, approval state, and next action without sending it.
+
+For each de-identified session, retain only:
+
+- participant role and care setting at aggregate-safe granularity;
+- scenario completion and elapsed time;
+- fields trusted, distrusted, or missing;
+- whether registry and site-confirmed states were distinguished correctly;
+- source-link use;
+- whether the participant identified the current owner, due state, and unresolved state;
+- terms or controls misunderstood;
+- steps duplicating the current hospital/coordinator workflow;
+- keep, simplify, remove, or investigate recommendation with rationale.
+
+Stop and rework before further sessions if the interface causes a participant to infer current site availability, patient eligibility, treatment recommendation, autonomous packet release, or a system-generated board/trial-team decision. The owner still decides the participant threshold and closes or redirects `P5`.
+
 ## Current slice
 
-**Branch:** `feat/responsive-presentation-modes`
+**Branch:** `chore/implementation-readiness`
 
-**Pull request outcome:** deliver Phase 5 slice 3 — flatten relationship paths into semantic vertical order on narrow screens, preserve map/list and workflow meaning without desktop coordinates, enforce reduced-motion and reduced-transparency media modes, and produce opaque print output that falls back from Map to the selected source-first List/profile while retaining identifiers, sources, dates, authority labels, and current workflow state.
+**Pull request outcome:** reconcile the completed Phase 0–5 implementation, freeze the safe synthetic Phase 6 observation scenarios and de-identified evidence fields, run one final integrated browser verification, and make the remaining evidence/product-lock boundary explicit.
 
-**Acceptance scenario:** at 390×844 confirm the relationship path becomes a five-node vertical sequence with rotated semantic connectors and no internal/page horizontal overflow; verify Map remains a flat one-column lens with selected label only; emulate reduced motion and observe near-zero animation/transition plus auto scroll; emulate reduced transparency and observe opaque topbar/context surfaces, no backdrop blur, no decorative geometry, and opaque dialog backdrop; emulate print while Map is selected and confirm Map/filters/navigation/actions hide, List/profile/source date display, detail overflow becomes visible, relationship path prints vertically, and all printed surfaces are opaque.
+**Acceptance scenario:** from a clean reload, complete Home → Trial library/List/Map → source-first profile/Trial room → synthetic Patient criterion review/missing task → versioned packet/lifecycle/trial-team outcome → treating-team review/closure, plus packet-bound tumour-board reference and synthetic EMR task; verify responsive, reduced-motion, reduced-transparency, and opaque print modes; retain clean deterministic checks, privacy scans, and `main` integration through a final pull request.
 
-**Explicit non-goals for this slice:** no user-stored display preferences, PDF generation service, new animation, decorative mobile geometry, hidden source/date labels, backend, persistence, authentication, or deployment change.
+**Explicit non-goals for this slice:** no claim of oncology-user validation, product lock, production readiness, deployment change, external outreach, participant recruitment, real patient data, backend, persistence, authentication, new data source, or clinical capability.
