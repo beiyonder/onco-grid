@@ -187,10 +187,10 @@ The owner decides whether to retain, simplify, supplement, or stop each major ca
 
 ## Current slice
 
-**Branch:** `feat/relationship-lenses`
+**Branch:** `feat/responsive-presentation-modes`
 
-**Pull request outcome:** deliver Phase 5 slice 2 — a restrained trial-profile relationship path whose nodes and labelled connectors correspond only to actual registry-source, trial-entity, retained-site, Trial room, clinician-selected synthetic patient, and linked handoff relationships. Nodes open the exact existing context and retain source/authority language; no decorative graph or inferred relationship is introduced.
+**Pull request outcome:** deliver Phase 5 slice 3 — flatten relationship paths into semantic vertical order on narrow screens, preserve map/list and workflow meaning without desktop coordinates, enforce reduced-motion and reduced-transparency media modes, and produce opaque print output that falls back from Map to the selected source-first List/profile while retaining identifiers, sources, dates, authority labels, and current workflow state.
 
-**Acceptance scenario:** open the initial trial profile and inspect Registry source → describes → Trial entity → lists → India sites → discussed in → Trial room, plus the actual synthetic-patient review relationship; verify source ID/date, retained-site count/site state, and room thread count; activate Sites and Room nodes with tab focus retained, open the linked patient workspace with exact trial selection, create a general inquiry and observe Handoff plus `creates work` appear dynamically, and navigate it to the handoff workspace; preserve semantic order and page overflow safety on mobile.
+**Acceptance scenario:** at 390×844 confirm the relationship path becomes a five-node vertical sequence with rotated semantic connectors and no internal/page horizontal overflow; verify Map remains a flat one-column lens with selected label only; emulate reduced motion and observe near-zero animation/transition plus auto scroll; emulate reduced transparency and observe opaque topbar/context surfaces, no backdrop blur, no decorative geometry, and opaque dialog backdrop; emulate print while Map is selected and confirm Map/filters/navigation/actions hide, List/profile/source date display, detail overflow becomes visible, relationship path prints vertically, and all printed surfaces are opaque.
 
-**Explicit non-goals for this slice:** no generic graph engine, decorative connector, inferred clinical relationship, cross-patient graph, new data source, automated provenance, backend, persistence, authentication, or deployment change.
+**Explicit non-goals for this slice:** no user-stored display preferences, PDF generation service, new animation, decorative mobile geometry, hidden source/date labels, backend, persistence, authentication, or deployment change.

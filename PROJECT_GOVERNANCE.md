@@ -173,7 +173,8 @@ On 2026-09-19 the owner authorised the agent to push and merge future implementa
 | `C2` | `P5` | `.harness/reports/20260919T131652Z-P5-tumour-board-context.md` | Complete; merged through pull request `#15` |
 | `C2` | `P5` | `.harness/reports/20260919T134104Z-P5-trial-team-outcome.md` | Complete; merged through pull request `#16` |
 | `C2` | `P5` | `.harness/reports/20260919T135650Z-P5-geographic-trial-view.md` | Complete; merged through pull request `#17` |
-| `C2` | `P5` | `.harness/reports/20260919T141239Z-P5-relationship-lenses.md` | Complete; Phase 5 relationship lenses ready for autonomous merge |
+| `C2` | `P5` | `.harness/reports/20260919T141239Z-P5-relationship-lenses.md` | Complete; merged through pull request `#18` |
+| `C2` | `P5` | `.harness/reports/20260919T142331Z-P5-responsive-presentation.md` | Complete; Phase 5 responsive/reduced presentation ready for autonomous merge |
 
 ## References
 
@@ -217,3 +218,4 @@ On 2026-09-19 the owner authorised the agent to push and merge future implementa
 - `.harness/reports/20260919T134104Z-P5-trial-team-outcome.md`
 - `.harness/reports/20260919T135650Z-P5-geographic-trial-view.md`
 - `.harness/reports/20260919T141239Z-P5-relationship-lenses.md`
+- `.harness/reports/20260919T142331Z-P5-responsive-presentation.md`
