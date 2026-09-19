@@ -648,6 +648,7 @@ function renderDetail(t) {
   const currentParticipant=roleProfiles[currentRole];
   const roomReadOnly=currentRole==='auditor';
   const relatedHandoffs=inquiries.filter(item=>item.trialId===t.id).length;
+  const linkedPatientReview=caseSelectedTrialId===t.id;
   const roomThreadMarkup=roomThreads.length?roomThreads.map(thread=>{
     const resolution=thread.resolution;
     const remainsOpen=!resolution||resolution==='unresolved';
@@ -760,6 +761,20 @@ function renderDetail(t) {
       <section class="profile-status site ${confirmationTone}"><span class="status-label">Independent site confirmation</span><strong>${t.verifyLabel}</strong><p>${confirmationUnknown?'No separate current site assertion retained':`${t.verifyMethod} · ${formatDate(t.verifiedAt)}`}</p></section>
     </div>
     <div class="profile-assertion ${confirmationTone}" role="${confirmationConflict?'alert':'note'}">${icon(confirmationConflict?'warning':confirmationUnknown?'clock':'check')}<div><strong>${confirmationTitle}</strong><span>${confirmationCopy}</span></div></div>
+    <div class="relationship-lens" aria-label="Current trial relationships">
+      <header><span>Relationship path</span><strong>Every connector below represents an active source or workflow relationship.</strong></header>
+      <div class="relationship-track">
+        ${t.realRegistryRecord?`<a class="relationship-node source" href="${t.sourceUrl}" target="_blank" rel="noopener noreferrer"><span>Registry source</span><strong>${t.source}</strong><small>${t.id} · ${formatDate(t.registryUpdated)}</small></a>`:`<div class="relationship-node source"><span>Source fixture</span><strong>Synthetic fallback</strong><small>${t.id}</small></div>`}
+        <span class="relationship-connector"><i aria-hidden="true">→</i><small>describes</small></span>
+        <div class="relationship-node entity current"><span>Trial entity</span><strong>${t.id}</strong><small>Current profile context</small></div>
+        <span class="relationship-connector"><i aria-hidden="true">→</i><small>lists</small></span>
+        <button class="relationship-node site" type="button" data-profile-lens="sites"><span>India sites</span><strong>${sites.length} retained</strong><small>${t.verifyLabel}</small></button>
+        <span class="relationship-connector"><i aria-hidden="true">→</i><small>discussed in</small></span>
+        <button class="relationship-node room" type="button" data-profile-lens="room"><span>Trial room</span><strong>${roomThreads.length} thread${roomThreads.length===1?'':'s'}</strong><small>General operations only</small></button>
+        ${linkedPatientReview?`<span class="relationship-connector"><i aria-hidden="true">↔</i><small>human review</small></span><button class="relationship-node patient" type="button" data-profile-lens="patient"><span>Synthetic patient</span><strong>SYN-2047</strong><small>Clinician-selected trial</small></button>`:''}
+        ${relatedHandoffs?`<span class="relationship-connector"><i aria-hidden="true">→</i><small>creates work</small></span><button class="relationship-node task" type="button" data-profile-lens="handoffs"><span>Handoffs</span><strong>${relatedHandoffs} linked</strong><small>Named owner and state</small></button>`:''}
+      </div>
+    </div>
     <div class="detail-actions">
       <button class="button primary" type="button" id="review-with-case">${icon('user')}Review this trial for the patient</button>
       <button class="button" type="button" id="open-trial-room">${icon('send')}Open Trial room</button>
@@ -791,6 +806,21 @@ function renderDetail(t) {
     renderDetail(t);
     $('#trial-room-heading')?.focus({preventScroll:false});
   });
+  $$('[data-profile-lens]',target).forEach(button=>button.addEventListener('click',()=>{
+    const lens=button.dataset.profileLens;
+    if(lens==='sites'||lens==='room'){
+      activeTab=lens;
+      renderDetail(t);
+      $(`.tab-button[data-tab="${lens}"]`,target)?.focus({preventScroll:true});
+      return;
+    }
+    if(lens==='patient'){
+      renderCase();
+      switchView('case');
+      return;
+    }
+    if(lens==='handoffs')switchView('inquiries');
+  }));
   $('#toggle-follow').addEventListener('click',()=>{
     if(followedTrialIds.has(t.id)){
       followedTrialIds.delete(t.id);
@@ -1885,7 +1915,11 @@ $('#inquiry-form').addEventListener('submit',(event)=>{
   const id=`INQ-${1043+inquiries.length}`;
   inquiries.unshift({id,trialId,question:$('#inquiry-type').value,owner:$('#inquiry-owner').value.split(' — ')[0],due:$('#inquiry-due').value,route:$('#inquiry-route').value,status:'draft',created:today});
   auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:'2026-09-13 09:02',actor:'A. Rao',title:'General site inquiry drafted',note:`${id} · ${trialId} · no patient data`,type:'task'});
-  $('#inquiry-dialog').close(); renderInquiries(); renderAudit(); showToast(`${id} created as a draft. Human approval is still required.`);
+  $('#inquiry-dialog').close();
+  renderInquiries();
+  if(profileOpen&&selectedTrialId===trialId)renderDetail(trialById(trialId));
+  renderAudit();
+  showToast(`${id} created as a draft. Human approval is still required.`);
 });
 
 $('#verification-form').addEventListener('submit',(event)=>{

@@ -187,10 +187,10 @@ The owner decides whether to retain, simplify, supplement, or stop each major ca
 
 ## Current slice
 
-**Branch:** `feat/geographic-trial-view`
+**Branch:** `feat/relationship-lenses`
 
-**Pull request outcome:** deliver Phase 5 slice 1 — List/Map continuity over the same filtered registry trials and site records using an honest India longitude/latitude extent, curated approximate city centroids where available, labelled state-centroid fallback otherwise, explicit unplaced coverage, keyboard-selectable clusters, source/status context, and persistent trial selection. No unapproved boundary or geocoding source is introduced.
+**Pull request outcome:** deliver Phase 5 slice 2 — a restrained trial-profile relationship path whose nodes and labelled connectors correspond only to actual registry-source, trial-entity, retained-site, Trial room, clinician-selected synthetic patient, and linked handoff relationships. Nodes open the exact existing context and retain source/authority language; no decorative graph or inferred relationship is introduced.
 
-**Acceptance scenario:** load 285 trials in List, switch to Map without changing filters/selection, inspect all 64 placed clusters plus explicit 106 unplaced sites/60 trials, distinguish approximate city from state-centroid placement, search Mumbai and retain 161 matching trials across both modes, select a cluster by keyboard, open a trial back in List with exact NCT/profile/search state preserved, verify zero-result recovery, and confirm every map surface states it does not represent patients, travel feasibility, capacity, site confirmation, or current enrolment availability.
+**Acceptance scenario:** open the initial trial profile and inspect Registry source → describes → Trial entity → lists → India sites → discussed in → Trial room, plus the actual synthetic-patient review relationship; verify source ID/date, retained-site count/site state, and room thread count; activate Sites and Room nodes with tab focus retained, open the linked patient workspace with exact trial selection, create a general inquiry and observe Handoff plus `creates work` appear dynamically, and navigate it to the handoff workspace; preserve semantic order and page overflow safety on mobile.
 
-**Explicit non-goals for this slice:** no administrative-boundary claim, precise facility coordinate, route/travel estimate, site-availability implication, external geocoder, new geographic data source, patient location, backend, persistence, authentication, or deployment change.
+**Explicit non-goals for this slice:** no generic graph engine, decorative connector, inferred clinical relationship, cross-patient graph, new data source, automated provenance, backend, persistence, authentication, or deployment change.
