@@ -153,24 +153,36 @@
 
         <section class="view" id="view-explore" data-view="explore" aria-labelledby="explore-title">
           <div class="view-header">
-            <div class="view-heading"><h1 id="explore-title">Trial library</h1><p>Search India-located oncology trials, inspect the registry source, and check what a site has separately confirmed.</p></div>
-            <div class="header-actions"><span class="priority-badge p0">P0 workflow</span><button class="button" id="refresh-results" type="button"><svg class="icon"><use href="#i-refresh"/></svg>Refresh view</button></div>
+            <div class="view-heading"><h1 id="explore-title">Trial library</h1><p>Search India-located oncology trials, inspect the registry source, and keep registry status separate from human site confirmation.</p></div>
+            <div class="header-actions">
+              <div class="library-view-switch" role="group" aria-label="Trial library view">
+                <button class="library-view-option active" type="button" aria-pressed="true">List</button>
+                <button class="library-view-option" type="button" aria-pressed="false" aria-describedby="map-planned-note" disabled>Map</button>
+              </div>
+              <button class="button" id="refresh-results" type="button"><svg class="icon"><use href="#i-refresh"/></svg>Refresh source</button>
+            </div>
           </div>
 
-          <div class="safety-strip"><svg class="icon"><use href="#i-shield"/></svg><strong>General discovery only.</strong><span>No patient facts, eligibility scores, rankings, or treatment recommendations.</span><span class="spacer"></span><span id="record-type-label">Loading registry records</span></div>
+          <div class="safety-strip"><svg class="icon"><use href="#i-shield"/></svg><strong>General discovery only.</strong><span>No patient facts, eligibility scores, patient-specific rankings, or treatment recommendations.</span><span class="spacer"></span><span id="record-type-label">Loading registry records</span></div>
 
           <div class="filter-bar" aria-label="Trial filters">
-            <div class="input-shell"><svg class="icon"><use href="#i-search"/></svg><label class="sr-only" for="trial-search">Search trials</label><input class="field" id="trial-search" type="search" placeholder="Cancer type, study title, phase, or city" autocomplete="off"></div>
-            <label class="sr-only" for="cancer-filter">Cancer type</label><select class="select" id="cancer-filter"><option value="all">All cancers</option><option value="Lung">Lung</option><option value="Head and neck">Head and neck</option><option value="Breast">Breast</option><option value="Supportive care">Supportive care</option></select>
-            <label class="sr-only" for="verify-filter">Verification status</label><select class="select" id="verify-filter"><option value="all">Any verification</option><option value="verified">Recently verified</option><option value="attention">Needs attention</option><option value="unverified">Not verified</option></select>
-            <label class="sr-only" for="state-filter">State</label><select class="select state-filter" id="state-filter"><option value="all">All states</option><option value="Maharashtra">Maharashtra</option><option value="Delhi">Delhi</option><option value="Tamil Nadu">Tamil Nadu</option><option value="Karnataka">Karnataka</option></select>
-            <button class="button" id="clear-filters" type="button"><svg class="icon"><use href="#i-filter"/></svg>Reset</button>
+            <label class="filter-control search-control" for="trial-search"><span>Search</span><div class="input-shell"><svg class="icon"><use href="#i-search"/></svg><input class="field" id="trial-search" type="search" placeholder="Condition, study, intervention, city, or NCT ID" autocomplete="off"></div></label>
+            <label class="filter-control" for="cancer-filter"><span>Condition</span><select class="select" id="cancer-filter"><option value="all">All cancer conditions</option></select></label>
+            <label class="filter-control" for="verify-filter"><span>Site confirmation</span><select class="select" id="verify-filter"><option value="all">Any site state</option><option value="verified">Recently confirmed</option><option value="attention">Needs attention</option><option value="unverified">Not confirmed</option></select></label>
+            <label class="filter-control state-filter" for="state-filter"><span>India state</span><select class="select" id="state-filter"><option value="all">All Indian states</option></select></label>
+            <button class="button filter-reset" id="clear-filters" type="button"><svg class="icon"><use href="#i-filter"/></svg>Reset</button>
           </div>
 
-          <div class="result-meta"><strong id="result-count">Loading trials</strong><span>sorted by registry freshness and India-site status</span><span class="spacer"></span><label for="sort-results">Sort</label><select class="sort-select" id="sort-results"><option value="confidence">Data readiness</option><option value="recent">Recently updated</option><option value="title">Study title</option></select></div>
+          <div class="result-meta">
+            <div class="result-summary"><strong id="result-count">Loading trials</strong><span id="library-source-date">ClinicalTrials.gov snapshot loading</span></div>
+            <span class="spacer"></span>
+            <span id="map-planned-note" class="map-roadmap-note">Map follows validated location handling</span>
+            <label for="sort-results">Sort</label>
+            <select class="sort-select" id="sort-results"><option value="confidence">Source readiness</option><option value="recent">Recently updated</option><option value="title">Study title</option></select>
+          </div>
 
           <div class="explorer-grid">
-            <div class="result-list" id="result-list" aria-live="polite"></div>
+            <div class="result-list" id="result-list" aria-live="polite" aria-busy="true"></div>
             <article class="detail-panel" id="trial-detail" aria-live="polite"></article>
           </div>
         </section>

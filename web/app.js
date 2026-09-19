@@ -121,6 +121,9 @@ const plainText = (value) => {
 };
 const validSourceUrl = (value, id) => value === `https://clinicaltrials.gov/study/${id}` ? value : `https://clinicaltrials.gov/study/${id}`;
 let registrySnapshotMeta = null;
+let registryLoadState = 'loading';
+let registryLoadError = '';
+let registryLoadRequest = 0;
 
 function fullDate(value) {
   if(!value) return today;
@@ -204,7 +207,7 @@ function replaceSelectOptions(select, label, values) {
 
 function populateRegistryFilters() {
   const conditionCounts=new Map();
-  trials.forEach(trial=>trial.conditions.forEach(condition=>conditionCounts.set(condition,(conditionCounts.get(condition)||0)+1)));
+  trials.forEach(trial=>(trial.conditions?.length?trial.conditions:[trial.cancer]).filter(Boolean).forEach(condition=>conditionCounts.set(condition,(conditionCounts.get(condition)||0)+1)));
   const topConditions=[...conditionCounts.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,24).map(([condition])=>condition);
   const states=[...new Set(trials.map(trial=>trial.state).filter(value=>value&&value!=='State not reported'))].sort();
   replaceSelectOptions($('#cancer-filter'),'All cancer conditions',topConditions);
@@ -226,12 +229,20 @@ function seedRegistryWorkflowData() {
 }
 
 async function loadRegistrySnapshot() {
+  const requestId=++registryLoadRequest;
   const bar=$('#registry-data-bar');
+  const refreshButton=$('#refresh-results');
+  registryLoadState='loading';
+  registryLoadError='';
+  refreshButton.disabled=true;
+  refreshButton.innerHTML=`${icon('refresh')}Loading source`;
+  renderTrials();
   try{
     const response=await fetch('./data/india-oncology-trials.json',{cache:'no-store'});
     if(!response.ok) throw new Error(`HTTP ${response.status}`);
     const snapshot=await response.json();
     if(snapshot.schemaVersion!==1||!Array.isArray(snapshot.trials)||!snapshot.trials.length) throw new Error('Invalid snapshot contract');
+    if(requestId!==registryLoadRequest)return;
     registrySnapshotMeta={
       retrievedAt:snapshot.retrievedAt,
       retrievedAtLabel:new Intl.DateTimeFormat('en-IN',{dateStyle:'medium',timeStyle:'short'}).format(new Date(snapshot.retrievedAt)),
@@ -249,14 +260,26 @@ async function loadRegistrySnapshot() {
     const initialRows=filteredTrials();
     if(initialRows.length) selectedTrialId=initialRows[0].id;
     caseSelectedTrialId=selectedTrialId;
+    registryLoadState='ready';
     $('#record-type-label').textContent='Real registry records · synthetic cases';
     bar.classList.remove('error');
     bar.innerHTML=`<strong>${trials.length} real India oncology trials loaded</strong><span>ClinicalTrials.gov · registry-declared · data ${escapeHTML(snapshot.source?.dataTimestamp||'timestamp not reported')}</span><span class="spacer"></span><a href="${escapeHTML(snapshot.source?.documentationUrl||'https://clinicaltrials.gov/data-api/about-api')}" target="_blank" rel="noopener noreferrer">Source and API</a>`;
     renderTrials();renderCase();renderCandidates();renderVerification();renderInquiries();renderAlerts();renderBoard();renderAudit();
   }catch(error){
+    if(requestId!==registryLoadRequest)return;
+    registryLoadState='error';
+    registryLoadError=error.message;
+    const retainedState=registrySnapshotMeta?'The last loaded registry records remain visible.':'Clearly labelled synthetic fallback records remain visible.';
     bar.classList.add('error');
-    bar.innerHTML=`<strong>Real registry snapshot could not be loaded</strong><span>${escapeHTML(error.message)}. Synthetic trial fixtures remain visible.</span><span class="spacer"></span><a href="https://clinicaltrials.gov/data-api/about-api" target="_blank" rel="noopener noreferrer">ClinicalTrials.gov API</a>`;
-    $('#record-type-label').textContent='Synthetic fallback records';
+    bar.innerHTML=`<strong>Real registry snapshot could not be loaded</strong><span>${escapeHTML(error.message)}. ${retainedState}</span><span class="spacer"></span><a href="https://clinicaltrials.gov/data-api/about-api" target="_blank" rel="noopener noreferrer">ClinicalTrials.gov API</a>`;
+    $('#record-type-label').textContent=registrySnapshotMeta?'Last loaded real records':'Synthetic fallback records';
+    if(!registrySnapshotMeta)populateRegistryFilters();
+    renderTrials();
+  }finally{
+    if(requestId===registryLoadRequest){
+      refreshButton.disabled=false;
+      refreshButton.innerHTML=`${icon('refresh')}Refresh source`;
+    }
   }
 }
 
@@ -278,7 +301,7 @@ function filteredTrials() {
   let rows = trials.filter(t => {
     const searchable = [t.title,t.cancer,...(t.conditions||[]),...(t.interventions||[]),t.phase,t.city,t.state,t.id,t.sponsor,t.registryStatus,t.verifyLabel,...(t.indiaLocations||[]).flatMap(location=>[location.facility,location.city,location.state])].join(' ').toLowerCase();
     const verifyMatch = verify === 'all' || (verify === 'verified' && ['verified_recruiting','verified_not_recruiting'].includes(t.verifyKey)) || (verify === 'attention' && (t.due || t.discrepancy)) || (verify === 'unverified' && ['unverified','no_authoritative_response'].includes(t.verifyKey));
-    return (!query || searchable.includes(query)) && (cancer === 'all' || (t.conditions||[]).includes(cancer)) && (state === 'all' || t.state === state) && verifyMatch;
+    return (!query || searchable.includes(query)) && (cancer === 'all' || (t.conditions?.length?t.conditions:[t.cancer]).includes(cancer)) && (state === 'all' || t.state === state) && verifyMatch;
   });
   if (sort === 'confidence') rows.sort((a,b)=>b.confidence-a.confidence);
   if (sort === 'recent') rows.sort((a,b)=>b.verifiedAt.localeCompare(a.verifiedAt));
@@ -287,25 +310,55 @@ function filteredTrials() {
 }
 
 function renderTrials() {
-  const rows = filteredTrials();
-  const visibleRows = rows.slice(0,60);
-  const list = $('#result-list');
-  $('#result-count').textContent = rows.length>visibleRows.length?`${rows.length} trials · showing first ${visibleRows.length}`:`${rows.length} ${rows.length === 1 ? 'trial' : 'trials'}`;
-  if (!rows.length) {
-    list.innerHTML = `<div class="empty-state"><div class="empty-symbol">${icon('search')}</div><h2>No general records found</h2><p>Try a broader cancer term or clear the operational-state filters. No patient details are needed.</p><button class="button" type="button" id="empty-reset">Clear filters</button></div>`;
-    $('#trial-detail').innerHTML = `<div class="detail-head"><h2>No record selected</h2><p class="summary">The detail panel updates when a general trial record is selected.</p></div>`;
-    $('#empty-reset')?.addEventListener('click', clearFilters);
+  const list=$('#result-list');
+  const detail=$('#trial-detail');
+  const count=$('#result-count');
+  const sourceDate=$('#library-source-date');
+  if(registryLoadState==='loading'){
+    count.textContent='Loading registry snapshot';
+    sourceDate.textContent='ClinicalTrials.gov source and snapshot date pending';
+    list.setAttribute('aria-busy','true');
+    list.innerHTML=`<p class="sr-only">Loading trial records</p><div class="skeleton card" aria-hidden="true"></div><div class="skeleton card" aria-hidden="true"></div><div class="skeleton card" aria-hidden="true"></div>`;
+    detail.innerHTML=`<div class="detail-head"><div class="skeleton" style="height:14px;width:34%;margin-bottom:14px" aria-hidden="true"></div><div class="skeleton" style="height:34px;width:82%;margin-bottom:10px" aria-hidden="true"></div><div class="skeleton" style="height:52px" aria-hidden="true"></div><p class="sr-only">Loading selected trial</p></div>`;
     return;
   }
-  if (!rows.some(t=>t.id===selectedTrialId)) selectedTrialId = rows[0].id;
-  list.innerHTML = visibleRows.map(t => `
-    <button class="trial-card ${t.id===selectedTrialId?'selected':''}" type="button" data-trial-id="${t.id}" aria-pressed="${t.id===selectedTrialId}">
-      <div class="trial-card-top"><span class="tag">${t.source}</span><span class="tag">${t.phase}</span><span class="updated">registry ${t.registryAge}</span></div>
-      <h2>${t.title}</h2>
-      <div class="trial-meta"><span class="tag">${t.cancer}</span><span class="tag">${t.city}</span>${t.discrepancy?'<span class="tag" style="color:var(--red);background:var(--red-soft)">discrepancy</span>':''}</div>
-      <div class="dual-status-mini"><div class="mini-state registry"><span>Registry declares</span><strong>${t.registryStatus}</strong></div><div class="mini-state verified ${t.verifyTone}"><span>Site verification</span><strong>${t.verifyLabel}</strong></div></div>
-    </button>`).join('')+(rows.length>visibleRows.length?`<div class="notice"><strong>${rows.length-visibleRows.length} more records.</strong> Narrow the cancer condition, state, status, or search text to review them.</div>`:'');
-  $$('.trial-card', list).forEach(button => button.addEventListener('click', () => { selectedTrialId=button.dataset.trialId; activeTab='summary'; renderTrials(); }));
+
+  list.setAttribute('aria-busy','false');
+  const rows=filteredTrials();
+  const visibleRows=rows.slice(0,60);
+  const snapshotDate=registrySnapshotMeta?.dataTimestamp?.slice(0,10);
+  const recordKind=registrySnapshotMeta?'registry':'synthetic fallback';
+  count.textContent=rows.length>visibleRows.length?`${rows.length} ${recordKind} trials · showing first ${visibleRows.length}`:`${rows.length} ${recordKind} ${rows.length===1?'trial':'trials'}`;
+  sourceDate.textContent=snapshotDate?`ClinicalTrials.gov snapshot · ${formatDate(snapshotDate)}`:'Registry snapshot unavailable · synthetic fallback';
+  const errorState=registryLoadState==='error'?`<div class="library-state error" role="alert"><strong>Registry snapshot unavailable</strong><p>${escapeHTML(registryLoadError)}. ${registrySnapshotMeta?'The last loaded registry records remain below.':'The records below are synthetic fallback examples.'}</p><button class="button small" type="button" id="retry-registry-load">${icon('refresh')}Retry source</button></div>`:'';
+
+  if(!rows.length){
+    list.innerHTML=errorState+`<div class="empty-state"><div class="empty-symbol">${icon('search')}</div><h2>No general records found</h2><p>Try a broader condition or clear the source-status filters. No patient details are needed.</p><button class="button" type="button" id="empty-reset">Clear filters</button></div>`;
+    detail.innerHTML=`<div class="detail-head"><h2>No record selected</h2><p class="summary">The detail panel updates when a general trial record is selected.</p></div>`;
+    $('#empty-reset')?.addEventListener('click',clearFilters);
+    $('#retry-registry-load')?.addEventListener('click',loadRegistrySnapshot);
+    return;
+  }
+
+  if(!rows.some(trial=>trial.id===selectedTrialId))selectedTrialId=rows[0].id;
+  list.innerHTML=errorState+visibleRows.map(trial=>{
+    const siteCount=(trial.indiaLocations||[]).length;
+    return `
+      <button class="trial-card ${trial.id===selectedTrialId?'selected':''}" type="button" data-trial-id="${trial.id}" aria-pressed="${trial.id===selectedTrialId}">
+        <div class="trial-card-top"><span class="tag">${trial.phase}</span><span class="tag">${siteCount} India site${siteCount===1?'':'s'}</span><span class="updated">${trial.city}, ${trial.state}</span></div>
+        <h2>${trial.title}</h2>
+        <div class="trial-source-trace"><strong>${trial.source}</strong><span>${trial.id}</span><span>registry updated ${formatDate(trial.registryUpdated)}</span></div>
+        <div class="trial-meta"><span class="tag">${trial.cancer}</span>${trial.discrepancy?'<span class="tag" style="color:var(--red);background:var(--red-soft)">source conflict</span>':''}</div>
+        <div class="dual-status-mini"><div class="mini-state registry"><span>Registry declares</span><strong>${trial.registryStatus}</strong></div><div class="mini-state verified ${trial.verifyTone}"><span>Site confirmation</span><strong>${trial.verifyLabel}</strong></div></div>
+      </button>`;
+  }).join('')+(rows.length>visibleRows.length?`<div class="notice"><strong>${rows.length-visibleRows.length} more records.</strong> Narrow the condition, state, status, or search text to review them.</div>`:'');
+  $$('.trial-card',list).forEach(button=>button.addEventListener('click',()=>{
+    selectedTrialId=button.dataset.trialId;
+    activeTab='summary';
+    renderTrials();
+    $$('.trial-card',list).find(candidate=>candidate.dataset.trialId===selectedTrialId)?.focus({preventScroll:true});
+  }));
+  $('#retry-registry-load')?.addEventListener('click',loadRegistrySnapshot);
   renderDetail(trialById(selectedTrialId));
 }
 
@@ -342,7 +395,7 @@ function renderDetail(t) {
     renderDetail(t);
     renderAlerts();
   });
-  $('#copy-reference').addEventListener('click', () => copyText(`${t.id} — ${t.title} — synthetic prototype record`, 'Reference copied.'));
+  $('#copy-reference').addEventListener('click', () => copyText(`${t.id} — ${plainText(t.title)} — ${t.realRegistryRecord?'ClinicalTrials.gov registry record':'synthetic fallback record'}`, 'Reference copied.'));
   $$('.tab-button', target).forEach(btn=>btn.addEventListener('click',()=>{activeTab=btn.dataset.tab;renderDetail(t);}));
 }
 
@@ -721,7 +774,7 @@ $$('[data-home-target],[data-context-target]').forEach(button=>button.addEventLi
 ['trial-search','cancer-filter','verify-filter','state-filter','sort-results'].forEach(id=>$('#'+id).addEventListener(id==='trial-search'?'input':'change',renderTrials));
 $('#clear-filters').addEventListener('click',clearFilters);
 $('#command-trigger').addEventListener('click',()=>{switchView('explore');setTimeout(()=>$('#trial-search').focus(),0);});
-$('#refresh-results').addEventListener('click',()=>{const list=$('#result-list');list.innerHTML='<div class="skeleton card"></div><div class="skeleton card"></div><div class="skeleton card"></div>';setTimeout(()=>{renderTrials();showToast('View refreshed from synthetic snapshots.');},650);});
+$('#refresh-results').addEventListener('click',async()=>{await loadRegistrySnapshot();if(registryLoadState==='ready')showToast('ClinicalTrials.gov snapshot refreshed. Site confirmation remains separate.');});
 $('#verify-selected').addEventListener('click',()=>openVerification(selectedVerificationId));
 $('#new-inquiry-global').addEventListener('click',()=>openInquiry(selectedTrialId));
 $('#inquiry-filter').addEventListener('change',renderInquiries);
