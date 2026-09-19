@@ -89,6 +89,8 @@ let currentArtifactName = '';
 let packetDrafted = false;
 let boardDecisionRecorded = false;
 const criterionDecisions = new Map();
+const trialRoomThreads = new Map();
+let trialRoomSequence = 1;
 let inquiries = [
   {id:'INQ-1042', trialId:'DEMO-CTRI-003', question:'Resolve registry discrepancy', owner:'A. Rao', due:'2026-09-14', route:'Site trial office', status:'sent', created:'2026-09-12'},
   {id:'INQ-1038', trialId:'DEMO-CTRI-002', question:'Confirm site recruitment', owner:'Trial office', due:'2026-09-15', route:'Registry public-query channel', status:'acknowledged', created:'2026-09-07'}
@@ -113,6 +115,12 @@ const formatDate = (value) => {
 };
 const statusPill = (trial) => `<span class="status-pill ${trial.verifyTone}"><span class="status-dot"></span>${trial.verifyLabel}</span>`;
 const statusHuman = {draft:'Draft',approved:'Human approved',sent:'Sent',acknowledged:'Acknowledged',closed:'Closed',unable:'Unable to contact'};
+const roleProfiles = {
+  coordinator:{initials:'AR',name:'A. Rao',label:'Research coordinator',institution:'Metro Cancer Centre',verified:true},
+  oncologist:{initials:'MS',name:'Dr M. Shah',label:'Treating oncologist',institution:'Metro Cancer Centre',verified:true},
+  site:{initials:'SS',name:'Site steward',label:'Verified site coordinator',institution:'Trial site · synthetic',verified:true},
+  auditor:{initials:'AU',name:'Read-only auditor',label:'Read-only auditor',institution:'OncoGrid validation',verified:false}
+};
 
 const escapeHTML = (value) => String(value ?? '').replace(/[&<>"']/g, character => {
   const entities = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'};
@@ -124,6 +132,19 @@ const plainText = (value) => {
   return decoder.value;
 };
 const validSourceUrl = (value, id) => value === `https://clinicaltrials.gov/study/${id}` ? value : `https://clinicaltrials.gov/study/${id}`;
+const roomResolutionLabels = {
+  answer:'Official site response',
+  informal:'Informal answer',
+  task:'Action created',
+  correction:'Source correction proposed',
+  unresolved:'Unresolved',
+  outdated:'Closed as outdated'
+};
+
+function roomThreadsFor(trialId) {
+  if(!trialRoomThreads.has(trialId))trialRoomThreads.set(trialId,[]);
+  return trialRoomThreads.get(trialId);
+}
 let registrySnapshotMeta = null;
 let registryLoadState = 'loading';
 let registryLoadError = '';
@@ -428,6 +449,32 @@ function renderDetail(t) {
       :`${t.verifyLabel}. Authority: ${t.verifyMethod}; recorded ${formatDate(t.verifiedAt)}.`;
   const activityTimeline=`<div class="timeline">${t.activity.map(item=>`<div class="timeline-item"><strong>${item[1]}</strong><span>${item[0]} · ${item[2]}</span></div>`).join('')}</div>`;
   const sourceLink=t.realRegistryRecord?`<a href="${t.sourceUrl}" target="_blank" rel="noopener noreferrer">Open the authoritative registry record</a>`:'Synthetic fallback has no external registry source.';
+  const roomThreads=roomThreadsFor(t.id);
+  const currentParticipant=roleProfiles[currentRole];
+  const roomReadOnly=currentRole==='auditor';
+  const relatedHandoffs=inquiries.filter(item=>item.trialId===t.id).length;
+  const roomThreadMarkup=roomThreads.length?roomThreads.map(thread=>{
+    const resolution=thread.resolution;
+    const remainsOpen=!resolution||resolution==='unresolved';
+    const resolutionLabel=resolution?roomResolutionLabels[resolution]:'Awaiting confirmation';
+    const resolutionTone=resolution==='answer'?'confirmed':resolution==='correction'?'correction':resolution==='task'?'task':resolution==='informal'?'informal':'unresolved';
+    return `
+      <article class="room-thread" id="thread-${thread.id}" tabindex="-1" data-room-thread="${thread.id}">
+        <header><div><span>${escapeHTML(thread.category)}</span><h4>${escapeHTML(thread.question)}</h4></div><span class="room-thread-state ${resolutionTone}">${resolutionLabel}</span></header>
+        <p class="room-thread-meta">Asked by ${escapeHTML(thread.authorName)} · ${escapeHTML(thread.authorRole)} · ${escapeHTML(thread.askedAt)}</p>
+        ${resolution?`<div class="room-resolution ${resolutionTone}"><strong>${resolutionLabel}</strong><p>${escapeHTML(thread.resolutionNote)}</p><span>${escapeHTML(thread.resolvedBy)} · ${escapeHTML(thread.resolvedRole)} · ${escapeHTML(thread.resolvedAt)}${thread.actionId?` · ${escapeHTML(thread.actionId)}`:''}${thread.resolution==='correction'?' · registry source unchanged':''}</span></div>`:''}
+        ${remainsOpen?`
+          <form class="room-resolution-form" data-room-resolution-form="${thread.id}">
+            <label><span>Record outcome</span><select class="select" name="resolution" data-room-resolution-select ${roomReadOnly?'disabled':''}><option value="answer">Official site response</option><option value="informal">Informal answer</option><option value="task">Create action</option><option value="correction">Propose source correction</option><option value="unresolved" ${resolution==='unresolved'?'selected':''}>Remain unresolved</option><option value="outdated">Close as outdated</option></select></label>
+            <label class="room-resolution-note"><span>Human-authored note</span><textarea class="field" name="note" rows="2" maxlength="500" required placeholder="Record the answer, action, correction, or why this remains unresolved." ${roomReadOnly?'disabled':''}></textarea></label>
+            <div class="room-task-fields" hidden>
+              <label><span>Owner</span><select class="select" name="owner" ${roomReadOnly?'disabled':''}><option value="A. Rao">A. Rao · coordinator</option><option value="Dr M. Shah">Dr M. Shah · oncologist</option><option value="Site steward">Site steward · trial site</option></select></label>
+              <label><span>Due date</span><input class="field" type="date" name="due" min="${today}" ${roomReadOnly?'disabled':''}></label>
+            </div>
+            <button class="button small" type="submit" ${roomReadOnly?'disabled':''}>Record outcome</button>
+          </form>`:''}
+      </article>`;
+  }).join(''):`<div class="room-empty"><div class="empty-symbol">${icon('send')}</div><h4>No questions yet</h4><p>Ask a general operational question. Patient-specific discussion does not belong in this shared room.</p></div>`;
   const tabData={
     overview:`
       <section class="profile-section" aria-labelledby="profile-overview-heading">
@@ -470,6 +517,38 @@ function renderDetail(t) {
           <summary>Verification and source history</summary>
           <div class="disclosure-body">${activityTimeline}</div>
         </details>
+      </section>`,
+    room:`
+      <section class="trial-room" aria-labelledby="trial-room-heading">
+        <div class="profile-section-heading"><div><span>Trial room</span><h3 id="trial-room-heading" tabindex="-1">Questions around ${t.id}</h3></div><p>Focused operational discussion. Pinned source facts cannot be changed by messages.</p></div>
+        <div class="room-pins" aria-label="Pinned trial facts">
+          <div class="room-pin source"><span>Registry source</span><strong>${t.source} · ${t.id}</strong><small>${t.realRegistryRecord?`<a href="${t.sourceUrl}" target="_blank" rel="noopener noreferrer">Open record</a>`:'Synthetic fallback'}</small></div>
+          <div class="room-pin"><span>Registry state</span><strong>${t.registryStatus}</strong><small>Updated ${formatDate(t.registryUpdated)}</small></div>
+          <div class="room-pin ${confirmationTone}"><span>Site confirmation</span><strong>${t.verifyLabel}</strong><small>${confirmationConflict?'Conflict remains open':confirmationUnknown?'Awaiting authorised source':formatDate(t.verifiedAt)}</small></div>
+          <div class="room-pin"><span>India context</span><strong>${sites.length} retained site${sites.length===1?'':'s'}</strong><small>${followedTrialIds.has(t.id)?'Following this trial':'Not currently followed'}</small></div>
+        </div>
+        <div class="room-layout">
+          <div class="room-main">
+            <form class="room-composer" id="room-question-form">
+              <div class="room-composer-heading"><div>${icon('send')}<span><strong>Ask a general operational question</strong><small>Addressed to the verified site coordinator. Status stays awaiting confirmation until an authorised response.</small></span></div><span class="status-pill neutral"><span class="status-dot"></span>${roomReadOnly?'Read only':currentParticipant.label}</span></div>
+              <div class="room-composer-fields">
+                <label><span>Category</span><select class="select" id="room-question-category" ${roomReadOnly?'disabled':''}><option>Site status</option><option>Protocol clarification</option><option>Documents and missing information</option><option>Referral process</option><option>General discussion</option></select></label>
+                <label class="room-question-copy"><span>Question</span><textarea class="field" id="room-question-copy" rows="3" minlength="10" maxlength="500" required placeholder="Ask about site status, contact route, protocol logistics, documents, or referral process." ${roomReadOnly?'disabled':''}></textarea></label>
+              </div>
+              <label class="room-safety-check"><input type="checkbox" id="room-question-safe" required ${roomReadOnly?'disabled':''}><span><strong>No patient-identifying or patient-specific information</strong>This shared room is for general trial operations only.</span></label>
+              <div class="room-composer-actions"><span>Browser-session demonstration · reload clears messages</span><button class="button primary" type="submit" ${roomReadOnly?'disabled':''}>Post question</button></div>
+            </form>
+            <div class="room-thread-list" aria-live="polite">${roomThreadMarkup}</div>
+          </div>
+          <aside class="room-participants" aria-label="Trial room participants">
+            <div class="room-side-heading"><span>Participants</span><strong>Verified roles</strong></div>
+            <div class="room-participant"><span class="room-participant-avatar">MS</span><div><strong>Dr M. Shah</strong><small>Treating oncologist · Metro Cancer Centre</small></div><span class="room-participant-state">Verified</span></div>
+            <div class="room-participant"><span class="room-participant-avatar">AR</span><div><strong>A. Rao</strong><small>Research coordinator · Metro Cancer Centre</small></div><span class="room-participant-state">Verified</span></div>
+            <div class="room-participant"><span class="room-participant-avatar site">SS</span><div><strong>Site steward</strong><small>Site coordinator · synthetic trial site</small></div><span class="room-participant-state official">Official source</span></div>
+            <div class="room-boundary">${icon('shield')}<p><strong>Official-response boundary</strong>Only the verified site role can publish an official site response or source correction. Other participants can answer informally, create work, or record that the question remains unresolved.</p></div>
+            <div class="room-related"><span>Related handoffs</span><strong>${relatedHandoffs}</strong><small>General inquiries or referral tasks linked to this trial</small></div>
+          </aside>
+        </div>
       </section>`
   };
   if(!tabData[activeTab])activeTab='overview';
@@ -486,8 +565,16 @@ function renderDetail(t) {
       <section class="profile-status site ${confirmationTone}"><span class="status-label">Independent site confirmation</span><strong>${t.verifyLabel}</strong><p>${confirmationUnknown?'No separate current site assertion retained':`${t.verifyMethod} · ${formatDate(t.verifiedAt)}`}</p></section>
     </div>
     <div class="profile-assertion ${confirmationTone}" role="${confirmationConflict?'alert':'note'}">${icon(confirmationConflict?'warning':confirmationUnknown?'clock':'check')}<div><strong>${confirmationTitle}</strong><span>${confirmationCopy}</span></div></div>
-    <div class="detail-actions"><button class="button primary" type="button" id="review-with-case">${icon('user')}Review with synthetic EMR case</button><button class="button" type="button" id="start-inquiry">${icon('send')}General site inquiry</button><button class="button" type="button" id="compare-sources">${icon('link')}Compare sources</button><button class="button ${followedTrialIds.has(t.id)?'success':''}" type="button" id="toggle-follow">${icon('bell')}${followedTrialIds.has(t.id)?'Following trial':'Follow trial'}</button>${t.realRegistryRecord?`<a class="button" href="${t.sourceUrl}" target="_blank" rel="noopener noreferrer">${icon('link')}Open registry record</a>`:''}<button class="button" type="button" id="copy-reference">${icon('copy')}Copy reference</button></div>
-    <div class="tabs" role="tablist" aria-label="Trial profile sections">${[['overview','Overview'],['sites','Sites & status']].map(([key,label])=>`<button class="tab-button ${activeTab===key?'active':''}" type="button" role="tab" aria-selected="${activeTab===key}" aria-controls="trial-profile-panel" data-tab="${key}">${label}</button>`).join('')}</div>
+    <div class="detail-actions">
+      <button class="button primary" type="button" id="review-with-case">${icon('user')}Review with synthetic EMR case</button>
+      <button class="button" type="button" id="open-trial-room">${icon('send')}Open Trial room</button>
+      <button class="button" type="button" id="start-inquiry">${icon('briefcase')}General site inquiry</button>
+      <button class="button" type="button" id="compare-sources">${icon('link')}Compare sources</button>
+      <button class="button ${followedTrialIds.has(t.id)?'success':''}" type="button" id="toggle-follow" aria-pressed="${followedTrialIds.has(t.id)}">${icon('bell')}${followedTrialIds.has(t.id)?'Following trial':'Follow trial'}</button>
+      ${t.realRegistryRecord?`<a class="button" href="${t.sourceUrl}" target="_blank" rel="noopener noreferrer">${icon('link')}Open registry record</a>`:''}
+      <button class="button" type="button" id="copy-reference">${icon('copy')}Copy reference</button>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Trial profile sections">${[['overview','Overview'],['sites','Sites & status'],['room',`Trial room${roomThreads.length?` · ${roomThreads.length}`:''}`]].map(([key,label])=>`<button class="tab-button ${activeTab===key?'active':''}" type="button" role="tab" aria-selected="${activeTab===key}" aria-controls="trial-profile-panel" data-tab="${key}">${label}</button>`).join('')}</div>
     <div class="tab-content" id="trial-profile-panel">${tabData[activeTab]}</div>`;
   $('#close-trial-profile').addEventListener('click',()=>{
     profileOpen=false;
@@ -504,6 +591,11 @@ function renderDetail(t) {
   });
   $('#start-inquiry').addEventListener('click',()=>openInquiry(t.id));
   $('#compare-sources').addEventListener('click',()=>openCompare(t.id));
+  $('#open-trial-room').addEventListener('click',()=>{
+    activeTab='room';
+    renderDetail(t);
+    $('#trial-room-heading')?.focus({preventScroll:false});
+  });
   $('#toggle-follow').addEventListener('click',()=>{
     if(followedTrialIds.has(t.id)){
       followedTrialIds.delete(t.id);
@@ -517,6 +609,82 @@ function renderDetail(t) {
     renderAlerts();
   });
   $('#copy-reference').addEventListener('click',()=>copyText(`${t.id} — ${plainText(t.title)} — ${t.realRegistryRecord?'ClinicalTrials.gov registry record':'synthetic fallback record'}`,'Reference copied.'));
+  $('#room-question-form')?.addEventListener('submit',event=>{
+    event.preventDefault();
+    if(roomReadOnly||!event.currentTarget.reportValidity())return;
+    const question=$('#room-question-copy',target).value.trim();
+    if(question.length<10){
+      showToast('Write a complete operational question.');
+      $('#room-question-copy',target).focus();
+      return;
+    }
+    const participant=roleProfiles[currentRole];
+    const id=`ROOM-${String(trialRoomSequence++).padStart(3,'0')}`;
+    roomThreads.unshift({
+      id,
+      category:$('#room-question-category',target).value,
+      question,
+      authorName:participant.name,
+      authorRole:participant.label,
+      askedAt:`${formatDate(today)} · this session`,
+      resolution:null
+    });
+    auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:`${today} session`,actor:participant.name,title:'Trial room question posted',note:`${t.id} · ${id} · no patient data`,type:'conversation'});
+    renderDetail(t);
+    renderAudit();
+    $(`#thread-${id}`,target)?.focus({preventScroll:false});
+    showToast(`${id} posted. Site confirmation remains unchanged until an authorised source responds.`);
+  });
+  $$('[data-room-resolution-select]',target).forEach(select=>{
+    const syncTaskFields=()=>{
+      const form=select.closest('form');
+      const fields=$('.room-task-fields',form);
+      const taskSelected=select.value==='task';
+      fields.hidden=!taskSelected;
+      $('select[name="owner"]',form).required=taskSelected;
+      $('input[name="due"]',form).required=taskSelected;
+    };
+    select.addEventListener('change',syncTaskFields);
+    syncTaskFields();
+  });
+  $$('[data-room-resolution-form]',target).forEach(form=>form.addEventListener('submit',event=>{
+    event.preventDefault();
+    if(roomReadOnly||!form.reportValidity())return;
+    const thread=roomThreads.find(item=>item.id===form.dataset.roomResolutionForm);
+    if(!thread)return;
+    const resolution=form.elements.resolution.value;
+    if(['answer','correction'].includes(resolution)&&currentRole!=='site'){
+      showToast('Only the verified site role can record an official response or source correction.');
+      form.elements.resolution.focus();
+      return;
+    }
+    const note=form.elements.note.value.trim();
+    if(!note){
+      form.elements.note.focus();
+      return;
+    }
+    const participant=roleProfiles[currentRole];
+    thread.resolution=resolution;
+    thread.resolutionNote=note;
+    thread.resolvedBy=participant.name;
+    thread.resolvedRole=participant.label;
+    thread.resolvedAt=`${formatDate(today)} · this session`;
+    if(resolution==='task'){
+      const actionId=`INQ-${1043+inquiries.length}`;
+      inquiries.unshift({id:actionId,trialId:t.id,question:note,owner:form.elements.owner.value,due:form.elements.due.value,route:'Trial room',status:'draft',created:today});
+      thread.actionId=actionId;
+    }
+    auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:`${today} session`,actor:participant.name,title:`Trial room outcome: ${roomResolutionLabels[resolution]}`,note:`${t.id} · ${thread.id}${thread.actionId?` · ${thread.actionId}`:''}`,type:resolution==='task'?'task':'conversation'});
+    if(followedTrialIds.has(t.id)&&resolution!=='unresolved'){
+      alerts.unshift({id:`ALT-${400+alerts.length}`,type:'trial',tone:resolution==='answer'?'good':resolution==='correction'?'warn':'neutral',title:`Trial room: ${roomResolutionLabels[resolution]}`,body:`${t.id} · ${note}`,source:`${participant.label} · this session`,recipients:['Treating oncologist','Research coordinator'],unread:true});
+    }
+    renderDetail(t);
+    renderInquiries();
+    renderAlerts();
+    renderAudit();
+    $(`#thread-${thread.id}`,target)?.focus({preventScroll:true});
+    showToast(resolution==='correction'?`${thread.id} recorded a proposed correction. The registry source was not changed.`:`${thread.id} recorded as ${roomResolutionLabels[resolution].toLowerCase()}.`);
+  }));
   $$('.tab-button',target).forEach(button=>button.addEventListener('click',()=>{
     activeTab=button.dataset.tab;
     renderDetail(t);
@@ -871,10 +1039,11 @@ $('#simulate-writeback').addEventListener('click',()=>{
 });
 $('#role-select').addEventListener('change',(event)=>{
   currentRole=event.target.value;
-  const roles={coordinator:['AR','Research coordinator'],oncologist:['MS','Treating oncologist'],site:['SS','Site steward'],auditor:['AU','Read-only auditor']};
-  $('#role-initial').textContent=roles[currentRole][0];
-  $('#role-description').textContent=roles[currentRole][1];
-  showToast(`Prototype role switched to ${roles[currentRole][1]}. Production permissions require institutional policy.`);
+  const role=roleProfiles[currentRole];
+  $('#role-initial').textContent=role.initials;
+  $('#role-description').textContent=role.label;
+  if(profileOpen&&activeTab==='room')renderDetail(trialById(selectedTrialId));
+  showToast(`Prototype role switched to ${role.label}. Production permissions require institutional policy.`);
 });
 $('#notification-button').addEventListener('click',()=>switchView('alerts'));
 $('#analytics-period').addEventListener('click',()=>showToast('Analytics are synthetic and operational only; no clinical outcome data are included.'));
@@ -912,8 +1081,8 @@ document.addEventListener('keydown',(event)=>{
 
 const initialHash=location.hash.slice(1);
 $('#role-select').value='coordinator';
-$('#role-initial').textContent='AR';
-$('#role-description').textContent='Research coordinator';
+$('#role-initial').textContent=roleProfiles.coordinator.initials;
+$('#role-description').textContent=roleProfiles.coordinator.label;
 $('#trial-search').value='';
 $('#cancer-filter').value='all';
 $('#verify-filter').value='all';
