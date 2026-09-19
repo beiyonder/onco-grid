@@ -3,10 +3,19 @@
 ## Status and authority
 
 - **OWNER DECISION — 2026-09-19:** begin implementation from [`product/TRIAL_RELAY_EXPERIENCE_BLUEPRINT.md`](product/TRIAL_RELAY_EXPERIENCE_BLUEPRINT.md) and [`product/TRIAL_RELAY_VISUAL_DESIGN_LANGUAGE.md`](product/TRIAL_RELAY_VISUAL_DESIGN_LANGUAGE.md).
+- **OWNER DECISION — 2026-09-19:** the agent may push and merge implementation pull requests without separate owner review after the required evidence, privacy, and safety checks pass; direct pushes to `main` remain prohibited.
+- **OWNER DECISION — 2026-09-19:** the implementation may leave the monolithic HTML architecture and adopt a more sustainable frontend stack when a named slice demonstrates a material maintainability or delivery need. This is conditional frontend authority, not approval for a backend, new data source, production identity or persistence boundary, deployment-topology change, or clinical capability.
 - **FACT:** the current runnable surface is the dependency-free static validation app in `web/`; it loads the dated ClinicalTrials.gov snapshot in `web/data/india-oncology-trials.json`.
 - **DECISION:** evolve that surface in small, reversible, user-observable slices before selecting a production runtime, backend, identity provider, database, or deployment topology.
 - **INFERENCE:** the blueprints are the target experience for implementation, not evidence that the workflow or product value has been validated.
 - **OPEN:** `P5` validation, persona ownership, buyer, local burden, and the operational KPI remain unresolved. Implementation does not close those gates.
+
+## Current frontend architecture decision
+
+- **FACT:** the accepted Home slice left `web/index.html` at 2,265 lines, including 1,004 lines of CSS and 746 lines of JavaScript.
+- **DECISION:** complete Phase 0 by separating the document, stylesheet, and application script into `web/index.html`, `web/styles.css`, and `web/app.js`. Keep the existing browser-native runtime and zero-dependency local serve path for now.
+- **RATIONALE:** stable file boundaries remove the immediate edit-collision and review problem without introducing a build system, framework lifecycle, dependency maintenance, or migration risk before those costs solve a demonstrated user-facing need.
+- **REASSESSMENT TRIGGER:** adopt a component framework and typed build only when a named slice demonstrates repeated component/state duplication, routing or testability limits, or delivery friction that browser-native modules cannot address cleanly.
 
 ## Product boundary
 
@@ -29,7 +38,7 @@ Real registry trial data and synthetic patient, EMR, board, referral, and workfl
 
 1. **One coherent job per pull request.** A review should demonstrate one complete user-observable outcome, not a collection of unrelated components.
 2. **One active UI pull request while `web/index.html` remains monolithic.** This prevents overlapping edits and unclear ownership. Parallel UI work begins only after a reviewed source split creates stable file boundaries.
-3. **No speculative platform work.** Add a backend, framework, dependency, authentication system, or persistence layer only when a named slice requires it and the owner approves the resulting runtime, privacy, and security boundary.
+3. **No speculative platform work.** Add a backend, authentication system, persistence layer, deployment change, or data source only with a named requirement and separate owner authority. Frontend structure, tooling, and dependencies may change under the owner's conditional authorisation when a review slice records the maintainability or delivery need and preserves the privacy, security, and no-build-or-equivalent local-run boundary.
 4. **Context before controls.** Each detailed view has one dominant trial, patient, thread, or handoff. Supporting operations remain attached to that entity.
 5. **Authority is visible.** Important state always names its source or human authority and date. Unknown and conflicting states remain explicit.
 6. **No hidden clinical logic.** Patient context never changes the trial list ordering or creates an overall eligibility score.
@@ -178,8 +187,8 @@ The owner decides whether to retain, simplify, supplement, or stop each major ca
 
 ## Current slice
 
-**Branch:** `feat/trial-relay-home`
+**Branch:** `refactor/split-web-source`
 
-**Pull request outcome:** deliver Phase 0 slice 1 — this plan, a calm Home view, the four-destination global navigation, and contextual links that keep the existing validation workflows reachable.
+**Pull request outcome:** deliver Phase 0 slice 2 — extract stable CSS and JavaScript from `web/index.html` without changing behavior, preserve the dependency-free local run path, and establish file boundaries for later trial, Inbox, patient, and handoff slices.
 
-**Explicit non-goals for this slice:** no new dependency, backend, persistence, authentication, trial-data change, patient-data change, matching logic, map, Trial room, or production deployment change.
+**Explicit non-goals for this slice:** no framework, package dependency, backend, persistence, authentication, trial-data change, patient-data change, matching logic, map, Trial room, or deployment change.

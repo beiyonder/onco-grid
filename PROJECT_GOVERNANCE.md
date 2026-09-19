@@ -125,6 +125,8 @@ On 2026-09-17 the owner made the GitHub repository private and authorised a priv
 
 On 2026-09-19 the owner authorised implementation of the Trial Relay experience and visual-language blueprints through small review pull requests. This authorisation covers reversible changes to the existing static validation app; it does not close `P5`, select a production stack, approve new dependencies or data sources, or constitute product lock. The existing clinical, privacy, and human-authority boundaries remain unchanged.
 
+On 2026-09-19 the owner authorised the agent to push and merge future implementation pull requests without separate owner review when the repository's observable acceptance, privacy, and safety checks pass. Every change must still use a review branch and pull request; direct pushes to `main` remain prohibited. The owner also authorised replacing the monolithic HTML architecture and selecting a more sustainable frontend stack when a named implementation slice demonstrates that the change is necessary for maintainability or delivery efficiency. This conditional authority does not approve a backend, new data source, production identity or persistence boundary, deployment-topology change, or any clinical capability.
+
 ## Gap register
 
 | Gap | Status | Evidence | Owner | Next action |
@@ -155,7 +157,8 @@ On 2026-09-19 the owner authorised implementation of the Trial Relay experience 
 | `C5` | `P5` | `.harness/reports/20260903T123318Z-P5-v2-source-reassessment.md` | Complete; internal provenance clarification now precedes external outreach |
 | `C5` | `P5` | `.harness/reports/20260913T134521Z-P5-ctri-data-access-quality.md` | Complete; dated non-commercial WHO mirror only, no product-data-source approval |
 | `C5` | `P5` | `.harness/reports/20260917T133754Z-P5-live-validation-deployment.md` | Complete; real ClinicalTrials.gov snapshot deployed for owner-authorised oncologist validation |
-| `C2` | `P5` | `.harness/reports/20260919T102253Z-P5-trial-relay-home.md` | Complete; first reversible blueprint implementation slice ready for owner review |
+| `C2` | `P5` | `.harness/reports/20260919T102253Z-P5-trial-relay-home.md` | Complete; merged through pull request `#2` |
+| `C2` | `P5` | `.harness/reports/20260919T104204Z-P5-trial-relay-source-split.md` | Complete; behavior-preserving source split ready for autonomous merge |
 
 ## References
 
@@ -183,3 +186,4 @@ On 2026-09-19 the owner authorised implementation of the Trial Relay experience 
 - `.harness/reports/20260913T134521Z-P5-ctri-data-access-quality.md`
 - `.harness/reports/20260917T133754Z-P5-live-validation-deployment.md`
 - `.harness/reports/20260919T102253Z-P5-trial-relay-home.md`
+- `.harness/reports/20260919T104204Z-P5-trial-relay-source-split.md`
