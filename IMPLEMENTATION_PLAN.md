@@ -187,10 +187,10 @@ The owner decides whether to retain, simplify, supplement, or stop each major ca
 
 ## Current slice
 
-**Branch:** `feat/trial-library`
+**Branch:** `feat/trial-profile`
 
-**Pull request outcome:** deliver Phase 1 slice 1 — a source-first Trial library with precise result hierarchy, compact labelled filters, persistent result and snapshot context, an explicit List/Map roadmap control, separate registry and site-confirmation traces, stable loading/empty/error states, and keyboard focus preserved when selecting a result.
+**Pull request outcome:** deliver Phase 1 slice 2 — one dominant trial profile with a visible registry source layer, official and brief titles, identifiers, source and snapshot dates, registry and independent site assertions, explicit unknown/conflict language, every retained India site grouped by state and city, safe source contact routing, and progressive disclosure for criteria, provenance, and history.
 
-**Acceptance scenario:** load the 285-record ClinicalTrials.gov snapshot; identify the source date and separate registry/site states; search `Mumbai`; clear to restore all records; select a result by keyboard without losing focus; observe deterministic loading, empty, and source-failure recovery states; retain zero horizontal overflow on desktop and narrow mobile.
+**Acceptance scenario:** open a trial from the first 60 library results; confirm the selected card and profile identifier match; distinguish registry status from an unknown or conflicting site assertion without relying on colour; inspect all retained India sites and their source states; switch Overview/Sites by keyboard; close the profile and return focus plus list position to the originating result on desktop and narrow mobile.
 
-**Explicit non-goals for this slice:** no working map, trial-profile restructuring, Trial room, persistence, authentication, backend, new data source, patient-context filter, patient-specific ranking, matching logic, or deployment change.
+**Explicit non-goals for this slice:** no Trial room conversation, persisted follow state, site-specific confirmation data beyond the retained model, working map, patient-context filter, patient-specific ranking, matching logic, backend, authentication, new data source, or deployment change.
