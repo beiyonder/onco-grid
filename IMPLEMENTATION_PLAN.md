@@ -187,10 +187,10 @@ The owner decides whether to retain, simplify, supplement, or stop each major ca
 
 ## Current slice
 
-**Branch:** `feat/missing-information-tasks`
+**Branch:** `feat/referral-packet`
 
-**Pull request outcome:** deliver Phase 3 slice 3 — create a named missing-information task only from a criterion in Needs clarification, preserving the exact criterion, clinician-linked source, current human state, task type, named owner, due date, expected operational outcome, creator, and explicit no-guessing boundary. The task appears once in Inbox and can complete or end unable to obtain without changing the criterion answer.
+**Pull request outcome:** deliver Phase 4 slice 1 — a versioned referral packet draft with explicit purpose, selected real-registry trial and retained India site, authorised recipient, owner, expiry, exact synthetic EMR source manifest, clinician-review progress, approval state, actor/history, and a hard draft-not-release boundary. Each later draft becomes a new unapproved version.
 
-**Acceptance scenario:** as treating oncologist mark criterion 2 Needs clarification, then as coordinator create a task from its exact context; verify four bounded task types, named owner, due date, criterion/source/state provenance, and safe confirmation; see `MISS-001` in the criterion, Recent work, and Inbox with task count increased; open the exact criterion from Inbox; complete the task and confirm it leaves active Tasks while the criterion remains Needs clarification; create a follow-up and record Unable to obtain with the same no-inference behavior; retain coherent desktop/mobile layouts.
+**Acceptance scenario:** prepare a packet for the selected trial; inspect `v1.0`, eight retained India-site choices, clinician-review count, Draft/not approved state, default expiry, and three selected source references; reject an empty manifest; create a two-source draft and verify its complete object, Recent work entry, canonical Inbox Task, and inspector statement `not approved · not released`; reopen the builder and observe `v2.0` starts as a separate unapproved draft; retain coherent desktop/mobile dialogs.
 
-**Explicit non-goals for this slice:** no inferred missing answer, automated source request, external message, criterion-state mutation from task completion, bulk assignment, real patient data, backend, persistence, authentication, new data source, or deployment change.
+**Explicit non-goals for this slice:** no automatic approval or release, file copying, clinical summarization, external transmission, packet editing after approval, full lifecycle redesign, trial-team outcome, real patient data, backend, persistence, authentication, new data source, or deployment change.

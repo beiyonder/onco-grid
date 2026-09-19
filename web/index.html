@@ -482,15 +482,24 @@
   <dialog id="packet-dialog" aria-labelledby="packet-dialog-title">
     <form id="packet-form">
       <div class="dialog-head"><div><h2 id="packet-dialog-title">Prepare referral packet</h2><p id="packet-trial-label">Bounded source manifest · draft only</p></div><button class="icon-button close-dialog" type="button" aria-label="Close packet builder"><svg class="icon"><use href="#i-x"/></svg></button></div>
-      <div class="dialog-body"><div class="notice" style="margin-bottom:13px"><strong>Explicit selection only.</strong> Trial Relay references chosen EMR source artifacts. It does not infer relevance, summarize clinical meaning, or release the packet automatically.</div><div class="form-grid">
-        <div class="form-row"><label for="packet-purpose">Purpose</label><select class="select" id="packet-purpose"><option>Trial-team formal screening</option><option>Tumour-board discussion</option><option>External expert review</option></select></div>
-        <div class="form-row"><label for="packet-recipient">Authorised recipient</label><select class="select" id="packet-recipient"><option>Verified site trial office</option><option>Sponsor central trial team</option><option>Internal tumour board</option></select></div>
-        <div class="form-row"><label for="packet-owner">Handoff owner</label><select class="select" id="packet-owner"><option>A. Rao — research coordinator</option><option>Dr M. Shah — treating oncologist</option><option>Trial office — shared queue</option></select></div>
-        <div class="form-row"><label for="packet-expiry">Access expiry</label><input class="field" id="packet-expiry" type="date" value="2026-09-27" required></div>
-        <div class="form-row full"><label>Source manifest</label><div class="packet-manifest"><label class="packet-item"><input type="checkbox" checked><span><strong>Pathology report · final</strong>DiagnosticReport reference · clinician reviewed</span></label><label class="packet-item"><input type="checkbox" checked><span><strong>Molecular diagnostic report</strong>DocumentReference · original linked report</span></label><label class="packet-item"><input type="checkbox" checked><span><strong>Treatment administration timeline</strong>MedicationAdministration references · no inferred response</span></label><label class="packet-item"><input type="checkbox"><span><strong>Latest laboratory report</strong>Observation references · include only if clinician selects</span></label></div></div>
-        <div class="form-row full"><label class="checkbox-row"><input id="packet-authorised" type="checkbox" required><span>I am authorised to prepare this packet and will review the exact source manifest before any release.</span></label></div>
-      </div></div>
-      <div class="dialog-foot"><button class="button close-dialog" type="button">Cancel</button><button class="button primary" type="submit"><svg class="icon"><use href="#i-briefcase"/></svg>Create draft packet</button></div>
+      <div class="dialog-body">
+        <div class="notice" style="margin-bottom:13px"><strong>Draft first; separate human approval before release.</strong> Trial Relay references only the selected synthetic EMR artifacts. It does not infer relevance, rewrite clinical meaning, send the packet, or approve it automatically.</div>
+        <div class="packet-context-grid">
+          <div><span>Packet version</span><strong id="packet-version">v1.0</strong></div>
+          <div><span>Clinician review state</span><strong id="packet-review-state">0 criteria reviewed</strong></div>
+          <div><span>Approval state</span><strong id="packet-approval-state">Draft · not approved</strong></div>
+        </div>
+        <div class="form-grid">
+          <div class="form-row"><label for="packet-purpose">Purpose</label><select class="select" id="packet-purpose" required><option>Trial-team formal screening</option><option>Tumour-board discussion</option><option>External expert review</option></select></div>
+          <div class="form-row"><label for="packet-site">Trial and site</label><select class="select" id="packet-site" required></select></div>
+          <div class="form-row"><label for="packet-recipient">Authorised recipient</label><select class="select" id="packet-recipient" required><option>Verified site trial office</option><option>Sponsor central trial team</option><option>Internal tumour board</option></select></div>
+          <div class="form-row"><label for="packet-owner">Handoff owner</label><select class="select" id="packet-owner" required><option>A. Rao — research coordinator</option><option>Dr M. Shah — treating oncologist</option><option>Trial office — shared queue</option></select></div>
+          <div class="form-row"><label for="packet-expiry">Access expiry</label><input class="field" id="packet-expiry" type="date" required></div>
+          <div class="form-row full"><label>Explicit source manifest</label><div class="packet-manifest"><label class="packet-item"><input type="checkbox" name="packet-source" value="Pathology report" checked><span><strong>Pathology report · final</strong>DiagnosticReport reference · clinician reviewed</span></label><label class="packet-item"><input type="checkbox" name="packet-source" value="Molecular diagnostic report" checked><span><strong>Molecular diagnostic report</strong>DocumentReference · original linked report</span></label><label class="packet-item"><input type="checkbox" name="packet-source" value="Treatment administration timeline" checked><span><strong>Treatment administration timeline</strong>MedicationAdministration references · no inferred response</span></label><label class="packet-item"><input type="checkbox" name="packet-source" value="Latest laboratory report"><span><strong>Latest laboratory report</strong>Observation references · include only if a human selects it</span></label></div></div>
+          <div class="form-row full"><label class="checkbox-row"><input id="packet-authorised" type="checkbox" required><span>I reviewed this exact draft manifest and understand that creating it does not approve or release it. A separate authorised human approval is required before sending.</span></label></div>
+        </div>
+      </div>
+      <div class="dialog-foot"><button class="button close-dialog" type="button">Cancel</button><button class="button primary" type="submit"><svg class="icon"><use href="#i-briefcase"/></svg>Create versioned draft</button></div>
     </form>
   </dialog>
 

@@ -167,7 +167,8 @@ On 2026-09-19 the owner authorised the agent to push and merge future implementa
 | `C2` | `P5` | `.harness/reports/20260919T115701Z-P5-notification-rules.md` | Complete; merged through pull request `#9` |
 | `C2` | `P5` | `.harness/reports/20260919T120627Z-P5-patient-workspace.md` | Complete; merged through pull request `#10` |
 | `C2` | `P5` | `.harness/reports/20260919T121825Z-P5-criterion-review.md` | Complete; merged through pull request `#11` |
-| `C2` | `P5` | `.harness/reports/20260919T123529Z-P5-missing-information-tasks.md` | Complete; Phase 3 missing-information tasks ready for autonomous merge |
+| `C2` | `P5` | `.harness/reports/20260919T123529Z-P5-missing-information-tasks.md` | Complete; merged through pull request `#12` |
+| `C2` | `P5` | `.harness/reports/20260919T124743Z-P5-referral-packet.md` | Complete; Phase 4 referral packet ready for autonomous merge |
 
 ## References
 
@@ -205,3 +206,4 @@ On 2026-09-19 the owner authorised the agent to push and merge future implementa
 - `.harness/reports/20260919T120627Z-P5-patient-workspace.md`
 - `.harness/reports/20260919T121825Z-P5-criterion-review.md`
 - `.harness/reports/20260919T123529Z-P5-missing-information-tasks.md`
+- `.harness/reports/20260919T124743Z-P5-referral-packet.md`

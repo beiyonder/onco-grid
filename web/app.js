@@ -87,7 +87,8 @@ let activeTab = 'overview';
 let ctriOutage = false;
 let caseSelectedTrialId = trials[0].id;
 let currentArtifactName = '';
-let packetDrafted = false;
+const referralPackets = [];
+let referralPacketSequence = 1;
 let boardDecisionRecorded = false;
 const criterionDecisions = new Map();
 const criterionSources = new Map();
@@ -937,7 +938,11 @@ function renderPatientWorkspaceState(t=trialById(caseSelectedTrialId)||trialById
     const latest=patientTasks.at(-1);
     work.unshift({tone:'task',title:'Missing-information task',meta:`${latest.id} · ${latest.type} · owner ${latest.owner}`,state:latest.status==='open'?formatDate(latest.due):latest.status});
   }
-  if(packetDrafted)work.unshift({tone:'task',title:'Referral packet manifest drafted',meta:'Explicit synthetic EMR references · human release still required',state:'Draft'});
+  const patientPackets=referralPackets.filter(packet=>packet.trialId===t.id);
+  if(patientPackets.length){
+    const latest=patientPackets.at(-1);
+    work.unshift({tone:'task',title:'Referral packet',meta:`${latest.id} · ${latest.version} · ${latest.sources.length} source references · owner ${latest.owner}`,state:statusHuman[latest.status]||latest.status});
+  }
   if(boardDecisionRecorded)work.unshift({tone:'human',title:'Human board disposition recorded',meta:'Signed decision reference retained in the synthetic EMR workflow',state:'Recorded'});
   $('#patient-recent-work').innerHTML=work.map(item=>`
     <div class="patient-work-item">
@@ -964,10 +969,36 @@ function openArtifact(name) {
 }
 
 function openPacket() {
-  const t=trialById(caseSelectedTrialId);
-  $('#packet-trial-label').textContent=`${plainText(t.id)} · ${plainText(t.title)}`;
+  const trial=trialById(caseSelectedTrialId);
+  if(!trial){
+    showToast('Select a trial before preparing a referral packet.');
+    return;
+  }
+  const existing=referralPackets.filter(packet=>packet.trialId===trial.id);
+  const version=`v${existing.length+1}.0`;
+  const reviewed=[...criterionDecisions.entries()].filter(([key,value])=>key.startsWith(`${trial.id}:`)&&value!=='not_reviewed').length;
+  const locations=trial.indiaLocations?.length?trial.indiaLocations:[{facility:trial.location,city:trial.city,state:trial.state,status:trial.registryStatus}];
+  const siteSelect=$('#packet-site');
+  siteSelect.replaceChildren(...locations.map((location,index)=>{
+    const label=`${location.facility||'Facility not reported'} · ${location.city||'City not reported'}, ${location.state||'State not reported'} · registry ${String(location.status||'unknown').replaceAll('_',' ').toLowerCase()}`;
+    return new Option(plainText(label),String(index));
+  }));
+  $('#packet-form').dataset.trialId=trial.id;
+  $('#packet-form').dataset.version=version;
+  $('#packet-trial-label').textContent=`${plainText(trial.id)} · ${plainText(trial.title)} · synthetic case SYN-2047`;
+  $('#packet-version').textContent=version;
+  $('#packet-review-state').textContent=`${reviewed} of ${currentCriterionCount} criteria reviewed by clinician`;
+  $('#packet-approval-state').textContent='Draft · not approved · not released';
+  $('#packet-purpose').value='Trial-team formal screening';
+  $('#packet-recipient').value='Verified site trial office';
+  $('#packet-owner').value='A. Rao — research coordinator';
+  const expiry=new Date(`${today}T00:00:00Z`);
+  expiry.setUTCDate(expiry.getUTCDate()+8);
+  $('#packet-expiry').value=expiry.toISOString().slice(0,10);
+  $$('input[name="packet-source"]').forEach((input,index)=>{input.checked=index<3;});
   $('#packet-authorised').checked=false;
   $('#packet-dialog').showModal();
+  $('#packet-purpose').focus();
 }
 
 function renderBoard() {
@@ -1114,6 +1145,7 @@ function inboxInspectorMarkup(item) {
   const linkedInquiry=inquiries.find(inquiry=>inquiry.id===item.inquiryId);
   const linkedTrial=trialById(item.trialId);
   const linkedMissing=missingInfoTasks.find(task=>task.id===item.missingTaskId);
+  const linkedPacket=referralPackets.find(packet=>packet.id===linkedInquiry?.packetId);
   const nextInquiryState=linkedInquiry?{draft:'approved',approved:'sent',sent:'acknowledged',acknowledged:'closed'}[linkedInquiry.status]:null;
   const nextInquiryLabel=nextInquiryState?{
     approved:'Approve draft',
@@ -1135,6 +1167,7 @@ function inboxInspectorMarkup(item) {
         <div><span>Source authority</span><strong>${escapeHTML(item.source)}</strong></div>
       </div>
       ${linkedInquiry?`<div class="inbox-inspector-state"><span>Handoff state</span><strong>${statusHuman[linkedInquiry.status]||linkedInquiry.status}</strong><small>${linkedInquiry.id} · ${linkedInquiry.route} · owner ${linkedInquiry.owner}</small></div>`:''}
+      ${linkedPacket?`<div class="inbox-inspector-state"><span>Referral packet</span><strong>${linkedPacket.id} · ${linkedPacket.version} · ${statusHuman[linkedPacket.status]||linkedPacket.status}</strong><small>${linkedPacket.sources.length} explicit source references · expires ${formatDate(linkedPacket.expiry)} · ${linkedPacket.approval?`approved by ${linkedPacket.approval.actor}`:'not approved · not released'}</small></div>`:''}
       ${item.targetView==='verification'&&linkedTrial?`<div class="inbox-inspector-state"><span>Source comparison</span><strong>Registry: ${linkedTrial.registryStatus} · Site: ${linkedTrial.verifyLabel}</strong><small>${linkedTrial.source} updated ${formatDate(linkedTrial.registryUpdated)}. Unknown remains unknown until an authorised source responds.</small></div>`:''}
       ${linkedMissing?`<div class="inbox-inspector-state"><span>Missing-information task</span><strong>${linkedMissing.status==='open'?'Open · answer remains unknown':linkedMissing.status}</strong><small>${linkedMissing.id} · criterion ${linkedMissing.criterionIndex+1} · ${linkedMissing.source} · created by ${linkedMissing.createdBy}</small></div>`:''}
       <div class="inbox-inspector-actions">
@@ -1418,17 +1451,48 @@ function renderInquiries() {
 }
 
 function advanceInquiry(id){
-  const item=inquiries.find(i=>i.id===id); if(!item)return;
-  const next={draft:'approved',approved:'sent',sent:'acknowledged',acknowledged:'closed'}[item.status]; if(!next)return;
-  const before=item.status; item.status=next;
-  auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:'2026-09-13 09:05',actor:'A. Rao',title:`Inquiry marked ${statusHuman[next].toLowerCase()}`,note:`${id} · from ${statusHuman[before]}`,type:'task'});
+  const item=inquiries.find(inquiry=>inquiry.id===id);
+  if(!item)return;
+  const next={draft:'approved',approved:'sent',sent:'acknowledged',acknowledged:'closed'}[item.status];
+  if(!next)return;
+  const packet=referralPackets.find(candidate=>candidate.id===item.packetId);
+  if(packet&&next==='sent'&&!packet.approval){
+    showToast(`${packet.id} cannot be sent without a separate human approval.`);
+    return;
+  }
+  const before=item.status;
+  const actor=roleProfiles[currentRole].name;
+  item.status=next;
+  if(packet){
+    packet.status=next;
+    if(next==='approved')packet.approval={actor,at:formatDate(today),version:packet.version};
+    packet.history.push({state:next,actor,at:formatDate(today),source:'Human handoff action'});
+  }
+  auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:`${today} session`,actor,title:`Handoff marked ${statusHuman[next].toLowerCase()}`,note:`${id} · from ${statusHuman[before]}${packet?` · ${packet.version}`:''}`,type:'task'});
   if(next==='acknowledged'){
     alerts.unshift({id:`ALT-${400+alerts.length}`,type:'handoff',tone:'good',title:'Referral acknowledged',body:`${id} was acknowledged. Formal screening remains with the trial team.`,source:'Human task event · just now',recipients:['Treating oncologist','Research coordinator'],unread:true});
-    renderAlerts();
   }
-  renderInquiries();renderAudit();showToast(`${id} moved to ${statusHuman[next]}.`);
+  renderInquiries();
+  renderAlerts();
+  renderAudit();
+  showToast(`${id} moved to ${statusHuman[next]}${next==='approved'&&packet?` by ${actor}; approval is bound to ${packet.version}`:''}.`);
 }
-function setInquiryUnable(id){const item=inquiries.find(i=>i.id===id);if(!item)return;item.status='unable';auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:'2026-09-13 09:06',actor:'A. Rao',title:'Inquiry closed — unable to contact',note:id,type:'task'});renderInquiries();renderAudit();showToast(`${id} closed as unable to contact.`);}
+function setInquiryUnable(id){
+  const item=inquiries.find(inquiry=>inquiry.id===id);
+  if(!item)return;
+  const actor=roleProfiles[currentRole].name;
+  item.status='unable';
+  const packet=referralPackets.find(candidate=>candidate.id===item.packetId);
+  if(packet){
+    packet.status='unable';
+    packet.history.push({state:'unable',actor,at:formatDate(today),source:'Unable-to-contact outcome'});
+  }
+  auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:`${today} session`,actor,title:'Handoff closed — unable to contact',note:`${id}${packet?` · ${packet.version}`:''}`,type:'task'});
+  renderInquiries();
+  renderAlerts();
+  renderAudit();
+  showToast(`${id} closed as unable to contact. No clinical or site conclusion was inferred.`);
+}
 
 function renderAudit(){
   $('#audit-list').innerHTML=auditEvents.map(e=>`<div class="audit-row"><time>${e.at}</time><span class="audit-actor">${e.actor}</span><span class="audit-event"><strong>${e.title}</strong><span>${e.note}</span></span><span class="audit-type"><span class="tag">${e.type}</span><br><span style="font-family:var(--font-data);color:var(--muted);font-size:8px">${e.id}</span></span></div>`).join('');
@@ -1520,14 +1584,51 @@ $('#verification-form').addEventListener('submit',(event)=>{
 $('#packet-form').addEventListener('submit',(event)=>{
   event.preventDefault();
   if(!event.currentTarget.reportValidity())return;
-  packetDrafted=true;
-  const id=`REF-${2200+inquiries.length}`;
-  inquiries.unshift({id,trialId:caseSelectedTrialId,question:'Review referral packet for formal site screening',owner:$('#packet-owner').value.split(' — ')[0],due:$('#packet-expiry').value,route:$('#packet-recipient').value,status:'draft',created:today});
-  auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:'2026-09-13 09:21',actor:'A. Rao',title:'Referral packet manifest drafted',note:`${id} · 3 selected EMR references · not released`,type:'packet'});
+  const trial=trialById(event.currentTarget.dataset.trialId);
+  const sources=$$('input[name="packet-source"]:checked').map(input=>input.value);
+  if(!trial||trial.id!==caseSelectedTrialId){
+    showToast('The selected trial changed. Reopen the packet builder.');
+    return;
+  }
+  if(!sources.length){
+    showToast('Select at least one explicit source reference.');
+    return;
+  }
+  if($('#packet-expiry').value<today){
+    showToast('Packet expiry cannot be earlier than today.');
+    $('#packet-expiry').focus();
+    return;
+  }
+  const id=`REF-${2200+referralPacketSequence++}`;
+  const owner=$('#packet-owner').value.split(' — ')[0];
+  const site=$('#packet-site').options[$('#packet-site').selectedIndex].text;
+  const reviewed=[...criterionDecisions.entries()].filter(([key,value])=>key.startsWith(`${trial.id}:`)&&value!=='not_reviewed').length;
+  const packet={
+    id,
+    version:event.currentTarget.dataset.version,
+    trialId:trial.id,
+    site,
+    syntheticPatientId:'SYN-2047',
+    purpose:$('#packet-purpose').value,
+    recipient:$('#packet-recipient').value,
+    owner,
+    expiry:$('#packet-expiry').value,
+    sources,
+    clinicianReview:`${reviewed} of ${currentCriterionCount} criteria reviewed`,
+    status:'draft',
+    approval:null,
+    createdBy:roleProfiles[currentRole].name,
+    createdAt:formatDate(today),
+    history:[{state:'draft',actor:roleProfiles[currentRole].name,at:formatDate(today),source:'Explicit packet manifest'}]
+  };
+  referralPackets.push(packet);
+  inquiries.unshift({id,packetId:id,version:packet.version,trialId:trial.id,site,question:`Review and approve ${packet.version} referral packet for ${packet.purpose.toLowerCase()}`,owner,due:packet.expiry,route:packet.recipient,status:'draft',created:today});
+  auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:`${today} session`,actor:packet.createdBy,title:'Versioned referral packet drafted',note:`${id} · ${packet.version} · ${sources.length} source references · not approved · not released`,type:'packet'});
   $('#packet-dialog').close();
   renderInquiries();
+  renderAlerts();
   renderAudit();
-  showToast(`${id} created as a draft. Source documents remain in the EMR; human release is required.`);
+  showToast(`${id} ${packet.version} created as Draft with ${sources.length} source references. Separate human approval is required before release.`);
 });
 
 $('#missing-info-form').addEventListener('submit',(event)=>{
