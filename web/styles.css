@@ -530,6 +530,28 @@ textarea.field { min-height: 92px; resize: vertical; }
 .profile-assertion.confirmed { background: var(--green-soft); color: var(--green); }
 .profile-assertion.unknown { background: var(--amber-soft); color: var(--amber); }
 .profile-assertion.conflict { background: var(--red-soft); color: var(--red); }
+.relationship-lens { border-bottom: 1px solid var(--rule); padding: 11px 14px 12px; background: var(--paper); }
+.relationship-lens > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.relationship-lens > header span { color: var(--plum); font-size: 8px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.relationship-lens > header strong { color: var(--muted); font-size: 8px; font-weight: 650; text-align: right; }
+.relationship-track { display: flex; align-items: stretch; gap: 5px; overflow-x: auto; padding: 3px 2px 8px; scrollbar-width: thin; }
+.relationship-node { display: grid; min-width: 132px; flex: 0 0 132px; align-content: center; gap: 2px; border: 1px solid var(--rule); border-left: 4px solid var(--rule-dark); border-radius: 8px; padding: 8px 9px; background: var(--paper-2); color: var(--ink); text-align: left; text-decoration: none; }
+button.relationship-node { cursor: pointer; }
+.relationship-node:hover { border-color: var(--rule-dark); }
+.relationship-node span, .relationship-node strong, .relationship-node small { display: block; }
+.relationship-node span { color: var(--muted); font-size: 7px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+.relationship-node strong { overflow-wrap: anywhere; font-size: 10px; }
+.relationship-node small { color: var(--muted); font-size: 7px; }
+.relationship-node.source { border-left-color: var(--navy-2); background: var(--blue-soft); }
+.relationship-node.entity { border-left-color: var(--navy); }
+.relationship-node.entity.current { border-color: var(--navy-2); box-shadow: inset 0 -3px 0 var(--navy-2); }
+.relationship-node.site { border-left-color: var(--amber); background: var(--amber-soft); }
+.relationship-node.room { border-left-color: var(--plum); background: var(--plum-soft); }
+.relationship-node.patient { border-left-color: var(--green); background: var(--green-soft); }
+.relationship-node.task { border-left-color: var(--amber); }
+.relationship-connector { display: grid; min-width: 55px; flex: 0 0 55px; place-content: center; color: var(--rule-dark); text-align: center; }
+.relationship-connector i { color: var(--ink-2); font-size: 14px; font-style: normal; }
+.relationship-connector small { color: var(--muted); font-size: 7px; line-height: 1.15; }
 .profile-section { display: grid; gap: 14px; }
 .profile-section-heading { display: flex; align-items: end; justify-content: space-between; gap: 16px; }
 .profile-section-heading span { color: var(--navy-2); font-size: 9px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
@@ -1138,6 +1160,8 @@ dialog::backdrop { background: rgba(16, 34, 45, .56); backdrop-filter: blur(2px)
   .profile-status-relationship { grid-template-columns: 1fr; }
   .profile-status + .profile-status { border-top: 1px solid var(--rule); border-left: 0; }
   .profile-section-heading { align-items: flex-start; flex-direction: column; gap: 6px; }
+  .relationship-lens > header { align-items: flex-start; flex-direction: column; gap: 3px; }
+  .relationship-lens > header strong { text-align: left; }
   .profile-section-heading p { max-width: none; text-align: left; }
   .profile-fact-grid { grid-template-columns: 1fr; }
   .contact-route, .site-row { align-items: flex-start; flex-direction: column; }
