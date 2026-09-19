@@ -90,6 +90,9 @@ let currentArtifactName = '';
 let packetDrafted = false;
 let boardDecisionRecorded = false;
 const criterionDecisions = new Map();
+const criterionSources = new Map();
+const criterionReviewMeta = new Map();
+let currentCriterionCount = 0;
 const trialRoomThreads = new Map();
 let trialRoomSequence = 1;
 let currentInboxKind = 'updates';
@@ -600,7 +603,7 @@ function renderDetail(t) {
     </div>
     <div class="profile-assertion ${confirmationTone}" role="${confirmationConflict?'alert':'note'}">${icon(confirmationConflict?'warning':confirmationUnknown?'clock':'check')}<div><strong>${confirmationTitle}</strong><span>${confirmationCopy}</span></div></div>
     <div class="detail-actions">
-      <button class="button primary" type="button" id="review-with-case">${icon('user')}Review with synthetic EMR case</button>
+      <button class="button primary" type="button" id="review-with-case">${icon('user')}Review this trial for the patient</button>
       <button class="button" type="button" id="open-trial-room">${icon('send')}Open Trial room</button>
       <button class="button" type="button" id="start-inquiry">${icon('briefcase')}General site inquiry</button>
       <button class="button" type="button" id="compare-sources">${icon('link')}Compare sources</button>
@@ -761,30 +764,107 @@ function openCompare(trialId) {
   $('#compare-dialog').showModal();
 }
 
+function protocolCriteriaFor(trial) {
+  const raw=plainText(trial.generalCriteria||'').replace(/\r/g,'').trim();
+  if(!raw)return ['Eligibility text is not reported in the retained registry snapshot.'];
+  const sectionized=raw.replace(/(Inclusion|Exclusion) Criteria:/gi,'\n$1 Criteria:\n');
+  const numbered=[];
+  let section='';
+  sectionized.split(/\n+/).map(value=>value.trim()).filter(Boolean).forEach(chunk=>{
+    if(/^(Inclusion|Exclusion) Criteria:$/i.test(chunk)){
+      section=chunk;
+      return;
+    }
+    const markers=[];
+    let expected=1;
+    for(const match of chunk.matchAll(/(^|\s)(\d{1,2})\.(?=\s+)/g)){
+      if(Number(match[2])!==expected)continue;
+      markers.push(match.index+match[1].length);
+      expected+=1;
+    }
+    markers.forEach((start,index)=>{
+      const end=markers[index+1]??chunk.length;
+      numbered.push(`${section} ${chunk.slice(start,end).trim()}`.trim());
+    });
+  });
+  if(numbered.length)return numbered.slice(0,4);
+  let excerpts=raw
+    .split(/\s*\*\s+/)
+    .map(value=>value.trim())
+    .filter(value=>value&&!/^(inclusion|exclusion) criteria:?$/i.test(value));
+  if(excerpts.length<2)excerpts=raw.split(/\n+/).map(value=>value.trim()).filter(Boolean);
+  return excerpts.slice(0,4);
+}
+
 function renderCase() {
-  const t=trialById(caseSelectedTrialId) || trialById(selectedTrialId) || trials[0];
+  const t=trialById(caseSelectedTrialId)||trialById(selectedTrialId)||trials[0];
   caseSelectedTrialId=t.id;
   $('#case-selected-trial-title').textContent=plainText(t.title);
-  $('#case-selected-trial-meta').textContent=`${plainText(t.id)} · ${plainText(t.phase)} · ${plainText(t.city)} · ${plainText(t.verifyLabel)}`;
+  $('#case-selected-trial-meta').textContent=`${plainText(t.id)} · ${plainText(t.phase)} · ${plainText(t.city)} · clinician selected · ${plainText(t.verifyLabel)}`;
   $('#board-trial-title').textContent=plainText(t.title);
-  const criteria=[
-    ['Protocol disease cohort','Clinician compares the protocol text with the clinician-confirmed diagnosis.','Pathology report + Condition'],
-    ['Recorded disease setting','Clinician reviews the protocol stage/state wording and current EMR source.','Oncology encounter'],
-    ['Protocol biomarker requirement','Clinician checks method, threshold, specimen, and accepted report.','Molecular report'],
-    ['Prior treatment and timing','Clinician checks lines, component drugs, dates, washout, and recovery.','Treatment timeline']
+  const criteria=protocolCriteriaFor(t);
+  currentCriterionCount=criteria.length;
+  const sourceOptions=[
+    ['Pathology report','Pathology report · 28 Aug 2026'],
+    ['Molecular report','Molecular report · 02 Sep 2026'],
+    ['Treatment timeline','Treatment timeline · clinician-reviewed history'],
+    ['Laboratory report','Laboratory report · 11 Sep 2026'],
+    ['No source linked','No source linked · missing or unknown']
   ];
-  $('#case-criteria-list').innerHTML=criteria.map((c,index)=>{
-    const key=`${t.id}:${index}`;
-    const value=criterionDecisions.get(key)||'not_reviewed';
-    return `<div class="criterion-row"><div class="criterion-copy"><strong>${c[0]}</strong><span>${c[1]}</span></div><span class="criterion-source">${icon('link')}${c[2]}</span><label><span class="sr-only">Human review state for ${c[0]}</span><select class="criterion-select" data-criterion-key="${key}"><option value="not_reviewed" ${value==='not_reviewed'?'selected':''}>Not reviewed</option><option value="confirmed" ${value==='confirmed'?'selected':''}>Confirmed by clinician</option><option value="not_met" ${value==='not_met'?'selected':''}>Not met — human decision</option><option value="clarify" ${value==='clarify'?'selected':''}>Needs clarification</option></select></label></div>`;
-  }).join('');
+  const nextActions={
+    not_reviewed:'Review exact protocol wording and linked source',
+    confirmed:'No missing-information action recorded',
+    not_met:'Preserve the human decision; formal screening remains with the trial team',
+    clarify:'Resolve the missing source or unanswered question before handoff'
+  };
+  $('#case-criteria-list').innerHTML=`
+    <div class="criterion-set-note"><strong>${criteria.length} exact registry excerpt${criteria.length===1?'':'s'} in this review set</strong><span>The complete registry eligibility text remains available in the trial source. Excerpts are not interpreted or scored.</span></div>
+    <div class="criterion-sequence-head" aria-hidden="true"><span>Criterion</span><span>Source record</span><span>Human review state</span><span>Next action</span></div>
+    ${criteria.map((criterion,index)=>{
+      const key=`${t.id}:${index}`;
+      const decision=criterionDecisions.get(key)||'not_reviewed';
+      const defaultSource=sourceOptions[Math.min(index,sourceOptions.length-2)][0];
+      const source=criterionSources.get(key)||defaultSource;
+      const meta=criterionReviewMeta.get(key);
+      return `
+        <div class="criterion-row" data-criterion-row="${key}">
+          <div class="criterion-copy"><span class="criterion-number">${String(index+1).padStart(2,'0')}</span><strong>Exact registry wording</strong><blockquote>${escapeHTML(criterion)}</blockquote></div>
+          <div class="criterion-source-control"><label><span>Clinician-linked EMR source</span><select class="criterion-select" data-criterion-source-key="${key}">${sourceOptions.map(([value,label])=>`<option value="${value}" ${source===value?'selected':''}>${label}</option>`).join('')}</select></label><button class="button small ghost" type="button" data-criterion-open-source="${source}" ${source==='No source linked'?'disabled':''}>${icon('link')}Open source</button></div>
+          <div class="criterion-review-control"><label><span>Human-entered state</span><select class="criterion-select" data-criterion-key="${key}"><option value="not_reviewed" ${decision==='not_reviewed'?'selected':''}>Not reviewed</option><option value="confirmed" ${decision==='confirmed'?'selected':''}>Confirmed by clinician</option><option value="not_met" ${decision==='not_met'?'selected':''}>Not met — human decision</option><option value="clarify" ${decision==='clarify'?'selected':''}>Needs clarification</option></select></label><span class="criterion-review-meta">${meta?`${escapeHTML(meta.reviewer)} · ${escapeHTML(meta.date)}`:'Awaiting treating oncologist'}</span></div>
+          <div class="criterion-next ${decision}"><span>Next action</span><strong>${nextActions[decision]}</strong></div>
+        </div>`;
+    }).join('')}`;
   $$('[data-criterion-key]').forEach(select=>select.addEventListener('change',()=>{
-    criterionDecisions.set(select.dataset.criterionKey,select.value);
-    auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:'2026-09-13 09:18',actor:'Dr M. Shah',title:'Criterion review state recorded',note:`${select.dataset.criterionKey} · ${select.options[select.selectedIndex].text}`,type:'clinical-human'});
-    updateCriteriaCount();
+    const key=select.dataset.criterionKey;
+    if(currentRole!=='oncologist'){
+      select.value=criterionDecisions.get(key)||'not_reviewed';
+      showToast('Only the treating oncologist role can record a criterion review state.');
+      return;
+    }
+    criterionDecisions.set(key,select.value);
+    if(select.value==='not_reviewed')criterionReviewMeta.delete(key);
+    else criterionReviewMeta.set(key,{reviewer:roleProfiles.oncologist.name,date:formatDate(today)});
+    auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:`${today} session`,actor:roleProfiles.oncologist.name,title:'Criterion review state recorded',note:`${key} · ${select.options[select.selectedIndex].text} · no aggregate score`,type:'clinical-human'});
+    renderCase();
     renderAudit();
+    $(`[data-criterion-key="${key}"]`)?.focus({preventScroll:true});
     showToast('Human review state saved. No overall eligibility result was calculated.');
   }));
+  $$('[data-criterion-source-key]').forEach(select=>select.addEventListener('change',()=>{
+    const key=select.dataset.criterionSourceKey;
+    if(currentRole!=='oncologist'){
+      select.value=criterionSources.get(key)||sourceOptions[Math.min(Number(key.split(':').at(-1)),sourceOptions.length-2)][0];
+      showToast('Only the treating oncologist role can link the source used for criterion review.');
+      return;
+    }
+    criterionSources.set(key,select.value);
+    auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:`${today} session`,actor:roleProfiles.oncologist.name,title:'Criterion source linked by clinician',note:`${key} · ${select.value}`,type:'clinical-human'});
+    renderCase();
+    renderAudit();
+    $(`[data-criterion-source-key="${key}"]`)?.focus({preventScroll:true});
+    showToast('Source link recorded by the treating oncologist. Source content was not interpreted.');
+  }));
+  $$('[data-criterion-open-source]').forEach(button=>button.addEventListener('click',()=>openArtifact(button.dataset.criterionOpenSource)));
   updateCriteriaCount();
 }
 
@@ -797,7 +877,7 @@ function renderPatientWorkspaceState(t=trialById(caseSelectedTrialId)||trialById
   $('#patient-referral-count').textContent=`${linkedHandoffs.length} open handoff${linkedHandoffs.length===1?'':'s'}`;
   const work=[
     {tone:'human',title:'Trial selected by clinician',meta:`${t.id} · ${t.title}`,state:'Human choice'},
-    {tone:'human',title:'Criterion review in progress',meta:`${reviewed} of 4 criterion states recorded by Dr M. Shah`,state:reviewed===4?'Reviewed':'In progress'},
+    {tone:'human',title:'Criterion review in progress',meta:`${reviewed} of ${currentCriterionCount} criterion states recorded by Dr M. Shah`,state:reviewed===currentCriterionCount?'Reviewed':'In progress'},
     currentArtifactName
       ?{tone:'source',title:'Source artifact opened',meta:`${currentArtifactName} · synthetic EMR read-through`,state:'Source viewed'}
       :{tone:'source',title:'Original records available',meta:'4 synthetic EMR references · source content not copied into workflow state',state:'4 sources'},
@@ -819,7 +899,7 @@ function renderPatientWorkspaceState(t=trialById(caseSelectedTrialId)||trialById
 function updateCriteriaCount() {
   const prefix=`${caseSelectedTrialId}:`;
   const reviewed=[...criterionDecisions.entries()].filter(([key,value])=>key.startsWith(prefix)&&value!=='not_reviewed').length;
-  $('#criteria-review-count').textContent=`${reviewed} of 4`;
+  $('#criteria-review-count').textContent=`${reviewed} of ${currentCriterionCount}`;
   renderPatientWorkspaceState();
 }
 
@@ -1450,6 +1530,7 @@ $('#role-select').addEventListener('change',(event)=>{
   $('#role-initial').textContent=role.initials;
   $('#role-description').textContent=role.label;
   if(profileOpen&&activeTab==='room')renderDetail(trialById(selectedTrialId));
+  if($('.view.active')?.dataset.view==='case')renderCase();
   showToast(`Prototype role switched to ${role.label}. Production permissions require institutional policy.`);
 });
 $('#notification-button').addEventListener('click',()=>switchView('alerts'));

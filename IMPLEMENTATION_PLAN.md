@@ -187,10 +187,10 @@ The owner decides whether to retain, simplify, supplement, or stop each major ca
 
 ## Current slice
 
-**Branch:** `feat/patient-workspace`
+**Branch:** `feat/criterion-review`
 
-**Pull request outcome:** deliver Phase 3 slice 1 — one dominant synthetic patient workspace with identity and encounter context, treating team, source availability, active review/referral counts, explicit source/clinician/unknown/conflict authority layers, original EMR references, collapsible source timeline, and dynamic recent work.
+**Pull request outcome:** deliver Phase 3 slice 2 — explicit clinician-driven trial selection and per-criterion review in the exact sequence `Criterion → Source record → Human review state → Next action`. The review set preserves the first four exact registry excerpts, lets only the treating oncologist link one of four synthetic EMR references and record a permitted human state, names reviewer/date, and reports count progress without a score.
 
-**Acceptance scenario:** open Patients and identify the synthetic identity, access context, treating team, four source references, active trial review, and open handoff count; distinguish original EMR references from four clinician-confirmed facts and from missing/conflicting states without relying on colour; open the pathology source and observe a no-interpretation boundary plus recent-work update; verify the three intended workspace sections and coherent reading order at desktop and narrow mobile.
+**Acceptance scenario:** choose Find trials to review and confirm the general 285-record library is neither ranked nor filtered by patient context; select a trial and use Review this trial for the patient; inspect four exact, unaltered numbered registry excerpts; block coordinator changes; as treating oncologist link source records and record Confirmed and Needs clarification states; verify reviewer/date, state-specific next actions, `2 of 4` progress, source opening, and the persistent no-aggregate-eligibility boundary; preserve sequence on narrow mobile.
 
-**Explicit non-goals for this slice:** no patient creation, real patient or identifiable data, automated extraction or inference, patient-specific trial filtering/ranking, criterion-workflow redesign, missing-information task creation, referral lifecycle change, backend, persistence, authentication, new data source, or deployment change.
+**Explicit non-goals for this slice:** no automated criteria extraction beyond deterministic list segmentation, semantic matching, eligibility conclusion, aggregate score, patient-specific trial ranking/filtering, missing-information task creation, real patient data, backend, persistence, authentication, new data source, or deployment change.
