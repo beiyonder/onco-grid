@@ -115,6 +115,7 @@ Owner sign-off is required for changes to goal, scope, non-goals, acceptance thr
 - 2026-09-19 implementation state: pull request `#16` merged authorised trial-team outcomes into `main`. The geographic-view slice adds List/Map continuity over the same filtered registry data using explicitly approximate curated city/state centroids, accessible clusters, persistent selection, and visible unplaced coverage without an administrative-boundary, route, availability, or patient-location claim.
 - 2026-09-19 implementation state: pull request `#17` merged approximate List/Map continuity into `main`. The relationship-lens slice adds only actual source→trial→site→room→patient/handoff nodes and labelled connectors, with each action opening an existing exact context and no inferred clinical graph.
 - 2026-09-19 implementation state: pull request `#18` merged contextual relationship lenses into `main`. The responsive-presentation slice flattens those paths on narrow screens, adds reduced-transparency alongside reduced-motion behavior, and makes print fall back from Map to an opaque source-first profile with identifiers, dates, authority labels, and disclosures preserved.
+- 2026-09-19 implementation state: pull request `#19` merged responsive, reduced-transparency, and opaque print modes into `main`. All planned Phase 0–5 implementation slices are integrated. Phase 6 remains open because no qualifying direct oncology-user observation or product-lock decision exists; implementation evidence alone does not close `P5`.
 
 ## References
 
