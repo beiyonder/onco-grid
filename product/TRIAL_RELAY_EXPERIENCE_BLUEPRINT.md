@@ -3,6 +3,7 @@
 ## Status
 
 - **Artifact type:** target-state product experience proposal.
+- **Companion artifact:** [`TRIAL_RELAY_VISUAL_DESIGN_LANGUAGE.md`](./TRIAL_RELAY_VISUAL_DESIGN_LANGUAGE.md).
 - **Audience:** product, design, clinical, research-operations, and engineering teams.
 - **Example users and patient records:** synthetic.
 - **Purpose:** agree on the user journey and product language before redesigning screens or deciding which features survive.
