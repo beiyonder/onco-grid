@@ -374,6 +374,55 @@ textarea.field { min-height: 92px; resize: vertical; }
 .sort-select { border: 0; background: transparent; color: var(--ink-2); font-size: 11px; font-weight: 700; }
 
 .explorer-grid { display: grid; grid-template-columns: minmax(340px, 430px) minmax(0, 1fr); gap: 13px; align-items: start; }
+.geo-view[hidden], #library-list-view[hidden] { display: none !important; }
+.geo-view { display: grid; grid-template-columns: minmax(0,1.35fr) minmax(300px,.65fr); gap: 13px; align-items: start; }
+.geo-map-shell, .geo-context { border: 1px solid var(--rule); border-radius: 11px; background: var(--paper); box-shadow: var(--shadow); overflow: hidden; }
+.geo-map-shell > header { display: flex; align-items: end; justify-content: space-between; gap: 20px; border-bottom: 1px solid var(--rule); padding: 14px 16px; }
+.geo-map-shell > header span { color: var(--navy-2); font-size: 8px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.geo-map-shell > header h2 { margin: 2px 0 0; font-family: var(--font-reading); font-size: 23px; }
+.geo-map-shell > header p { max-width: 430px; margin: 0; color: var(--muted); font-size: 9px; text-align: right; }
+.geo-map { position: relative; min-height: 610px; overflow: hidden; background: var(--paper-2); }
+.geo-grid { position: absolute; inset: 34px; border: 1px solid rgba(36,93,134,.16); border-radius: 22% 22% 36% 28%; background-image: linear-gradient(rgba(36,93,134,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(36,93,134,.07) 1px,transparent 1px); background-size: 12.5% 12.5%; box-shadow: inset 0 0 80px rgba(36,93,134,.05); }
+.geo-grid::after { content: "India geographic extent · coordinate lens"; position: absolute; inset: 50% auto auto 50%; color: rgba(36,93,134,.18); font-family: var(--font-data); font-size: 16px; letter-spacing: .08em; text-align: center; text-transform: uppercase; transform: translate(-50%,-50%) rotate(-18deg); }
+.geo-axis { position: absolute; z-index: 3; color: var(--faint); font-family: var(--font-data); font-size: 8px; }
+.geo-axis.north { top: 10px; left: 50%; transform: translateX(-50%); }
+.geo-axis.south { bottom: 10px; left: 50%; transform: translateX(-50%); }
+.geo-axis.west { top: 50%; left: 8px; transform: translateY(-50%) rotate(-90deg); }
+.geo-axis.east { top: 50%; right: 8px; transform: translateY(-50%) rotate(90deg); }
+.geo-markers { position: absolute; z-index: 4; inset: 34px; }
+.geo-marker { position: absolute; display: grid; width: var(--marker-size); height: var(--marker-size); place-items: center; border: 2px solid var(--paper); border-radius: 50%; padding: 0; background: var(--navy-2); color: #fff; box-shadow: 0 0 0 1px rgba(36,93,134,.62),0 5px 14px rgba(24,38,48,.15); transform: translate(-50%,-50%); }
+.geo-marker:hover, .geo-marker:focus-visible { z-index: 6; }
+.geo-marker.fallback { border-style: dashed; background: var(--amber); box-shadow: 0 0 0 1px rgba(155,91,19,.6),0 5px 14px rgba(24,38,48,.14); }
+.geo-marker.selected { z-index: 7; background: var(--green); box-shadow: 0 0 0 3px rgba(23,107,80,.2),0 8px 24px rgba(23,107,80,.24); }
+.geo-marker > span { font-family: var(--font-data); font-size: 8px; font-weight: 800; }
+.geo-marker small { display: none; position: absolute; top: calc(100% + 5px); left: 50%; width: max-content; max-width: 150px; border: 1px solid var(--rule); border-radius: 6px; padding: 3px 5px; background: rgba(251,252,251,.96); color: var(--ink-2); font-size: 8px; line-height: 1.25; box-shadow: 0 4px 12px rgba(24,38,48,.1); transform: translateX(-50%); }
+.geo-marker.labelled small, .geo-marker:hover small, .geo-marker:focus-visible small { display: block; }
+.geo-boundary-note { display: flex; align-items: flex-start; gap: 8px; border-top: 1px solid #efd5a9; padding: 10px 13px; background: var(--amber-soft); color: var(--amber); }
+.geo-boundary-note strong, .geo-boundary-note span { display: block; }
+.geo-boundary-note span { color: var(--ink-2); font-size: 9px; }
+.geo-context { position: sticky; top: calc(var(--topbar) + 18px); max-height: calc(100vh - var(--topbar) - 36px); overflow: auto; scrollbar-gutter: stable; }
+.geo-context-head { border-bottom: 1px solid var(--rule); padding: 15px; background: var(--paper-2); }
+.geo-context-head > span { color: var(--navy-2); font-size: 8px; font-weight: 800; letter-spacing: .055em; text-transform: uppercase; }
+.geo-context-head h2 { margin: 3px 0; font-family: var(--font-reading); font-size: 23px; }
+.geo-context-head p { margin: 0; color: var(--muted); font-size: 9px; }
+.geo-context-stats { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1px; border-bottom: 1px solid var(--rule); background: var(--rule); }
+.geo-context-stats > div { padding: 9px; background: var(--paper); }
+.geo-context-stats span, .geo-context-stats strong { display: block; }
+.geo-context-stats span { color: var(--muted); font-size: 7px; text-transform: uppercase; }
+.geo-context-stats strong { margin-top: 2px; font-family: var(--font-reading); font-size: 19px; }
+.geo-context-warning { display: flex; gap: 7px; border-bottom: 1px solid #efd5a9; padding: 9px 11px; background: var(--amber-soft); color: var(--amber); }
+.geo-context-warning span { color: var(--ink-2); font-size: 8px; }
+.geo-trial-list { display: grid; }
+.geo-trial-list button { display: flex; width: 100%; min-width: 0; align-items: center; gap: 8px; border: 0; border-bottom: 1px solid var(--rule); padding: 10px 11px; background: var(--paper); color: var(--ink); text-align: left; }
+.geo-trial-list button:hover { background: var(--paper-2); }
+.geo-trial-list button.selected { background: var(--green-soft); box-shadow: inset 3px 0 0 var(--green); }
+.geo-trial-list button > span { min-width: 0; flex: 1; }
+.geo-trial-list strong, .geo-trial-list small { display: block; }
+.geo-trial-list strong { overflow: hidden; font-family: var(--font-reading); font-size: 11px; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
+.geo-trial-list small { margin-top: 2px; color: var(--muted); font-size: 8px; }
+.geo-coverage-note { display: grid; gap: 2px; padding: 11px; background: var(--paper-2); }
+.geo-coverage-note strong { font-size: 9px; }
+.geo-coverage-note span { color: var(--muted); font-size: 8px; }
 .result-list { display: grid; gap: 8px; min-width: 0; }
 .trial-card {
   position: relative;
@@ -1033,6 +1082,8 @@ dialog::backdrop { background: rgba(16, 34, 45, .56); backdrop-filter: blur(2px)
   .feature-list { grid-template-columns: 1fr 1fr; }
   .feature-row:nth-child(odd) { border-right: 1px solid var(--rule); }
   .stats-grid { grid-template-columns: 1fr 1fr; }
+  .geo-view { grid-template-columns: 1fr; }
+  .geo-context { position: static; max-height: none; overflow: visible; scrollbar-gutter: auto; }
 }
 @media (max-width: 900px) {
   :root { --sidebar: 0px; }
@@ -1077,6 +1128,11 @@ dialog::backdrop { background: rgba(16, 34, 45, .56); backdrop-filter: blur(2px)
   .explorer-grid { grid-template-columns: 1fr; }
   .detail-panel { position: static; max-height: none; overflow: visible; scrollbar-gutter: auto; }
   .result-list { max-height: 470px; overflow: auto; padding-right: 2px; }
+  .geo-map-shell > header { align-items: flex-start; flex-direction: column; gap: 7px; }
+  .geo-map-shell > header p { max-width: none; text-align: left; }
+  .geo-map { min-height: 500px; }
+  .geo-marker small, .geo-marker.labelled small { display: none; }
+  .geo-marker.selected small, .geo-marker:hover small, .geo-marker:focus-visible small { display: block; }
   .detail-grid { grid-template-columns: 1fr 1fr; }
   .detail-head.trial-entity { padding-top: 58px; padding-right: 20px; }
   .profile-status-relationship { grid-template-columns: 1fr; }
@@ -1126,6 +1182,10 @@ dialog::backdrop { background: rgba(16, 34, 45, .56); backdrop-filter: blur(2px)
   .filter-bar { grid-template-columns: 1fr; }
   .filter-bar .search-control { grid-column: auto; }
   .map-roadmap-note { display: none; }
+  .geo-map { min-height: 420px; }
+  .geo-grid, .geo-markers { inset: 24px; }
+  .geo-grid::after { font-size: 11px; }
+  .geo-context-stats { grid-template-columns: 1fr 1fr 1fr; }
   .detail-grid, .stats-grid { grid-template-columns: 1fr; }
   .detail-actions .button { flex: 1 1 calc(50% - 5px); }
   .room-pins, .room-task-fields { grid-template-columns: 1fr; }

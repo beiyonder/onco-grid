@@ -171,7 +171,8 @@ On 2026-09-19 the owner authorised the agent to push and merge future implementa
 | `C2` | `P5` | `.harness/reports/20260919T124743Z-P5-referral-packet.md` | Complete; merged through pull request `#13` |
 | `C2` | `P5` | `.harness/reports/20260919T130148Z-P5-referral-lifecycle.md` | Complete; merged through pull request `#14` |
 | `C2` | `P5` | `.harness/reports/20260919T131652Z-P5-tumour-board-context.md` | Complete; merged through pull request `#15` |
-| `C2` | `P5` | `.harness/reports/20260919T134104Z-P5-trial-team-outcome.md` | Complete; Phase 4 trial-team outcome ready for autonomous merge |
+| `C2` | `P5` | `.harness/reports/20260919T134104Z-P5-trial-team-outcome.md` | Complete; merged through pull request `#16` |
+| `C2` | `P5` | `.harness/reports/20260919T135650Z-P5-geographic-trial-view.md` | Complete; Phase 5 geographic Trial view ready for autonomous merge |
 
 ## References
 
@@ -213,3 +214,4 @@ On 2026-09-19 the owner authorised the agent to push and merge future implementa
 - `.harness/reports/20260919T130148Z-P5-referral-lifecycle.md`
 - `.harness/reports/20260919T131652Z-P5-tumour-board-context.md`
 - `.harness/reports/20260919T134104Z-P5-trial-team-outcome.md`
+- `.harness/reports/20260919T135650Z-P5-geographic-trial-view.md`

@@ -156,8 +156,8 @@
             <div class="view-heading"><h1 id="explore-title">Trial library</h1><p>Search India-located oncology trials, inspect the registry source, and keep registry status separate from human site confirmation.</p></div>
             <div class="header-actions">
               <div class="library-view-switch" role="group" aria-label="Trial library view">
-                <button class="library-view-option active" type="button" aria-pressed="true">List</button>
-                <button class="library-view-option" type="button" aria-pressed="false" aria-describedby="map-planned-note" disabled>Map</button>
+                <button class="library-view-option active" type="button" aria-pressed="true" data-library-mode="list">List</button>
+                <button class="library-view-option" type="button" aria-pressed="false" aria-describedby="map-planned-note" data-library-mode="map">Map</button>
               </div>
               <button class="button" id="refresh-results" type="button"><svg class="icon"><use href="#i-refresh"/></svg>Refresh source</button>
             </div>
@@ -176,15 +176,27 @@
           <div class="result-meta">
             <div class="result-summary"><strong id="result-count">Loading trials</strong><span id="library-source-date">ClinicalTrials.gov snapshot loading</span></div>
             <span class="spacer"></span>
-            <span id="map-planned-note" class="map-roadmap-note">Map follows validated location handling</span>
+            <span id="map-planned-note" class="map-roadmap-note">Same filters and selection · approximate geographic placement</span>
             <label for="sort-results">Sort</label>
             <select class="sort-select" id="sort-results"><option value="confidence">Source readiness</option><option value="recent">Recently updated</option><option value="title">Study title</option></select>
           </div>
 
-          <div class="explorer-grid">
+          <div class="explorer-grid" id="library-list-view">
             <div class="result-list" id="result-list" aria-live="polite" aria-busy="true"></div>
             <article class="detail-panel" id="trial-detail" aria-live="polite"></article>
           </div>
+          <section class="geo-view" id="library-map-view" aria-labelledby="geo-view-title" hidden>
+            <div class="geo-map-shell">
+              <header><div><span>Geographic lens</span><h2 id="geo-view-title" tabindex="-1">India trial locations</h2></div><p>Markers represent registry-listed sites for the filtered trial set—not patients, travel feasibility, or current enrolment availability.</p></header>
+              <div class="geo-map" id="geo-map" role="group" aria-label="Approximate India trial city and state-centroid markers">
+                <span class="geo-axis north">North · 37.5°N</span><span class="geo-axis south">South · 6.5°N</span><span class="geo-axis west">68°E</span><span class="geo-axis east">97.5°E</span>
+                <div class="geo-grid" aria-hidden="true"></div>
+                <div class="geo-markers" id="geo-markers"></div>
+              </div>
+              <div class="geo-boundary-note"><svg class="icon"><use href="#i-warning"/></svg><span><strong>Approximate geographic placement.</strong> City markers use a curated approximate city centroid where available; otherwise a labelled state centroid. This is not an administrative-boundary or route map.</span></div>
+            </div>
+            <aside class="geo-context" id="geo-context" aria-live="polite"></aside>
+          </section>
         </section>
 
         <section class="view" id="view-case" data-view="case" aria-labelledby="case-title">

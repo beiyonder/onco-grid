@@ -187,10 +187,10 @@ The owner decides whether to retain, simplify, supplement, or stop each major ca
 
 ## Current slice
 
-**Branch:** `feat/trial-team-outcome`
+**Branch:** `feat/geographic-trial-view`
 
-**Pull request outcome:** deliver Phase 4 slice 4 — record an authorised trial-team screening outcome exactly as sourced, preserve source role/date/note and packet version, add Trial-team outcome to the lifecycle, create one treating-team review task, block closure until that task is reviewed by the treating oncologist, and then close the operational handoff without a Trial Relay eligibility judgement or recommendation.
+**Pull request outcome:** deliver Phase 5 slice 1 — List/Map continuity over the same filtered registry trials and site records using an honest India longitude/latitude extent, curated approximate city centroids where available, labelled state-centroid fallback otherwise, explicit unplaced coverage, keyboard-selectable clusters, source/status context, and persistent trial selection. No unapproved boundary or geocoding source is introduced.
 
-**Acceptance scenario:** advance `REF-2201 v1.0` through screening; block a coordinator from recording the outcome; as verified site coordinator record More information required with source/date/note; verify one canonical Outcome Message, seven-stage lifecycle, packet/inquiry history, and `OUT-TASK-001` assigned to Treating oncology unit; block the site role from completing treating-team review; as Dr M. Shah complete it with no recommended action; then expose and perform Close handoff; confirm Patient Recent work, mobile layout, and source-authority labels. Also verify Eligible/Ineligible options remain explicitly labelled trial-team decisions.
+**Acceptance scenario:** load 285 trials in List, switch to Map without changing filters/selection, inspect all 64 placed clusters plus explicit 106 unplaced sites/60 trials, distinguish approximate city from state-centroid placement, search Mumbai and retain 161 matching trials across both modes, select a cluster by keyboard, open a trial back in List with exact NCT/profile/search state preserved, verify zero-result recovery, and confirm every map surface states it does not represent patients, travel feasibility, capacity, site confirmation, or current enrolment availability.
 
-**Explicit non-goals for this slice:** no Trial Relay eligibility calculation, clinical recommendation, reinterpretation of the site decision, automated treating-team action, actual external screening, real patient data, backend, persistence, authentication, new data source, or deployment change.
+**Explicit non-goals for this slice:** no administrative-boundary claim, precise facility coordinate, route/travel estimate, site-availability implication, external geocoder, new geographic data source, patient location, backend, persistence, authentication, or deployment change.

@@ -178,6 +178,32 @@ let registrySnapshotMeta = null;
 let registryLoadState = 'loading';
 let registryLoadError = '';
 let registryLoadRequest = 0;
+let libraryMode = 'list';
+let selectedGeoClusterId = null;
+const cityGeoCentroids = {
+  'new delhi':[28.61,77.21],delhi:[28.61,77.21],mumbai:[19.08,72.88],'navi mumbai':[19.03,73.03],thane:[19.22,72.98],
+  kolkata:[22.57,88.36],howrah:[22.6,88.31],pune:[18.52,73.86],bangalore:[12.97,77.59],bengaluru:[12.97,77.59],
+  hyderabad:[17.39,78.49],nashik:[20,73.79],ahmedabad:[23.02,72.57],nagpur:[21.15,79.09],varanasi:[25.32,82.97],
+  surat:[21.17,72.83],gurgaon:[28.46,77.03],gurugram:[28.46,77.03],bhubaneswar:[20.3,85.82],jaipur:[26.91,75.79],
+  chennai:[13.08,80.27],thiruvananthapuram:[8.52,76.94],vadodara:[22.3,73.18],visakhapatnam:[17.69,83.22],
+  belagavi:[15.85,74.5],madurai:[9.93,78.12],chandigarh:[30.73,76.78],kochi:[9.93,76.27],mysuru:[12.3,76.64],
+  puducherry:[11.94,79.81],kolhapur:[16.7,74.24],mohali:[30.7,76.72],vijayawada:[16.51,80.65],lucknow:[26.85,80.95],
+  calicut:[11.25,75.78],kozhikode:[11.25,75.78],kanpur:[26.45,80.33],patna:[25.61,85.14],vellore:[12.92,79.13],
+  aurangabad:[19.88,75.34],jhajjar:[28.61,76.66],faridabad:[28.41,77.31],indore:[22.72,75.86],
+  coimbatore:[11.02,76.96],guwahati:[26.14,91.74],ranchi:[23.34,85.31],raipur:[21.25,81.63],jodhpur:[26.24,73.02],
+  mangalore:[12.91,74.86],srinagar:[34.08,74.8],dehradun:[30.32,78.03],noida:[28.57,77.32],ghaziabad:[28.67,77.45]
+};
+const stateGeoCentroids = {
+  'andhra pradesh':[15.9,79.7],'arunachal pradesh':[28.2,94.7],assam:[26.2,92.9],bihar:[25.9,85.6],
+  chhattisgarh:[21.3,82],goa:[15.3,74],gujarat:[22.3,71.2],haryana:[29,76],'himachal pradesh':[31.8,77.2],
+  jharkhand:[23.6,85.3],karnataka:[15.3,75.7],kerala:[10.4,76.4],'madhya pradesh':[23.5,78.6],
+  maharashtra:[19.7,75.7],manipur:[24.8,93.9],meghalaya:[25.5,91.3],mizoram:[23.2,92.9],nagaland:[26.1,94.5],
+  odisha:[20.5,84.4],orissa:[20.5,84.4],punjab:[31,75.4],rajasthan:[26.8,73.8],sikkim:[27.5,88.5],
+  'tamil nadu':[11.1,78.7],telangana:[18.1,79],tripura:[23.8,91.6],'uttar pradesh':[26.8,80.9],
+  uttarakhand:[30.1,79.3],'west bengal':[23.1,87.9],delhi:[28.61,77.21],'jammu and kashmir':[33.5,75],
+  'jammu & kashmir':[33.5,75],ladakh:[34.2,77.6],puducherry:[11.94,79.81],chandigarh:[30.73,76.78]
+};
+const geoKey = value => plainText(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
 
 function fullDate(value) {
   if(!value) return today;
@@ -396,11 +422,118 @@ function filteredTrials() {
   return rows;
 }
 
+function geoPointFor(location) {
+  const city=geoKey(location.city);
+  const state=geoKey(location.state);
+  if(cityGeoCentroids[city]){
+    return {point:cityGeoCentroids[city],precision:'Approximate city centroid',fallback:false};
+  }
+  if(stateGeoCentroids[state]){
+    return {point:stateGeoCentroids[state],precision:'Approximate state centroid · city not geocoded',fallback:true};
+  }
+  return null;
+}
+
+function buildGeoClusters(rows) {
+  const clusters=new Map();
+  let unplacedSites=0;
+  const unplacedTrials=new Set();
+  rows.forEach(trial=>{
+    const locations=trial.indiaLocations?.length?trial.indiaLocations:[{facility:trial.location,city:trial.city,state:trial.state,status:trial.registryStatus}];
+    locations.forEach(location=>{
+      const placement=geoPointFor(location);
+      if(!placement){
+        unplacedSites+=1;
+        unplacedTrials.add(trial.id);
+        return;
+      }
+      const [lat,lon]=placement.point;
+      const state=plainText(location.state||trial.state||'State not reported');
+      const city=plainText(location.city||trial.city||'City not reported');
+      const id=placement.fallback?`state:${geoKey(state)}`:`city:${lat.toFixed(2)},${lon.toFixed(2)}`;
+      if(!clusters.has(id)){
+        clusters.set(id,{id,point:placement.point,precision:placement.precision,fallback:placement.fallback,state,cities:new Set(),facilities:new Set(),trials:new Map(),siteCount:0});
+      }
+      const cluster=clusters.get(id);
+      cluster.cities.add(city);
+      if(location.facility)cluster.facilities.add(plainText(location.facility));
+      cluster.trials.set(trial.id,trial);
+      cluster.siteCount+=1;
+    });
+  });
+  const sorted=[...clusters.values()].sort((a,b)=>b.trials.size-a.trials.size||b.siteCount-a.siteCount||[...a.cities][0].localeCompare([...b.cities][0]));
+  return {clusters:sorted,unplacedSites,unplacedTrialCount:unplacedTrials.size};
+}
+
+function projectGeoPoint([lat,lon]) {
+  const x=Math.max(3,Math.min(97,((lon-68)/(97.5-68))*100));
+  const y=Math.max(3,Math.min(97,((37.5-lat)/(37.5-6.5))*100));
+  return {x,y};
+}
+
+function renderGeographicView(rows) {
+  const markers=$('#geo-markers');
+  const context=$('#geo-context');
+  const {clusters,unplacedSites,unplacedTrialCount}=buildGeoClusters(rows);
+  if(!clusters.some(cluster=>cluster.id===selectedGeoClusterId)){
+    selectedGeoClusterId=clusters.find(cluster=>cluster.trials.has(selectedTrialId))?.id||clusters[0]?.id||null;
+  }
+  if(!clusters.length){
+    markers.innerHTML='';
+    context.innerHTML=`<div class="empty-state"><div class="empty-symbol">${icon('compass')}</div><h2>No placeable locations</h2><p>No filtered registry site has a curated approximate city or state-centroid placement. Use List for the complete source records.</p></div>`;
+    return;
+  }
+  const topLabelIds=new Set(clusters.slice(0,12).map(cluster=>cluster.id));
+  markers.innerHTML=clusters.map(cluster=>{
+    const {x,y}=projectGeoPoint(cluster.point);
+    const selected=cluster.id===selectedGeoClusterId;
+    const label=cluster.fallback?cluster.state:[...cluster.cities].sort().join(' / ');
+    const size=Math.min(46,20+Math.sqrt(cluster.trials.size)*2.2);
+    return `<button class="geo-marker ${selected?'selected':''} ${cluster.fallback?'fallback':''} ${topLabelIds.has(cluster.id)||selected?'labelled':''}" type="button" data-geo-cluster="${escapeHTML(cluster.id)}" style="left:${x.toFixed(2)}%;top:${y.toFixed(2)}%;--marker-size:${size.toFixed(1)}px" aria-pressed="${selected}" aria-label="${escapeHTML(label)}: ${cluster.trials.size} matching trials across ${cluster.siteCount} registry-listed sites; ${cluster.precision}"><span>${cluster.trials.size}</span><small>${escapeHTML(label)}</small></button>`;
+  }).join('');
+  const selected=clusters.find(cluster=>cluster.id===selectedGeoClusterId)||clusters[0];
+  const label=selected.fallback?selected.state:[...selected.cities].sort().join(' / ');
+  const selectedTrials=[...selected.trials.values()].sort((a,b)=>b.confidence-a.confidence||a.title.localeCompare(b.title));
+  context.innerHTML=`
+    <div class="geo-context-head"><span>Selected geographic cluster</span><h2>${escapeHTML(label)}</h2><p>${escapeHTML(selected.precision)}</p></div>
+    <div class="geo-context-stats"><div><span>Matching trials</span><strong>${selectedTrials.length}</strong></div><div><span>Registry-listed sites</span><strong>${selected.siteCount}</strong></div><div><span>Facilities named</span><strong>${selected.facilities.size}</strong></div></div>
+    <div class="geo-context-warning">${icon('warning')}<span>Marker position and size do not indicate travel feasibility, capacity, independent site confirmation, or current enrolment availability.</span></div>
+    <div class="geo-trial-list">${selectedTrials.slice(0,12).map(trial=>`<button type="button" data-geo-trial="${trial.id}" class="${trial.id===selectedTrialId?'selected':''}"><span><strong>${trial.title}</strong><small>${trial.id} · ${trial.phase} · Registry: ${trial.registryStatus} · Site: ${trial.verifyLabel}</small></span>${icon('arrow')}</button>`).join('')}</div>
+    ${selectedTrials.length>12?`<div class="notice"><strong>${selectedTrials.length-12} more trials in this cluster.</strong> Use List with the same filters for the complete result set.</div>`:''}
+    <div class="geo-coverage-note"><strong>${clusters.length} placed clusters</strong><span>${unplacedSites} registry-listed sites across ${unplacedTrialCount} trials are not placed because neither a curated city nor reported-state centroid is available. They remain in List.</span></div>`;
+  $$('[data-geo-cluster]',markers).forEach(button=>button.addEventListener('click',()=>{
+    selectedGeoClusterId=button.dataset.geoCluster;
+    renderGeographicView(rows);
+    $(`[data-geo-cluster="${selectedGeoClusterId}"]`,markers)?.focus({preventScroll:true});
+  }));
+  $$('[data-geo-trial]',context).forEach(button=>button.addEventListener('click',()=>{
+    selectedTrialId=button.dataset.geoTrial;
+    profileOriginId=selectedTrialId;
+    profileOpen=true;
+    activeTab='overview';
+    libraryMode='list';
+    renderTrials();
+    $('#trial-profile-title')?.focus({preventScroll:false});
+  }));
+}
+
+function syncLibraryModeViews(forceList=false) {
+  const mode=forceList?'list':libraryMode;
+  $('#library-list-view').hidden=mode!=='list';
+  $('#library-map-view').hidden=mode!=='map';
+  $$('[data-library-mode]').forEach(button=>{
+    const active=button.dataset.libraryMode===mode;
+    button.classList.toggle('active',active);
+    button.setAttribute('aria-pressed',String(active));
+  });
+}
+
 function renderTrials() {
   const list=$('#result-list');
   const detail=$('#trial-detail');
   const count=$('#result-count');
   const sourceDate=$('#library-source-date');
+  syncLibraryModeViews(registryLoadState==='loading');
   if(registryLoadState==='loading'){
     count.textContent='Loading registry snapshot';
     sourceDate.textContent='ClinicalTrials.gov source and snapshot date pending';
@@ -415,20 +548,23 @@ function renderTrials() {
   const visibleRows=rows.slice(0,60);
   const snapshotDate=registrySnapshotMeta?.dataTimestamp?.slice(0,10);
   const recordKind=registrySnapshotMeta?'registry':'synthetic fallback';
-  count.textContent=rows.length>visibleRows.length?`${rows.length} ${recordKind} trials · showing first ${visibleRows.length}`:`${rows.length} ${recordKind} ${rows.length===1?'trial':'trials'}`;
+  count.textContent=libraryMode==='map'?`${rows.length} ${recordKind} ${rows.length===1?'trial':'trials'} · all filtered registry locations`:rows.length>visibleRows.length?`${rows.length} ${recordKind} trials · showing first ${visibleRows.length}`:`${rows.length} ${recordKind} ${rows.length===1?'trial':'trials'}`;
   sourceDate.textContent=snapshotDate?`ClinicalTrials.gov snapshot · ${formatDate(snapshotDate)}`:'Registry snapshot unavailable · synthetic fallback';
   const errorState=registryLoadState==='error'?`<div class="library-state error" role="alert"><strong>Registry snapshot unavailable</strong><p>${escapeHTML(registryLoadError)}. ${registrySnapshotMeta?'The last loaded registry records remain below.':'The records below are synthetic fallback examples.'}</p><button class="button small" type="button" id="retry-registry-load">${icon('refresh')}Retry source</button></div>`:'';
+  syncLibraryModeViews();
 
   if(!rows.length){
     list.innerHTML=errorState+`<div class="empty-state"><div class="empty-symbol">${icon('search')}</div><h2>No general records found</h2><p>Try a broader condition or clear the source-status filters. No patient details are needed.</p><button class="button" type="button" id="empty-reset">Clear filters</button></div>`;
     detail.innerHTML=`<div class="detail-head"><h2>No record selected</h2><p class="summary">The detail panel updates when a general trial record is selected.</p></div>`;
     $('#empty-reset')?.addEventListener('click',clearFilters);
     $('#retry-registry-load')?.addEventListener('click',loadRegistrySnapshot);
+    if(libraryMode==='map')renderGeographicView(rows);
     return;
   }
 
-  if(!visibleRows.some(trial=>trial.id===selectedTrialId)){
-    selectedTrialId=visibleRows[0].id;
+  const selectionPool=libraryMode==='map'?rows:visibleRows;
+  if(!selectionPool.some(trial=>trial.id===selectedTrialId)){
+    selectedTrialId=selectionPool[0].id;
     if(profileOpen)profileOriginId=selectedTrialId;
   }
   list.innerHTML=errorState+visibleRows.map(trial=>{
@@ -461,6 +597,7 @@ function renderTrials() {
     const selected=trialById(selectedTrialId);
     detail.innerHTML=`<div class="detail-prompt"><div class="empty-symbol">${icon('compass')}</div><h2>Choose a trial to inspect</h2><p>${selected?`Returned from ${selected.id}. `:''}Your filters and list position remain unchanged.</p></div>`;
   }
+  if(libraryMode==='map')renderGeographicView(rows);
 }
 
 function renderDetail(t) {
@@ -2138,6 +2275,12 @@ $$('[data-inbox-kind]').forEach(button=>button.addEventListener('click',()=>{
 $$('.close-dialog').forEach(button=>button.addEventListener('click',()=>button.closest('dialog').close()));
 $$('.nav-button').forEach(button=>button.addEventListener('click',()=>switchView(button.dataset.target)));
 $$('[data-home-target],[data-context-target]').forEach(button=>button.addEventListener('click',()=>switchView(button.dataset.homeTarget||button.dataset.contextTarget)));
+$$('[data-library-mode]').forEach(button=>button.addEventListener('click',()=>{
+  libraryMode=button.dataset.libraryMode;
+  renderTrials();
+  if(libraryMode==='map')$('#geo-view-title').focus({preventScroll:true});
+  else $$('.trial-card',$('#result-list')).find(card=>card.dataset.trialId===selectedTrialId)?.focus({preventScroll:true});
+}));
 ['trial-search','cancer-filter','verify-filter','state-filter','sort-results'].forEach(id=>$('#'+id).addEventListener(id==='trial-search'?'input':'change',renderTrials));
 $('#clear-filters').addEventListener('click',clearFilters);
 $('#command-trigger').addEventListener('click',()=>{switchView('explore');setTimeout(()=>$('#trial-search').focus(),0);});
