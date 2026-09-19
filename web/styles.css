@@ -1205,7 +1205,8 @@ dialog::backdrop { background: rgba(16, 34, 45, .56); backdrop-filter: blur(2px)
 .inbox-inspector-facts span, .inbox-inspector-state > span { color: var(--muted); font-size: 7px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
 .inbox-inspector-facts strong, .inbox-inspector-state strong { overflow-wrap: anywhere; font-size: 10px; }
 .inbox-inspector-state small { color: var(--muted); font-size: 8px; }
-.packet-lifecycle { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: 4px; }
+.inbox-inspector-state.trial-outcome-state { border-left-color: var(--green); background: var(--green-soft); }
+.packet-lifecycle { display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); gap: 4px; }
 .packet-stage { position: relative; display: grid; gap: 3px; justify-items: center; border: 1px solid var(--rule); border-radius: 7px; padding: 7px 4px; background: rgba(251,252,251,.62); color: var(--muted); text-align: center; }
 .packet-stage > span { display: grid; width: 20px; height: 20px; place-items: center; border-radius: 50%; background: var(--paper-2); font-family: var(--font-data); font-size: 7px; }
 .packet-stage strong { font-size: 7px; line-height: 1.2; }

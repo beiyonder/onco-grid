@@ -89,6 +89,11 @@ let caseSelectedTrialId = trials[0].id;
 let currentArtifactName = '';
 const referralPackets = [];
 let referralPacketSequence = 1;
+const trialTeamOutcomes = [];
+const trialOutcomeTasks = [];
+let trialOutcomeSequence = 1;
+let trialOutcomeTaskSequence = 1;
+let pendingOutcomePacketId = null;
 let boardContext = null;
 let boardTaskWritten = false;
 const criterionDecisions = new Map();
@@ -137,8 +142,8 @@ const formatDate = (value) => {
   const parsed=new Date(`${normalized}T00:00:00`);
   return Number.isNaN(parsed.getTime())?value:new Intl.DateTimeFormat('en-IN',{day:'2-digit',month:'short',year:'numeric'}).format(parsed);
 };
-const statusPill = (trial) => `<span class="status-pill ${trial.verifyTone}"><span class="status-dot"></span>${trial.verifyLabel}</span>`;
-const statusHuman = {draft:'Draft',approved:'Human approved',sent:'Sent',acknowledged:'Acknowledged',screening:'Trial-team screening',correction:'Correction required',closed:'Closed',unable:'Unable to contact'};
+const statusPill = trial => `<span class="status-pill ${trial.verifyTone}"><span class="status-dot"></span>${trial.verifyLabel}</span>`;
+const statusHuman = {draft:'Draft',approved:'Human approved',sent:'Sent',acknowledged:'Acknowledged',screening:'Trial-team screening',outcome:'Trial-team outcome',correction:'Correction required',closed:'Closed',unable:'Unable to contact'};
 const roleProfiles = {
   coordinator:{initials:'AR',name:'A. Rao',label:'Research coordinator',institution:'Metro Cancer Centre',verified:true},
   oncologist:{initials:'MS',name:'Dr M. Shah',label:'Treating oncologist',institution:'Metro Cancer Centre',verified:true},
@@ -773,6 +778,28 @@ function openVerification(trialId=selectedVerificationId) {
   $('#verification-status').focus();
 }
 
+function openTrialTeamOutcome(packetId) {
+  if(currentRole!=='site'){
+    showToast('Switch to the verified site coordinator role to record an authorised trial-team outcome.');
+    return;
+  }
+  const packet=referralPackets.find(candidate=>candidate.id===packetId);
+  const inquiry=inquiries.find(candidate=>candidate.packetId===packetId);
+  if(!packet||!inquiry||packet.status!=='screening'||packet.outcomeId){
+    showToast('A packet in Trial-team screening without an existing outcome is required.');
+    return;
+  }
+  pendingOutcomePacketId=packetId;
+  $('#trial-outcome-context').textContent=`${packet.id} · ${packet.version} · ${packet.site} · synthetic case SYN-2047`;
+  $('#trial-outcome-value').value='more_info';
+  $('#trial-outcome-source').value='Site trial coordinator';
+  $('#trial-outcome-date').value=today;
+  $('#trial-outcome-note').value='';
+  $('#trial-outcome-authority').checked=false;
+  $('#trial-outcome-dialog').showModal();
+  $('#trial-outcome-value').focus();
+}
+
 function openCompare(trialId) {
   const t=trialById(trialId);
   $('#compare-trial-label').textContent=`${t.id} · synthetic comparison`;
@@ -943,6 +970,12 @@ function renderPatientWorkspaceState(t=trialById(caseSelectedTrialId)||trialById
   if(patientPackets.length){
     const latest=patientPackets.at(-1);
     work.unshift({tone:'task',title:'Referral packet',meta:`${latest.id} · ${latest.version} · ${latest.sources.length} source references · owner ${latest.owner}`,state:statusHuman[latest.status]||latest.status});
+  }
+  const patientOutcomes=trialTeamOutcomes.filter(outcome=>outcome.trialId===t.id);
+  if(patientOutcomes.length){
+    const latest=patientOutcomes.at(-1);
+    const nextTask=trialOutcomeTasks.find(task=>task.outcomeId===latest.id);
+    work.unshift({tone:'human',title:'Authorised trial-team outcome',meta:`${latest.id} · ${latest.label} · ${latest.sourceRole} · ${formatDate(latest.recordedOn)}`,state:nextTask?.status==='open'?'Treating-team review due':'Reviewed'});
   }
   if(boardContext?.decision)work.unshift({tone:'human',title:'Human board disposition recorded',meta:`${boardContext.decision.recordRef} · ${boardContext.packetId} · next owner ${boardContext.decision.owner}`,state:boardTaskWritten?'Task written':'Recorded'});
   $('#patient-recent-work').innerHTML=work.map(item=>`
@@ -1129,13 +1162,13 @@ function buildInboxItems() {
   inquiries.forEach(inquiry=>{
     if(['closed','unable'].includes(inquiry.status))return;
     const representedByAlert=alerts.some(alert=>alert.body.includes(inquiry.id));
-    if(['acknowledged','screening'].includes(inquiry.status)&&representedByAlert)return;
+    if(['acknowledged','screening','outcome'].includes(inquiry.status)&&representedByAlert)return;
     const trial=trialById(inquiry.trialId);
-    const kind=['acknowledged','screening'].includes(inquiry.status)?'messages':'tasks';
+    const kind=['acknowledged','screening','outcome'].includes(inquiry.status)?'messages':'tasks';
     items.push({
       id:`inquiry:${inquiry.id}`,
       kind,
-      title:inquiry.status==='acknowledged'?'Referral or inquiry acknowledged':inquiry.status==='screening'?'Trial-team screening':`${statusHuman[inquiry.status]||inquiry.status} handoff`,
+      title:inquiry.status==='acknowledged'?'Referral or inquiry acknowledged':inquiry.status==='screening'?'Trial-team screening':inquiry.status==='outcome'?'Trial-team outcome returned':`${statusHuman[inquiry.status]||inquiry.status} handoff`,
       body:inquiry.question,
       context:`${inquiry.id} · ${inquiry.trialId}`,
       owner:inquiry.owner||'Unassigned',
@@ -1166,6 +1199,25 @@ function buildInboxItems() {
       missingTaskId:task.id
     });
   });
+  trialOutcomeTasks.filter(task=>task.status==='open').forEach(task=>{
+    const outcome=trialTeamOutcomes.find(candidate=>candidate.id===task.outcomeId);
+    items.push({
+      id:`outcome-task:${task.id}`,
+      kind:'tasks',
+      title:'Review trial-team screening outcome',
+      body:'Review the authorised source outcome and choose the treating team’s human next step. Trial Relay does not recommend an action.',
+      context:`SYN-2047 · ${task.packetId} · ${task.trialId}`,
+      owner:task.owner,
+      due:dueLabel(task.due),
+      source:`${outcome?.sourceRole||'Authorised trial team'} · ${outcome?.id||task.outcomeId}`,
+      tone:'warn',
+      unread:false,
+      targetView:'outcome-task',
+      trialId:task.trialId,
+      packetId:task.packetId,
+      outcomeTaskId:task.id
+    });
+  });
   trials.filter(trial=>trial.due||trial.discrepancy).forEach(trial=>{
     items.push({
       id:`verification:${trial.id}`,
@@ -1189,14 +1241,17 @@ function inboxInspectorMarkup(item) {
   const linkedInquiry=inquiries.find(inquiry=>inquiry.id===item.inquiryId);
   const linkedTrial=trialById(item.trialId);
   const linkedMissing=missingInfoTasks.find(task=>task.id===item.missingTaskId);
-  const linkedPacket=referralPackets.find(packet=>packet.id===linkedInquiry?.packetId);
-  const lifecycleStates=['draft','approved','sent','acknowledged','screening','closed'];
+  const linkedPacket=referralPackets.find(packet=>packet.id===(linkedInquiry?.packetId||item.packetId));
+  const linkedOutcome=trialTeamOutcomes.find(outcome=>outcome.id===linkedPacket?.outcomeId);
+  const linkedOutcomeTask=trialOutcomeTasks.find(task=>task.id===item.outcomeTaskId||(linkedPacket&&task.packetId===linkedPacket.id));
+  const lifecycleStates=['draft','approved','sent','acknowledged','screening','outcome','closed'];
   const packetLifecycle=linkedPacket?`<div class="packet-lifecycle" aria-label="Referral lifecycle">${lifecycleStates.map((state,index)=>{
     const reached=linkedPacket.history.some(event=>event.state===state);
     const current=linkedPacket.status===state;
     return `<div class="packet-stage ${reached?'done':''} ${current?'current':''}"><span>${index+1}</span><strong>${statusHuman[state]}</strong></div>`;
   }).join('')}</div><details class="packet-history"><summary>Actor, timestamp, and source history</summary><div>${linkedPacket.history.map(event=>`<p><strong>${statusHuman[event.state]||event.state}</strong><span>${escapeHTML(event.actor)} · ${escapeHTML(event.at)} · ${escapeHTML(event.source)}</span></p>`).join('')}</div></details>`:'';
-  const nextInquiryState=linkedInquiry?{draft:'approved',approved:'sent',sent:'acknowledged',acknowledged:'screening',screening:'closed'}[linkedInquiry.status]:null;
+  const proposedNextInquiryState=linkedInquiry?{draft:'approved',approved:'sent',sent:'acknowledged',acknowledged:'screening',outcome:'closed'}[linkedInquiry.status]:null;
+  const nextInquiryState=proposedNextInquiryState==='closed'&&linkedOutcomeTask?.status==='open'?null:proposedNextInquiryState;
   const nextInquiryLabel=nextInquiryState?{
     approved:'Approve draft',
     sent:'Mark sent',
@@ -1222,6 +1277,8 @@ function inboxInspectorMarkup(item) {
       ${packetLifecycle}
       ${item.targetView==='verification'&&linkedTrial?`<div class="inbox-inspector-state"><span>Source comparison</span><strong>Registry: ${linkedTrial.registryStatus} · Site: ${linkedTrial.verifyLabel}</strong><small>${linkedTrial.source} updated ${formatDate(linkedTrial.registryUpdated)}. Unknown remains unknown until an authorised source responds.</small></div>`:''}
       ${linkedMissing?`<div class="inbox-inspector-state"><span>Missing-information task</span><strong>${linkedMissing.status==='open'?'Open · answer remains unknown':linkedMissing.status}</strong><small>${linkedMissing.id} · criterion ${linkedMissing.criterionIndex+1} · ${linkedMissing.source} · created by ${linkedMissing.createdBy}</small></div>`:''}
+      ${linkedOutcome?`<div class="inbox-inspector-state trial-outcome-state"><span>Authorised trial-team outcome</span><strong>${escapeHTML(linkedOutcome.label)}</strong><small>${escapeHTML(linkedOutcome.sourceRole)} · ${formatDate(linkedOutcome.recordedOn)} · ${escapeHTML(linkedOutcome.note)}</small></div>`:''}
+      ${linkedOutcomeTask?`<div class="inbox-inspector-state"><span>Treating-team next task</span><strong>${linkedOutcomeTask.status==='open'?'Open · human review required':linkedOutcomeTask.status}</strong><small>${linkedOutcomeTask.id} · owner ${linkedOutcomeTask.owner} · due ${formatDate(linkedOutcomeTask.due)}</small></div>`:''}
       <div class="inbox-inspector-actions">
         ${item.unread?`<button class="button" type="button" data-inbox-read="${item.id}">${icon('check')}Mark read</button>`:''}
         ${nextInquiryLabel?`<button class="button primary" type="button" data-inbox-advance="${linkedInquiry.id}">${icon('arrow')}${nextInquiryLabel}</button>`:''}
@@ -1229,6 +1286,8 @@ function inboxInspectorMarkup(item) {
         ${item.targetView==='verification'&&item.trialId?`<button class="button primary" type="button" data-inbox-verify="${item.trialId}">${icon('check')}Record verification</button>`:''}
         ${linkedMissing&&linkedMissing.status==='open'?`<button class="button primary" type="button" data-complete-missing-task="${linkedMissing.id}">${icon('check')}Mark task complete</button><button class="button danger" type="button" data-unable-missing-task="${linkedMissing.id}">${icon('warning')}Unable to obtain</button>`:''}
         ${linkedPacket&&['approved','sent','acknowledged','screening'].includes(linkedPacket.status)?`<button class="button danger" type="button" data-request-packet-correction="${linkedPacket.id}">${icon('warning')}Request correction</button>`:''}
+        ${linkedPacket&&linkedPacket.status==='screening'&&!linkedOutcome?`<button class="button primary" type="button" data-record-trial-outcome="${linkedPacket.id}">${icon('check')}Record trial-team outcome</button>`:''}
+        ${linkedOutcomeTask&&linkedOutcomeTask.status==='open'?`<button class="button primary" type="button" data-review-outcome-task="${linkedOutcomeTask.id}">${icon('check')}Mark treating-team review complete</button>`:''}
         <button class="button" type="button" data-inbox-open="${item.id}">${icon('arrow')}Go to full context</button>
       </div>
       <div class="inbox-inspector-boundary">${icon('shield')}<span>Only a human-recorded operational action changes workflow state. Opening or reading this item never changes a registry assertion, site confirmation, or clinical conclusion.</span></div>
@@ -1381,6 +1440,37 @@ function renderAlerts() {
     renderAlerts();
     focusInboxOrigin(originId,true);
   }));
+  $$('[data-record-trial-outcome]',stream).forEach(button=>button.addEventListener('click',()=>{
+    const originId=selectedInboxItemId;
+    openTrialTeamOutcome(button.dataset.recordTrialOutcome);
+    const dialog=$('#trial-outcome-dialog');
+    if(!dialog.open)return;
+    dialog.addEventListener('close',()=>{
+      if($('.view.active')?.dataset.view==='alerts'){
+        selectedInboxItemId=buildInboxItems().some(item=>item.id===originId)?originId:null;
+        renderAlerts();
+        focusInboxOrigin(selectedInboxItemId,Boolean(selectedInboxItemId));
+      }
+    },{once:true});
+  }));
+  $$('[data-review-outcome-task]',stream).forEach(button=>button.addEventListener('click',()=>{
+    if(currentRole!=='oncologist'){
+      showToast('Switch to the treating oncologist role to complete the outcome-review task.');
+      return;
+    }
+    const task=trialOutcomeTasks.find(candidate=>candidate.id===button.dataset.reviewOutcomeTask);
+    if(!task||task.status!=='open')return;
+    task.status='complete';
+    task.reviewedBy=roleProfiles.oncologist.name;
+    task.reviewedAt=formatDate(today);
+    auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:`${today} session`,actor:task.reviewedBy,title:'Trial-team outcome reviewed by treating team',note:`${task.id} · ${task.outcomeId} · no Trial Relay recommendation`,type:'task'});
+    selectedInboxItemId=null;
+    renderPatientWorkspaceState();
+    renderAlerts();
+    renderAudit();
+    focusInboxOrigin('',false);
+    showToast(`${task.id} marked reviewed by the treating oncologist. Trial Relay did not choose the next clinical action.`);
+  }));
   $$('[data-inbox-verify]',stream).forEach(button=>button.addEventListener('click',()=>{
     pendingInboxFocusId=selectedInboxItemId;
     const dialog=$('#verification-dialog');
@@ -1444,6 +1534,12 @@ function renderAlerts() {
       renderCase();
       switchView('case');
       $(`[data-criterion-row="${item.criterionKey}"]`)?.focus({preventScroll:false});
+    }else if(item.targetView==='outcome-task'&&item.trialId){
+      caseSelectedTrialId=item.trialId;
+      renderCase();
+      switchView('case');
+      $('#patient-recent-work').setAttribute('tabindex','-1');
+      $('#patient-recent-work').focus({preventScroll:false});
     }else if(item.trialId){
       $('#trial-search').value=item.trialId;
       selectedTrialId=item.trialId;
@@ -1505,7 +1601,7 @@ function renderInquiries() {
   renderPatientWorkspaceState();
   const wrap=$('#inquiry-table-wrap');
   if(!rows.length){wrap.innerHTML='<div class="empty-state" style="margin:14px"><h2>No inquiries in this state</h2><p>Change the filter or create a general site inquiry from a trial record.</p></div>';return;}
-  wrap.innerHTML=`<table class="inquiry-table"><thead><tr><th>Trial</th><th>Question</th><th>Owner</th><th>Due</th><th>State</th><th>Next action</th></tr></thead><tbody>${rows.map(i=>{const t=trialById(i.trialId);const next={draft:'Approve',approved:'Mark sent',sent:'Mark acknowledged',acknowledged:'Begin screening',screening:'Close handoff'}[i.status]||'Closed';const canAdvance=['draft','approved','sent','acknowledged','screening'].includes(i.status);const canUnable=['draft','approved','sent'].includes(i.status);return `<tr><td class="inquiry-trial" data-label="Trial"><strong>${t?.title||'Synthetic trial'}</strong><span>${i.id} · ${i.trialId}${i.version?` · ${i.version}`:''}</span></td><td data-label="Question">${i.question}</td><td data-label="Owner">${i.owner}</td><td data-label="Due">${formatDate(i.due)}</td><td data-label="State"><span class="status-pill ${i.status==='closed'?'good':i.status==='sent'?'warn':'neutral'}"><span class="status-dot"></span>${statusHuman[i.status]}</span></td><td data-label="Next"><div class="stage-control"><button class="button small ${i.status==='screening'?'success':''}" type="button" data-advance="${i.id}" ${canAdvance?'':'disabled'}>${next}</button>${canUnable?`<button class="button small ghost" type="button" data-unable="${i.id}">Unable</button>`:''}</div></td></tr>`}).join('')}</tbody></table>`;
+  wrap.innerHTML=`<table class="inquiry-table"><thead><tr><th>Trial</th><th>Question</th><th>Owner</th><th>Due</th><th>State</th><th>Next action</th></tr></thead><tbody>${rows.map(i=>{const t=trialById(i.trialId);const next={draft:'Approve',approved:'Mark sent',sent:'Mark acknowledged',acknowledged:'Begin screening',screening:'Record outcome in Inbox',outcome:'Close handoff'}[i.status]||'Closed';const canAdvance=['draft','approved','sent','acknowledged','outcome'].includes(i.status);const canUnable=['draft','approved','sent'].includes(i.status);return `<tr><td class="inquiry-trial" data-label="Trial"><strong>${t?.title||'Synthetic trial'}</strong><span>${i.id} · ${i.trialId}${i.version?` · ${i.version}`:''}</span></td><td data-label="Question">${i.question}</td><td data-label="Owner">${i.owner}</td><td data-label="Due">${formatDate(i.due)}</td><td data-label="State"><span class="status-pill ${i.status==='closed'?'good':i.status==='sent'?'warn':'neutral'}"><span class="status-dot"></span>${statusHuman[i.status]}</span></td><td data-label="Next"><div class="stage-control"><button class="button small ${i.status==='outcome'?'success':''}" type="button" data-advance="${i.id}" ${canAdvance?'':'disabled'}>${next}</button>${canUnable?`<button class="button small ghost" type="button" data-unable="${i.id}">Unable</button>`:''}</div></td></tr>`}).join('')}</tbody></table>`;
   $$('[data-advance]',wrap).forEach(btn=>btn.addEventListener('click',()=>advanceInquiry(btn.dataset.advance)));
   $$('[data-unable]',wrap).forEach(btn=>btn.addEventListener('click',()=>setInquiryUnable(btn.dataset.unable)));
 }
@@ -1513,12 +1609,19 @@ function renderInquiries() {
 function advanceInquiry(id){
   const item=inquiries.find(inquiry=>inquiry.id===id);
   if(!item)return;
-  const next={draft:'approved',approved:'sent',sent:'acknowledged',acknowledged:'screening',screening:'closed'}[item.status];
+  const next={draft:'approved',approved:'sent',sent:'acknowledged',acknowledged:'screening',outcome:'closed'}[item.status];
   if(!next)return;
   const packet=referralPackets.find(candidate=>candidate.id===item.packetId);
   if(packet&&next==='sent'&&!packet.approval){
     showToast(`${packet.id} cannot be sent without a separate human approval.`);
     return;
+  }
+  if(packet&&next==='closed'){
+    const outcomeTask=trialOutcomeTasks.find(task=>task.packetId===packet.id&&task.status==='open');
+    if(outcomeTask){
+      showToast(`${packet.id} cannot close until ${outcomeTask.id} is reviewed by the treating oncologist.`);
+      return;
+    }
   }
   const before=item.status;
   const actor=roleProfiles[currentRole].name;
@@ -1788,6 +1891,77 @@ $('#board-form').addEventListener('submit',(event)=>{
   renderBoard();
   renderAudit();
   showToast(`${decision.recordRef} recorded as a signed human reference. Only the operational task was captured.`);
+});
+
+$('#trial-outcome-form').addEventListener('submit',(event)=>{
+  event.preventDefault();
+  if(!event.currentTarget.reportValidity())return;
+  if(currentRole!=='site'||!pendingOutcomePacketId){
+    showToast('A verified site coordinator and screening packet context are required.');
+    return;
+  }
+  const packet=referralPackets.find(candidate=>candidate.id===pendingOutcomePacketId);
+  const inquiry=inquiries.find(candidate=>candidate.packetId===pendingOutcomePacketId);
+  if(!packet||!inquiry||packet.status!=='screening'||packet.outcomeId){
+    showToast('This packet is not awaiting an authorised trial-team outcome.');
+    return;
+  }
+  const labels={
+    eligible:'Eligible — trial-team decision',
+    ineligible:'Ineligible — trial-team decision',
+    more_info:'More information required',
+    deferred:'Screening deferred',
+    unable:'Unable to contact'
+  };
+  const key=$('#trial-outcome-value').value;
+  const outcome={
+    id:`OUT-${String(trialOutcomeSequence++).padStart(3,'0')}`,
+    packetId:packet.id,
+    packetVersion:packet.version,
+    trialId:packet.trialId,
+    key,
+    label:labels[key],
+    sourceRole:$('#trial-outcome-source').value,
+    recordedOn:$('#trial-outcome-date').value,
+    note:$('#trial-outcome-note').value.trim(),
+    recordedBy:roleProfiles.site.name
+  };
+  trialTeamOutcomes.push(outcome);
+  const due=new Date(`${today}T00:00:00Z`);
+  due.setUTCDate(due.getUTCDate()+1);
+  const nextTask={
+    id:`OUT-TASK-${String(trialOutcomeTaskSequence++).padStart(3,'0')}`,
+    outcomeId:outcome.id,
+    packetId:packet.id,
+    trialId:packet.trialId,
+    owner:'Treating oncology unit',
+    due:due.toISOString().slice(0,10),
+    status:'open'
+  };
+  trialOutcomeTasks.push(nextTask);
+  packet.outcomeId=outcome.id;
+  packet.status='outcome';
+  packet.history.push({state:'outcome',actor:outcome.sourceRole,at:formatDate(outcome.recordedOn),source:`Authorised trial-team outcome ${outcome.id}`});
+  inquiry.status='outcome';
+  inquiry.history??=[];
+  inquiry.history.push({state:'outcome',actor:outcome.sourceRole,at:formatDate(outcome.recordedOn),source:`Authorised trial-team outcome ${outcome.id}`});
+  let alert=alerts.find(candidate=>candidate.body.includes(inquiry.id));
+  if(!alert){
+    alert={id:`ALT-${400+alerts.length}`,type:'handoff',tone:'good',title:'Trial-team outcome returned',body:'',source:'',recipients:['Treating oncologist','Research coordinator'],unread:true};
+    alerts.unshift(alert);
+  }
+  alert.title='Trial-team outcome returned';
+  alert.body=`${outcome.id} · ${packet.id} · ${outcome.label}. Treating-team review remains a human task.`;
+  alert.source=`${outcome.sourceRole} · ${formatDate(outcome.recordedOn)}`;
+  alert.unread=true;
+  auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:`${today} session`,actor:outcome.recordedBy,title:'Authorised trial-team outcome recorded',note:`${outcome.id} · ${packet.id} ${packet.version} · ${outcome.label} · source ${outcome.sourceRole}`,type:'trial-team'});
+  pendingOutcomePacketId=null;
+  $('#trial-outcome-dialog').close();
+  renderInquiries();
+  renderPatientWorkspaceState();
+  renderAlerts();
+  renderAudit();
+  showToast(`${outcome.id} recorded exactly as ${outcome.label}. ${nextTask.id} assigned to the treating team; Trial Relay made no recommendation.`);
 });
 
 $('#alert-rule-form').addEventListener('submit',(event)=>{

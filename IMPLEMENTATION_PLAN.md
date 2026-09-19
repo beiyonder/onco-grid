@@ -187,10 +187,10 @@ The owner decides whether to retain, simplify, supplement, or stop each major ca
 
 ## Current slice
 
-**Branch:** `feat/tumour-board-context`
+**Branch:** `feat/trial-team-outcome`
 
-**Pull request outcome:** deliver Phase 4 slice 3 — route one bounded Tumour-board discussion packet into a human board workspace, expose its exact purpose/trial/source/access context, record only a signed human decision reference and authorised operational disposition, assign recipient/owner/due date, preserve packet and audit history, and preview/write only reference-plus-task metadata to the synthetic EMR.
+**Pull request outcome:** deliver Phase 4 slice 4 — record an authorised trial-team screening outcome exactly as sourced, preserve source role/date/note and packet version, add Trial-team outcome to the lifecycle, create one treating-team review task, block closure until that task is reviewed by the treating oncologist, and then close the operational handoff without a Trial Relay eligibility judgement or recommendation.
 
-**Acceptance scenario:** choose Add to board without a packet and receive a preconfigured Tumour-board discussion draft; create and route `REF-2201 v1.0`; inspect dynamic agenda, three-source manifest, participant boundary, and routed history; record `MDT-DEMO-20260919-2201` only after confirming human authorship; verify operational disposition, owner, recipient, due date, and packet history without generated clinical prose; preview a synthetic Task plus signed DocumentReference where clinical content is not copied; write the task and observe lifecycle/recent-work/audit/Inbox continuity; retain coherent desktop/mobile layouts.
+**Acceptance scenario:** advance `REF-2201 v1.0` through screening; block a coordinator from recording the outcome; as verified site coordinator record More information required with source/date/note; verify one canonical Outcome Message, seven-stage lifecycle, packet/inquiry history, and `OUT-TASK-001` assigned to Treating oncology unit; block the site role from completing treating-team review; as Dr M. Shah complete it with no recommended action; then expose and perform Close handoff; confirm Patient Recent work, mobile layout, and source-authority labels. Also verify Eligible/Ineligible options remain explicitly labelled trial-team decisions.
 
-**Explicit non-goals for this slice:** no generated or summarized board decision, meeting transcription, autonomous packet routing, actual EMR write, external transmission, clinical recommendation, trial-team outcome, real patient data, backend, persistence, authentication, new data source, or deployment change.
+**Explicit non-goals for this slice:** no Trial Relay eligibility calculation, clinical recommendation, reinterpretation of the site decision, automated treating-team action, actual external screening, real patient data, backend, persistence, authentication, new data source, or deployment change.
