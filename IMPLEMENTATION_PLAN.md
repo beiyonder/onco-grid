@@ -187,10 +187,10 @@ The owner decides whether to retain, simplify, supplement, or stop each major ca
 
 ## Current slice
 
-**Branch:** `feat/inbox-context-resolution`
+**Branch:** `feat/notification-rules`
 
-**Pull request outcome:** deliver Phase 2 slice 2 — an inline Inbox context inspector with exact accountability facts, explicit workflow state, safe operational actions, full-context navigation, and deterministic focus return. Handoff tasks can advance or close in place, unable-to-contact remains explicit, and verification tasks open the existing authority-gated form without leaving Inbox.
+**Pull request outcome:** deliver Phase 2 slice 3 — configurable browser-session notification rules with one followed trial, factual trigger, named recipients, in-app-only approved delivery, repeat control, stop condition, active/stopped state, exact duplicate prevention, and visible audit events. External delivery remains disabled and explicitly unconfigured.
 
-**Acceptance scenario:** inspect an Update in place and close back to its originating row; inspect a sent handoff Task, record acknowledgement, observe its canonical move to Messages, then close it without losing focus; close another task as unable to contact and remove it from the active queue; open a verification Task, cancel back to the inspector, then record an authorised site assertion and return to the Inbox heading when the completed task disappears; retain explicit registry/site separation and zero horizontal overflow on desktop and narrow mobile.
+**Acceptance scenario:** inspect two seeded rules tied to real followed trials; open the rule builder and confirm only followed real-trial IDs are selectable; verify EMR and email channels are disabled; create an in-app rule with named recipients, daily repeat, and follow-end stop condition; reject an exact duplicate; stop and resume a rule with focus retained; unfollow its trial and observe follow-end rules stop automatically; refuse resume until the trial is followed again; retain zero horizontal overflow on desktop and narrow mobile.
 
-**Explicit non-goals for this slice:** no notification-rule redesign, bulk task mutation, automatic acknowledgement, persistence, external delivery, production identity or authorization, patient-specific content, backend, new data source, or deployment change.
+**Explicit non-goals for this slice:** no actual email, EMR inbox, EMR Task, escalation, scheduled background delivery, persistence, production identity or authorization, patient-specific content, backend, new data source, or deployment change.

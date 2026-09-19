@@ -67,7 +67,8 @@ let trials = [
 ];
 let currentRole = 'coordinator';
 const followedTrialIds = new Set(['DEMO-CTRI-001','DEMO-CTRI-003']);
-let alertRules = 4;
+let alertRuleSequence = 1;
+let alertRules = [];
 let alerts = [
   {id:'ALT-301',type:'trial',tone:'warn',title:'Registry status changed',body:'DEMO-CTRI-001 changed from Not yet recruiting to Open to recruitment in the latest synthetic registry snapshot.',source:'CTRI snapshot · 18 minutes ago',recipients:['Treating oncologist','Research coordinator'],unread:true},
   {id:'ALT-302',type:'verification',tone:'bad',title:'Registry and site do not agree',body:'DEMO-CTRI-003 is listed as open, but the site reports a temporary pause. A coordinator owns the follow-up.',source:'Site trial office · 1 hour ago',recipients:['Research coordinator','Site steward'],unread:true},
@@ -244,10 +245,39 @@ function populateRegistryFilters() {
   replaceSelectOptions($('#state-filter'),'All Indian states',states);
 }
 
+function populateAlertRuleTrials() {
+  const select=$('#alert-trial');
+  if(!select)return;
+  const current=select.value;
+  const followed=[...followedTrialIds].map(trialById).filter(Boolean);
+  select.replaceChildren(...followed.map(trial=>new Option(`${plainText(trial.id)} · ${plainText(trial.city)}`,trial.id)));
+  select.disabled=followed.length===0;
+  $('#new-alert-rule').disabled=followed.length===0;
+  if(followed.some(trial=>trial.id===current))select.value=current;
+  else if(followed.some(trial=>trial.id===selectedTrialId))select.value=selectedTrialId;
+}
+
 function seedRegistryWorkflowData() {
   followedTrialIds.clear();
   trials.filter(trial=>trial.registryStatus==='Recruiting').slice(0,2).forEach(trial=>followedTrialIds.add(trial.id));
   const followed=[...followedTrialIds].map(trialById).filter(Boolean);
+  if(!alertRules.length){
+    alertRules=followed.map((trial,index)=>({
+      id:`RULE-${String(alertRuleSequence++).padStart(3,'0')}`,
+      trialId:trial.id,
+      trigger:index===0?'Registry recruitment status changes':'Site confirmation changes or expires',
+      recipients:index===0?['Treating oncologist','Research coordinator']:['Research coordinator','Site steward'],
+      channels:['In app'],
+      repeat:'Once per source change',
+      stop:'When task closes or follow ends',
+      active:true,
+      createdAt:`${formatDate(today)} · seeded validation rule`
+    }));
+  }
+  alertRules.forEach(rule=>{
+    if(rule.stop.includes('follow')&&!followedTrialIds.has(rule.trialId))rule.active=false;
+  });
+  populateAlertRuleTrials();
   if(followed[0]){
     alerts[0]={id:'ALT-301',type:'trial',tone:'warn',title:'Registry status snapshot loaded',body:`${followed[0].id} is registry-declared ${followed[0].registryStatus}. The listed site is not independently verified.`,source:'ClinicalTrials.gov snapshot',recipients:['Treating oncologist','Research coordinator'],unread:true};
     inquiries[0].trialId=followed[0].id;
@@ -935,8 +965,43 @@ function inboxInspectorMarkup(item) {
     </section>`;
 }
 
+function renderNotificationRules() {
+  alertRules.forEach(rule=>{
+    if(rule.active&&rule.stop.includes('follow')&&!followedTrialIds.has(rule.trialId))rule.active=false;
+  });
+  const activeCount=alertRules.filter(rule=>rule.active).length;
+  $('#alert-rule-count').textContent=activeCount;
+  const list=$('#alert-rules-list');
+  list.innerHTML=alertRules.length?alertRules.map(rule=>{
+    const trial=trialById(rule.trialId);
+    return `
+      <div class="notification-rule ${rule.active?'':'stopped'}">
+        <div class="notification-rule-head"><span>${rule.id}</span><strong>${escapeHTML(rule.trigger)}</strong></div>
+        <p>${escapeHTML(rule.trialId)}${trial?` · ${escapeHTML(trial.city)}`:''}</p>
+        <dl><div><dt>Recipients</dt><dd>${rule.recipients.map(escapeHTML).join(', ')}</dd></div><div><dt>Delivery</dt><dd>${rule.channels.map(escapeHTML).join(', ')}</dd></div><div><dt>Repeat</dt><dd>${escapeHTML(rule.repeat)}</dd></div><div><dt>Stops</dt><dd>${escapeHTML(rule.stop)}</dd></div></dl>
+        <div class="notification-rule-foot"><span class="status-pill ${rule.active?'good':'neutral'}"><span class="status-dot"></span>${rule.active?'Active':'Stopped'}</span><button class="button small ghost" type="button" data-toggle-alert-rule="${rule.id}">${rule.active?'Stop rule':'Resume rule'}</button></div>
+      </div>`;
+  }).join(''):'<div class="empty-state"><h2>No notification rules</h2><p>Follow a trial, then create a factual in-app rule.</p></div>';
+  $$('[data-toggle-alert-rule]',list).forEach(button=>button.addEventListener('click',()=>{
+    const rule=alertRules.find(candidate=>candidate.id===button.dataset.toggleAlertRule);
+    if(!rule)return;
+    if(!rule.active&&!followedTrialIds.has(rule.trialId)){
+      showToast(`Follow ${rule.trialId} before resuming this rule.`);
+      return;
+    }
+    rule.active=!rule.active;
+    auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:`${today} session`,actor:roleProfiles[currentRole].name,title:`Notification rule ${rule.active?'resumed':'stopped'}`,note:`${rule.id} · ${rule.trialId}`,type:'alert'});
+    renderNotificationRules();
+    renderAudit();
+    $(`[data-toggle-alert-rule="${rule.id}"]`,list)?.focus({preventScroll:true});
+    showToast(`${rule.id} ${rule.active?'resumed':'stopped'}. No external message was sent.`);
+  }));
+}
+
 function renderAlerts() {
   const items=buildInboxItems();
+  populateAlertRuleTrials();
+  renderNotificationRules();
   const counts={
     updates:items.filter(item=>item.kind==='updates').length,
     messages:items.filter(item=>item.kind==='messages').length,
@@ -1275,19 +1340,45 @@ $('#alert-rule-form').addEventListener('submit',(event)=>{
   if(!event.currentTarget.reportValidity())return;
   const recipients=$$('input[name="alert-recipient"]:checked').map(input=>input.value);
   const channels=$$('input[name="alert-channel"]:checked').map(input=>input.value);
-  if(!recipients.length||!channels.length){
-    showToast('Choose at least one recipient and one delivery channel.');
+  const trialId=$('#alert-trial').value;
+  if(!trialId){
+    showToast('Follow a trial before creating a notification rule.');
     return;
   }
-  const trialId=$('#alert-trial').value;
+  if(!recipients.length){
+    showToast('Choose at least one named recipient.');
+    return;
+  }
+  if(channels.length!==1||channels[0]!=='In app'){
+    showToast('Only in-app delivery is approved in this validation build.');
+    return;
+  }
+  const proposed={
+    trialId,
+    trigger:$('#alert-trigger').value,
+    recipients,
+    channels,
+    repeat:$('#alert-repeat').value,
+    stop:$('#alert-end').value
+  };
+  const duplicate=alertRules.find(rule=>rule.active&&rule.trialId===proposed.trialId&&rule.trigger===proposed.trigger&&rule.recipients.join('|')===proposed.recipients.join('|')&&rule.repeat===proposed.repeat&&rule.stop===proposed.stop);
+  if(duplicate){
+    showToast(`${duplicate.id} already covers this trial, trigger, recipients, repeat control, and stop condition.`);
+    return;
+  }
+  const rule={
+    id:`RULE-${String(alertRuleSequence++).padStart(3,'0')}`,
+    ...proposed,
+    active:true,
+    createdAt:`${formatDate(today)} · this browser session`
+  };
+  alertRules.unshift(rule);
   followedTrialIds.add(trialId);
-  alertRules+=1;
-  alerts.unshift({id:`ALT-${306+alertRules}`,type:'trial',tone:'neutral',title:'New alert rule saved',body:`${$('#alert-trigger').value} for ${trialId}.`,source:`Rule ${alertRules} · synthetic`,recipients,unread:false});
-  auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:'2026-09-13 10:12',actor:'A. Rao',title:'Operational alert rule created',note:`${trialId} · ${recipients.join(', ')} · ${channels.join(', ')}`,type:'alert'});
+  auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:`${today} session`,actor:roleProfiles[currentRole].name,title:'In-app notification rule created',note:`${rule.id} · ${trialId} · ${recipients.join(', ')} · ${rule.repeat} · ${rule.stop}`,type:'alert'});
   $('#alert-rule-dialog').close();
   renderAlerts();
   renderAudit();
-  showToast(`Alert rule saved for ${trialId}. No clinical recommendation was created.`);
+  showToast(`${rule.id} saved for in-app delivery only. No external message was sent.`);
 });
 
 
@@ -1343,7 +1434,12 @@ $$('[data-open-candidate]').forEach(button=>button.addEventListener('click',()=>
     showToast(`${button.dataset.openCandidate} is a synthetic read-only example. Its displayed state comes from a named human or trial team.`);
   }
 }));
-$('#new-alert-rule').addEventListener('click',()=>{$('#alert-safe').checked=false;$('#alert-rule-dialog').showModal();});
+$('#new-alert-rule').addEventListener('click',()=>{
+  populateAlertRuleTrials();
+  $('#alert-safe').checked=false;
+  $('#alert-rule-dialog').showModal();
+  $('#alert-trial').focus();
+});
 $('#mark-alerts-read').addEventListener('click',()=>{
   const visibleItems=buildInboxItems().filter(item=>item.kind===currentInboxKind);
   visibleItems.forEach(item=>{
