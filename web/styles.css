@@ -798,21 +798,66 @@ dialog::backdrop { background: rgba(16, 34, 45, .56); backdrop-filter: blur(2px)
 .case-identity-copy strong { display: block; font-family: var(--font-reading); font-size: 17px; }
 .case-identity-copy span { color: var(--muted); font-size: 10px; }
 .case-identity-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
+.patient-entity { border-color: #b9d7ca; background: var(--green-soft); box-shadow: 0 4px 16px rgba(23,107,80,.06); }
+.patient-entity-label { display: block; color: var(--green) !important; font-size: 8px !important; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.patient-context-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 1px; overflow: hidden; margin: -2px 0 13px; border: 1px solid var(--rule); border-radius: 10px; background: var(--rule); }
+.patient-context-grid > div { min-width: 0; padding: 9px 11px; background: var(--paper); }
+.patient-context-grid span, .patient-context-grid strong { display: block; }
+.patient-context-grid span { color: var(--muted); font-size: 8px; font-weight: 780; letter-spacing: .05em; text-transform: uppercase; }
+.patient-context-grid strong { margin-top: 2px; overflow-wrap: anywhere; font-size: 10px; }
+.patient-authority-key { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 7px; margin-bottom: 13px; }
+.patient-authority-key > div { border-left: 3px solid var(--rule-dark); border-radius: 0 8px 8px 0; padding: 8px 9px; background: var(--paper-2); }
+.patient-authority-key .source { border-left-color: var(--navy-2); background: var(--blue-soft); }
+.patient-authority-key .confirmed { border-left-color: var(--green); background: var(--green-soft); }
+.patient-authority-key .unknown { border-left-color: var(--amber); background: var(--amber-soft); }
+.patient-authority-key .conflict { border-left-color: var(--red); background: var(--red-soft); }
+.patient-authority-key span, .patient-authority-key strong { display: block; }
+.patient-authority-key span { color: var(--muted); font-size: 7px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+.patient-authority-key strong { margin-top: 2px; font-size: 9px; line-height: 1.3; }
+.patient-section-nav { display: flex; gap: 1px; overflow-x: auto; margin-bottom: 13px; border: 1px solid var(--rule); border-radius: 9px; padding: 4px; background: var(--paper-2); }
+.patient-section-nav span { flex: 1; min-width: 150px; border-radius: 6px; padding: 7px 9px; background: var(--paper); color: var(--ink-2); font-size: 9px; font-weight: 750; text-align: center; }
+.case-grid.patient-workspace-grid { grid-template-columns: minmax(360px,.9fr) minmax(0,1.1fr); }
+.patient-section-heading { display: flex; align-items: center; gap: 9px; padding: 1px 2px; }
+.patient-section-heading > span { display: grid; width: 26px; height: 26px; place-items: center; border-radius: 7px; background: var(--navy); color: #fff; font-family: var(--font-data); font-size: 8px; }
+.patient-section-heading strong, .patient-section-heading small { display: block; }
+.patient-section-heading strong { font-family: var(--font-reading); font-size: 16px; }
+.patient-section-heading small { color: var(--muted); font-size: 8px; }
+.patient-layer { position: relative; }
+.patient-layer::before { content: ""; position: absolute; inset: 0 auto 0 0; z-index: 1; width: 4px; background: var(--rule-dark); }
+.patient-layer.source-layer::before { background: var(--navy-2); }
+.patient-layer.confirmed-layer::before { background: var(--green); }
+.patient-layer.review-layer::before { background: var(--plum); }
 .case-grid { display: grid; grid-template-columns: minmax(320px, .82fr) minmax(0, 1.18fr); gap: 13px; align-items: start; }
 .case-stack { display: grid; gap: 13px; min-width: 0; }
 .artifact-list { display: grid; }
-.artifact-row { display: grid; grid-template-columns: 34px minmax(0,1fr) auto; gap: 10px; align-items: center; border-bottom: 1px solid var(--rule); padding: 11px 13px; }
+.artifact-row { display: grid; grid-template-columns: 34px minmax(0,1fr) auto auto; gap: 10px; align-items: center; border-bottom: 1px solid var(--rule); padding: 11px 13px; }
 .artifact-row:last-child { border-bottom: 0; }
 .artifact-icon { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 7px; background: var(--blue-soft); color: var(--navy-2); }
 .artifact-icon .icon { width: 16px; height: 16px; }
 .artifact-copy strong { display: block; font-size: 11px; }
 .artifact-copy span { display: block; color: var(--muted); font-size: 9px; }
 .artifact-action { color: var(--navy-2); font-size: 9px; font-weight: 750; }
+.artifact-state { border-left: 3px solid var(--navy-2); padding-left: 7px; color: var(--navy-2); font-size: 8px; font-weight: 760; white-space: nowrap; }
 .human-fact-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .human-fact { border: 1px solid var(--rule); border-radius: 8px; padding: 9px; background: var(--paper-2); }
 .human-fact label { display: block; color: var(--muted); font-size: 8px; letter-spacing: .04em; text-transform: uppercase; }
 .human-fact strong { display: block; margin: 2px 0; font-size: 11px; }
 .human-fact span { color: var(--green); font-size: 8px; font-weight: 720; }
+.patient-history summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; padding: 12px 14px; }
+.patient-history summary span { font-size: 11px; font-weight: 760; }
+.patient-history summary small { color: var(--muted); font-size: 8px; }
+.patient-history[open] summary { border-bottom: 1px solid var(--rule); }
+.patient-recent-work { display: grid; }
+.patient-work-item { display: grid; grid-template-columns: 4px minmax(0,1fr) auto; gap: 9px; align-items: center; border-bottom: 1px solid var(--rule); padding: 10px 12px; }
+.patient-work-item:last-child { border-bottom: 0; }
+.patient-work-trace { align-self: stretch; border-radius: 999px; background: var(--navy-2); }
+.patient-work-trace.source { background: var(--navy-2); }
+.patient-work-trace.human { background: var(--plum); }
+.patient-work-trace.task { background: var(--amber); }
+.patient-work-copy strong, .patient-work-copy span { display: block; }
+.patient-work-copy strong { font-size: 10px; }
+.patient-work-copy span { margin-top: 2px; color: var(--muted); font-size: 8px; }
+.patient-work-state { color: var(--muted); font-size: 8px; font-weight: 760; text-align: right; }
 .trial-review-head { border-bottom: 1px solid var(--rule); padding: 15px; }
 .trial-review-head h2 { margin: 5px 0 4px; font-family: var(--font-reading); font-size: 20px; line-height: 1.2; }
 .trial-review-head p { margin: 0; color: var(--muted); font-size: 10px; }
@@ -895,7 +940,7 @@ dialog::backdrop { background: rgba(16, 34, 45, .56); backdrop-filter: blur(2px)
 
 @media (max-width: 1120px) {
   .context-chip:nth-of-type(2) { display: none; }
-  .case-grid, .integration-grid { grid-template-columns: 1fr; }
+  .case-grid, .case-grid.patient-workspace-grid, .integration-grid { grid-template-columns: 1fr; }
   .board-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 720px) {
@@ -905,6 +950,8 @@ dialog::backdrop { background: rgba(16, 34, 45, .56); backdrop-filter: blur(2px)
   .emr-context-bar .button { margin-left: auto; }
   .case-identity { align-items: flex-start; flex-wrap: wrap; }
   .case-identity-meta { width: 100%; margin-left: 56px; }
+  .patient-context-grid, .patient-authority-key { grid-template-columns: 1fr 1fr; }
+  .patient-section-nav span { min-width: 135px; }
   .criterion-row { grid-template-columns: 1fr; gap: 6px; }
   .review-footer { align-items: stretch; flex-direction: column; }
   .review-footer .button:first-of-type { margin-left: 0; }
@@ -918,6 +965,9 @@ dialog::backdrop { background: rgba(16, 34, 45, .56); backdrop-filter: blur(2px)
   .human-fact-list { grid-template-columns: 1fr; }
   .artifact-row { grid-template-columns: 32px minmax(0,1fr); }
   .artifact-action { grid-column: 2; }
+  .patient-authority-key { grid-template-columns: 1fr; }
+  .artifact-state { grid-column: 2; }
+  .patient-history summary { align-items: flex-start; flex-direction: column; gap: 3px; }
   .resource-row { grid-template-columns: 1fr auto; }
   .resource-use { grid-column: 1 / -1; }
   .bar-row { grid-template-columns: 92px minmax(0,1fr) 34px; }

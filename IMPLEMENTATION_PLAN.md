@@ -187,10 +187,10 @@ The owner decides whether to retain, simplify, supplement, or stop each major ca
 
 ## Current slice
 
-**Branch:** `feat/notification-rules`
+**Branch:** `feat/patient-workspace`
 
-**Pull request outcome:** deliver Phase 2 slice 3 — configurable browser-session notification rules with one followed trial, factual trigger, named recipients, in-app-only approved delivery, repeat control, stop condition, active/stopped state, exact duplicate prevention, and visible audit events. External delivery remains disabled and explicitly unconfigured.
+**Pull request outcome:** deliver Phase 3 slice 1 — one dominant synthetic patient workspace with identity and encounter context, treating team, source availability, active review/referral counts, explicit source/clinician/unknown/conflict authority layers, original EMR references, collapsible source timeline, and dynamic recent work.
 
-**Acceptance scenario:** inspect two seeded rules tied to real followed trials; open the rule builder and confirm only followed real-trial IDs are selectable; verify EMR and email channels are disabled; create an in-app rule with named recipients, daily repeat, and follow-end stop condition; reject an exact duplicate; stop and resume a rule with focus retained; unfollow its trial and observe follow-end rules stop automatically; refuse resume until the trial is followed again; retain zero horizontal overflow on desktop and narrow mobile.
+**Acceptance scenario:** open Patients and identify the synthetic identity, access context, treating team, four source references, active trial review, and open handoff count; distinguish original EMR references from four clinician-confirmed facts and from missing/conflicting states without relying on colour; open the pathology source and observe a no-interpretation boundary plus recent-work update; verify the three intended workspace sections and coherent reading order at desktop and narrow mobile.
 
-**Explicit non-goals for this slice:** no actual email, EMR inbox, EMR Task, escalation, scheduled background delivery, persistence, production identity or authorization, patient-specific content, backend, new data source, or deployment change.
+**Explicit non-goals for this slice:** no patient creation, real patient or identifiable data, automated extraction or inference, patient-specific trial filtering/ranking, criterion-workflow redesign, missing-information task creation, referral lifecycle change, backend, persistence, authentication, new data source, or deployment change.
