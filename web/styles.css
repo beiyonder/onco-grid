@@ -1192,6 +1192,10 @@ dialog::backdrop { background: rgba(16, 34, 45, .56); backdrop-filter: blur(2px)
   .stage-control { display: inline-flex; }
   .form-grid, .compare-grid { grid-template-columns: 1fr; }
   .form-row.full { grid-column: auto; }
+  .relationship-track { display: grid; gap: 0; overflow: visible; padding-bottom: 0; }
+  .relationship-node { width: 100%; min-width: 0; flex: none; }
+  .relationship-connector { display: flex; width: auto; min-width: 0; flex: none; align-items: center; justify-content: center; gap: 7px; padding: 4px; }
+  .relationship-connector i { transform: rotate(90deg); }
 }
 @media (max-width: 480px) {
   .sidebar { align-items: stretch; }
@@ -1222,15 +1226,35 @@ dialog::backdrop { background: rgba(16, 34, 45, .56); backdrop-filter: blur(2px)
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+@media (prefers-reduced-transparency: reduce) {
+  :root { --shadow: none; --shadow-high: none; }
+  .topbar, .work-rail, .detail-panel, .profile-source-plane, .geo-marker, .geo-marker small, .trial-card, .panel, .patient-entity, .inbox-group.active, .room-composer, .room-resolution, .profile-status, .inbox-inspector-facts div, .inbox-inspector-state, .packet-stage, .packet-history, .journey-entry { background-color: var(--paper) !important; backdrop-filter: none !important; box-shadow: none !important; opacity: 1 !important; }
+  .geo-grid { background-image: none; box-shadow: none; }
+  .geo-grid::after, .journey-entry::before { display: none; }
+  dialog::backdrop { background: #dfe5e2; backdrop-filter: none; }
+}
 @media print {
-  .sidebar, .topbar, .source-alert, .header-actions, .filter-bar, .result-list, .detail-actions, dialog, .toast-region { display: none !important; }
+  @page { margin: 14mm; }
+  *, *::before, *::after { box-shadow: none !important; text-shadow: none !important; backdrop-filter: none !important; }
+  html, body, .app-shell, .workspace, .view, .panel, .detail-panel, .profile-status, .profile-assertion, .profile-source-plane, .relationship-node, .inbox-inspector, .packet-stage, .packet-history, .patient-layer { background: #fff !important; color: #111 !important; }
+  body { font-size: 10pt; }
+  .sidebar, .topbar, .source-alert, .header-actions, .filter-bar, .result-list, .detail-actions, .detail-close, .tabs, .patient-section-nav, .inbox-groups, #library-map-view, dialog, .toast-region, .button.close-dialog { display: none !important; }
   .workspace { margin: 0; }
   .view { display: none !important; padding: 0; }
   .view.active { display: block !important; }
-  .explorer-grid { display: block; }
-  .detail-panel { position: static; box-shadow: none; border-color: #888; }
-  .detail-head h2 { font-size: 22pt; }
-  body { background: #fff; color: #111; }
+  #library-list-view, #library-list-view[hidden], .explorer-grid { display: block !important; }
+  .detail-panel, .geo-context { position: static; max-height: none; overflow: visible; border: 1px solid #777; }
+  .detail-head h2 { font-size: 20pt; }
+  .result-meta { border-bottom: 1px solid #777; padding-bottom: 7px; }
+  .relationship-track { display: grid; gap: 4px; overflow: visible; }
+  .relationship-node { width: 100%; min-width: 0; border-color: #777 !important; page-break-inside: avoid; }
+  .relationship-connector { display: flex; width: auto; min-width: 0; align-items: center; justify-content: center; gap: 7px; }
+  .relationship-connector i { transform: rotate(90deg); }
+  .profile-source-plane, .status-label, .record-id, #library-source-date, .fact label, .inbox-row-facts dt { color: #222 !important; }
+  a { color: #111; text-decoration: underline; }
+  .panel, .site-group, .room-thread, .inbox-row, .patient-work-item { break-inside: avoid; }
+  .profile-disclosure, .patient-history, .packet-history { break-inside: avoid; }
+  .profile-disclosure > .disclosure-body, .patient-history > .panel-body, .packet-history > div { display: block !important; }
 }
 @media (max-width: 720px) {
   .role-switch { position: relative; }
