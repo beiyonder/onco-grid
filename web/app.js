@@ -89,7 +89,8 @@ let caseSelectedTrialId = trials[0].id;
 let currentArtifactName = '';
 const referralPackets = [];
 let referralPacketSequence = 1;
-let boardDecisionRecorded = false;
+let boardContext = null;
+let boardTaskWritten = false;
 const criterionDecisions = new Map();
 const criterionSources = new Map();
 const criterionReviewMeta = new Map();
@@ -943,7 +944,7 @@ function renderPatientWorkspaceState(t=trialById(caseSelectedTrialId)||trialById
     const latest=patientPackets.at(-1);
     work.unshift({tone:'task',title:'Referral packet',meta:`${latest.id} · ${latest.version} · ${latest.sources.length} source references · owner ${latest.owner}`,state:statusHuman[latest.status]||latest.status});
   }
-  if(boardDecisionRecorded)work.unshift({tone:'human',title:'Human board disposition recorded',meta:'Signed decision reference retained in the synthetic EMR workflow',state:'Recorded'});
+  if(boardContext?.decision)work.unshift({tone:'human',title:'Human board disposition recorded',meta:`${boardContext.decision.recordRef} · ${boardContext.packetId} · next owner ${boardContext.decision.owner}`,state:boardTaskWritten?'Task written':'Recorded'});
   $('#patient-recent-work').innerHTML=work.map(item=>`
     <div class="patient-work-item">
       <span class="patient-work-trace ${item.tone}"></span>
@@ -1002,14 +1003,57 @@ function openPacket() {
 }
 
 function renderBoard() {
-  const t=trialById(caseSelectedTrialId)||trials[0];
-  $('#board-trial-title').textContent=plainText(t.title);
-  renderPatientWorkspaceState(t);
-  if(!boardDecisionRecorded) return;
-  $('#board-decision-state').textContent='Human decision recorded · ready for write-back';
-  $('#board-decision-copy').innerHTML='<strong>Operational disposition:</strong> Authorise coordinator to contact the verified site for formal trial-team screening. Clinical decision content remains in the signed EMR record.';
-  $('#board-writeback').disabled=false;
-  $('#board-lifecycle').innerHTML='<div class="board-stage done"><span class="board-stage-marker">1</span><div><strong>Case selected</strong><span>Treating oncologist · 13 Sep</span></div></div><div class="board-stage done"><span class="board-stage-marker">2</span><div><strong>Packet sources reviewed</strong><span>Presenter · synthetic artifacts</span></div></div><div class="board-stage done"><span class="board-stage-marker">3</span><div><strong>Board discussion completed</strong><span>Human participants</span></div></div><div class="board-stage done"><span class="board-stage-marker">4</span><div><strong>Decision reference signed</strong><span>MDT-DEMO-2026-0916-01</span></div></div><div class="board-stage current"><span class="board-stage-marker">5</span><div><strong>EMR task pending</strong><span>Owner and acknowledgement ready</span></div></div>';
+  const lifecycle=$('#board-lifecycle');
+  if(!boardContext){
+    $('#board-context-banner').innerHTML=`${icon('board')}<div><strong>No packet routed to the board</strong><span>Prepare a Tumour-board discussion packet in the Patient workspace, then choose Add to board.</span></div><span class="spacer"></span><span class="status-pill neutral"><span class="status-dot"></span>Awaiting packet</span>`;
+    $('#board-session-state').className='status-pill neutral';
+    $('#board-session-state').innerHTML='<span class="status-dot"></span>No routed packet';
+    $('#board-agenda-title').textContent='SYN-2047 · awaiting packet';
+    $('#board-agenda-question').textContent='No operational question routed.';
+    $('#board-agenda-state').className='status-pill neutral';
+    $('#board-agenda-state').innerHTML='<span class="status-dot"></span>Not ready';
+    $('#board-packet-title').textContent='Board packet manifest · none';
+    $('#board-purpose').textContent='No packet routed';
+    $('#board-trial-title').textContent='No selected packet';
+    $('#board-sources').textContent='None';
+    $('#board-source-count').textContent='0 EMR references';
+    $('#board-access').textContent='Board participants only';
+    $('#board-expiry').textContent='No expiry';
+    $('#record-board-decision').disabled=true;
+    $('#board-writeback').disabled=true;
+    $('#board-decision-state').textContent='No signed decision reference recorded';
+    $('#board-decision-copy').textContent='After the human meeting, record the signed EMR decision reference and only its authorised operational disposition, recipient, owner, and due date.';
+    lifecycle.innerHTML='<div class="board-stage current"><span class="board-stage-marker">1</span><div><strong>Packet routed</strong><span>Awaiting bounded source manifest</span></div></div><div class="board-stage"><span class="board-stage-marker">2</span><div><strong>Sources reviewed</strong><span>Not started</span></div></div><div class="board-stage"><span class="board-stage-marker">3</span><div><strong>Human discussion</strong><span>Not started</span></div></div><div class="board-stage"><span class="board-stage-marker">4</span><div><strong>Signed decision reference</strong><span>Not recorded</span></div></div><div class="board-stage"><span class="board-stage-marker">5</span><div><strong>Next operational task</strong><span>Not assigned</span></div></div>';
+    return;
+  }
+  const packet=referralPackets.find(candidate=>candidate.id===boardContext.packetId);
+  const trial=packet?trialById(packet.trialId):null;
+  if(!packet||!trial){
+    boardContext=null;
+    renderBoard();
+    return;
+  }
+  const decision=boardContext.decision;
+  $('#board-context-banner').innerHTML=`${icon('board')}<div><strong>${packet.id} · ${packet.version} routed to the human board</strong><span>${escapeHTML(packet.purpose)} · ${packet.sources.length} source references · routed by ${escapeHTML(boardContext.routedBy)} on ${escapeHTML(boardContext.routedAt)}</span></div><span class="spacer"></span><span class="status-pill ${decision?'good':'warn'}"><span class="status-dot"></span>${decision?'Decision referenced':'Awaiting human decision'}</span>`;
+  $('#board-session-state').className=`status-pill ${decision?'good':'warn'}`;
+  $('#board-session-state').innerHTML=`<span class="status-dot"></span>${decision?'Decision recorded':'Packet ready'}`;
+  $('#board-agenda-title').textContent=`SYN-2047 · ${packet.id} ${packet.version}`;
+  $('#board-agenda-question').textContent=`Operational question: ${packet.purpose}`;
+  $('#board-agenda-state').className=`status-pill ${decision?'good':'warn'}`;
+  $('#board-agenda-state').innerHTML=`<span class="status-dot"></span>${decision?'Recorded':'Ready for discussion'}`;
+  $('#board-packet-title').textContent=`Board packet manifest · ${packet.id} ${packet.version}`;
+  $('#board-purpose').textContent=packet.purpose;
+  $('#board-trial-title').textContent=plainText(trial.title);
+  $('#board-sources').textContent=packet.sources.join(', ');
+  $('#board-source-count').textContent=`${packet.sources.length} explicit EMR reference${packet.sources.length===1?'':'s'}`;
+  $('#board-access').textContent=packet.recipient;
+  $('#board-expiry').textContent=`Expires ${formatDate(packet.expiry)} · ${packet.site}`;
+  $('#record-board-decision').disabled=Boolean(decision);
+  $('#board-writeback').disabled=!decision||boardTaskWritten;
+  $('#board-decision-state').textContent=decision?`${decision.recordRef} · signed human reference`:'No signed decision reference recorded';
+  $('#board-decision-copy').innerHTML=decision?`<strong>Operational disposition:</strong> ${escapeHTML(decision.disposition)}<br><strong>Next task:</strong> ${escapeHTML(decision.owner)} → ${escapeHTML(decision.recipient)} · due ${formatDate(decision.due)}. Clinical decision content remains only in the signed EMR record.`:'After the human meeting, record the signed EMR decision reference and only its authorised operational disposition, recipient, owner, and due date.';
+  lifecycle.innerHTML=`<div class="board-stage done"><span class="board-stage-marker">1</span><div><strong>Packet routed</strong><span>${packet.id} ${packet.version} · ${boardContext.routedBy}</span></div></div><div class="board-stage done"><span class="board-stage-marker">2</span><div><strong>Sources reviewed</strong><span>${packet.sources.length} explicit references · no copied clinical prose</span></div></div><div class="board-stage ${decision?'done':'current'}"><span class="board-stage-marker">3</span><div><strong>Human discussion</strong><span>${decision?'Completed by board participants':'Awaiting human board'}</span></div></div><div class="board-stage ${decision?'done':''}"><span class="board-stage-marker">4</span><div><strong>Signed decision reference</strong><span>${decision?escapeHTML(decision.recordRef):'Not recorded'}</span></div></div><div class="board-stage ${boardTaskWritten?'done':decision?'current':''}"><span class="board-stage-marker">5</span><div><strong>Next operational task</strong><span>${boardTaskWritten?`${boardContext.taskId} written · acknowledgement pending`:decision?'Ready for synthetic write-back':'Not assigned'}</span></div></div>`;
+  renderPatientWorkspaceState(trial);
 }
 
 function renderHome() {
@@ -1721,12 +1765,29 @@ $('#missing-info-form').addEventListener('submit',(event)=>{
 $('#board-form').addEventListener('submit',(event)=>{
   event.preventDefault();
   if(!event.currentTarget.reportValidity())return;
-  boardDecisionRecorded=true;
-  auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:'2026-09-13 09:24',actor:'Board recorder',title:'Human board disposition recorded',note:`${$('#board-record-ref').value} · ${$('#board-disposition').value}`,type:'board'});
+  const packet=referralPackets.find(candidate=>candidate.id===boardContext?.packetId);
+  if(!packet||boardContext.decision){
+    showToast('A routed packet without an existing decision is required.');
+    return;
+  }
+  const decision={
+    recordRef:$('#board-record-ref').value.trim(),
+    disposition:$('#board-disposition').value,
+    owner:$('#board-owner').value.split(' — ')[0],
+    due:$('#board-due').value,
+    recipient:$('#board-recipient').value,
+    recordedBy:'Board recorder',
+    recordedAt:formatDate(today),
+    packetId:packet.id,
+    packetVersion:packet.version
+  };
+  boardContext.decision=decision;
+  packet.history.push({state:'board_decision',actor:decision.recordedBy,at:decision.recordedAt,source:`Signed EMR reference ${decision.recordRef}`});
+  auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:`${today} session`,actor:decision.recordedBy,title:'Signed human board decision referenced',note:`${decision.recordRef} · ${packet.id} ${packet.version} · ${decision.disposition} · owner ${decision.owner}`,type:'board'});
   $('#board-dialog').close();
   renderBoard();
   renderAudit();
-  showToast('Human board disposition recorded. Clinical decision content was not generated or rewritten.');
+  showToast(`${decision.recordRef} recorded as a signed human reference. Only the operational task was captured.`);
 });
 
 $('#alert-rule-form').addEventListener('submit',(event)=>{
@@ -1780,7 +1841,25 @@ $('#alert-rule-form').addEventListener('submit',(event)=>{
 $('#open-case-workspace').addEventListener('click',()=>{renderCase();switchView('case');});
 $('#return-to-search').addEventListener('click',()=>switchView('explore'));
 $('#prepare-packet').addEventListener('click',openPacket);
-$('#add-to-board').addEventListener('click',()=>{renderBoard();switchView('board');showToast('Synthetic case added to the board agenda by a human action.');});
+$('#add-to-board').addEventListener('click',()=>{
+  const packet=[...referralPackets].reverse().find(candidate=>candidate.trialId===caseSelectedTrialId&&candidate.purpose==='Tumour-board discussion');
+  if(!packet){
+    openPacket();
+    $('#packet-purpose').value='Tumour-board discussion';
+    $('#packet-recipient').value='Internal tumour board';
+    showToast('Create a bounded Tumour-board discussion packet before routing this case.');
+    return;
+  }
+  const actor=roleProfiles[currentRole].name;
+  boardContext={packetId:packet.id,routedBy:actor,routedAt:formatDate(today),decision:null};
+  boardTaskWritten=false;
+  packet.history.push({state:'board_routed',actor,at:formatDate(today),source:'Human route to tumour board'});
+  auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:`${today} session`,actor,title:'Packet routed to tumour board',note:`${packet.id} · ${packet.version} · ${packet.sources.length} source references`,type:'board'});
+  renderBoard();
+  renderAudit();
+  switchView('board');
+  showToast(`${packet.id} ${packet.version} routed to the human board. No clinical decision was generated.`);
+});
 $('#preview-writeback').addEventListener('click',()=>$('#writeback-dialog').showModal());
 $$('[data-preview-artifact]').forEach(button=>button.addEventListener('click',()=>openArtifact(button.dataset.previewArtifact)));
 $('#confirm-source-fact').addEventListener('click',()=>{
@@ -1789,22 +1868,51 @@ $('#confirm-source-fact').addEventListener('click',()=>{
   renderAudit();
   showToast('Clinician confirmation recorded with its source reference.');
 });
-$('#record-board-decision').addEventListener('click',()=>{$('#board-human-authored').checked=false;$('#board-dialog').showModal();});
+$('#record-board-decision').addEventListener('click',()=>{
+  const packet=referralPackets.find(candidate=>candidate.id===boardContext?.packetId);
+  if(!packet){
+    showToast('Route a bounded packet before recording a board decision reference.');
+    return;
+  }
+  $('#board-dialog-packet').textContent=`${packet.id} · ${packet.version} · ${packet.sources.length} source references · synthetic case SYN-2047`;
+  $('#board-record-ref').value=`MDT-DEMO-${today.replaceAll('-','')}-${packet.id.slice(-4)}`;
+  $('#board-disposition').value='Authorise site contact for formal screening';
+  $('#board-owner').value='A. Rao — research coordinator';
+  const due=new Date(`${today}T00:00:00Z`);
+  due.setUTCDate(due.getUTCDate()+2);
+  $('#board-due').value=due.toISOString().slice(0,10);
+  $('#board-recipient').value='Treating oncology unit';
+  $('#board-human-authored').checked=false;
+  $('#board-dialog').showModal();
+  $('#board-record-ref').focus();
+});
 $('#open-board-case').addEventListener('click',()=>{renderCase();switchView('case');});
-$('#board-writeback').addEventListener('click',()=>$('#writeback-dialog').showModal());
+$('#board-writeback').addEventListener('click',()=>{
+  const decision=boardContext?.decision;
+  const packet=referralPackets.find(candidate=>candidate.id===boardContext?.packetId);
+  if(!decision||!packet)return;
+  $('#writeback-body').innerHTML=`<div class="compare-grid"><div class="compare-card"><span class="tag">Task</span><h3>Board-authorised operational handoff</h3><div class="compare-row"><label>Subject</label><strong>Patient/SYN-2047</strong></div><div class="compare-row"><label>Owner</label><strong>${escapeHTML(decision.owner)}</strong></div><div class="compare-row"><label>Recipient</label><strong>${escapeHTML(decision.recipient)}</strong></div><div class="compare-row"><label>Due</label><strong>${formatDate(decision.due)}</strong></div><div class="compare-row"><label>Status</label><strong>draft · acknowledgement required</strong></div></div><div class="compare-card"><span class="tag">DocumentReference</span><h3>Signed decision and packet references</h3><div class="compare-row"><label>Decision reference</label><strong>${escapeHTML(decision.recordRef)}</strong></div><div class="compare-row"><label>Packet</label><strong>${packet.id} · ${packet.version}</strong></div><div class="compare-row"><label>Source references</label><strong>${packet.sources.length} referenced · not copied</strong></div><div class="compare-row"><label>Clinical decision copied</label><strong>No</strong></div></div></div>`;
+  $('#writeback-dialog').showModal();
+});
 $('#test-writeback').addEventListener('click',()=>$('#writeback-dialog').showModal());
 $('#simulate-writeback').addEventListener('click',()=>{
-  auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:'2026-09-13 09:27',actor:'EMR adapter',title:'Synthetic Task write-back completed',note:'Task/SYN-TASK-901 · version precondition accepted',type:'integration'});
-  alerts.unshift({id:`ALT-${400+alerts.length}`,type:'handoff',tone:'good',title:'EMR task written',body:'Task/SYN-TASK-901 was written to the EMR and is waiting for treating-unit acknowledgement.',source:'EMR adapter · just now',recipients:['Treating unit','Board presenter','Research coordinator'],unread:true});
-  $('#writeback-dialog').close();
-  if(boardDecisionRecorded){
-    $('#board-decision-state').textContent='Written to EMR · acknowledgement pending';
-    $('#board-writeback').disabled=true;
-    $('#board-lifecycle').innerHTML='<div class="board-stage done"><span class="board-stage-marker">1</span><div><strong>Case selected</strong><span>Treating oncologist · 13 Sep</span></div></div><div class="board-stage done"><span class="board-stage-marker">2</span><div><strong>Packet sources reviewed</strong><span>Presenter · synthetic artifacts</span></div></div><div class="board-stage done"><span class="board-stage-marker">3</span><div><strong>Board discussion completed</strong><span>Human participants</span></div></div><div class="board-stage done"><span class="board-stage-marker">4</span><div><strong>Decision reference signed</strong><span>MDT-DEMO-2026-0916-01</span></div></div><div class="board-stage done"><span class="board-stage-marker">5</span><div><strong>Task written to EMR</strong><span>Task/SYN-TASK-901 · acknowledgement pending</span></div></div>';
+  const decision=boardContext?.decision;
+  const packet=referralPackets.find(candidate=>candidate.id===boardContext?.packetId);
+  if(decision&&packet){
+    boardTaskWritten=true;
+    boardContext.taskId=`TASK-${2050+auditEvents.length}`;
+    packet.history.push({state:'board_task_written',actor:'EMR adapter',at:formatDate(today),source:`Synthetic Task ${boardContext.taskId}`});
+    auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:`${today} session`,actor:'EMR adapter',title:'Board operational task written to synthetic EMR',note:`${boardContext.taskId} · ${decision.recordRef} · owner ${decision.owner} · version precondition accepted`,type:'integration'});
+    alerts.unshift({id:`ALT-${400+alerts.length}`,type:'handoff',tone:'good',title:'Board task written to synthetic EMR',body:`${boardContext.taskId} was written for ${packet.id}. It is waiting for ${decision.owner} acknowledgement.`,source:'EMR adapter · this session',recipients:[decision.owner,'Board presenter','Research coordinator'],unread:true});
+  }else{
+    auditEvents.unshift({id:`EVT-${2050+auditEvents.length}`,at:`${today} session`,actor:'EMR adapter',title:'Synthetic Task write-back completed',note:'Task/SYN-TASK-901 · version precondition accepted',type:'integration'});
+    alerts.unshift({id:`ALT-${400+alerts.length}`,type:'handoff',tone:'good',title:'EMR task written',body:'Task/SYN-TASK-901 was written to the EMR and is waiting for treating-unit acknowledgement.',source:'EMR adapter · this session',recipients:['Treating unit','Board presenter','Research coordinator'],unread:true});
   }
+  $('#writeback-dialog').close();
+  renderBoard();
   renderAlerts();
   renderAudit();
-  showToast('Synthetic EMR write-back completed with an audit event.');
+  showToast(decision?`${boardContext.taskId} written to the synthetic EMR with ${decision.recordRef}; acknowledgement remains pending.`:'Synthetic EMR write-back completed with an audit event.');
 });
 $('#role-select').addEventListener('change',(event)=>{
   currentRole=event.target.value;

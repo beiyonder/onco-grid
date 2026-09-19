@@ -914,6 +914,12 @@ dialog::backdrop { background: rgba(16, 34, 45, .56); backdrop-filter: blur(2px)
 .packet-item span { display: block; color: var(--muted); font-size: 9px; }
 
 .board-grid { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(290px,.8fr); gap: 13px; align-items: start; }
+.board-context-banner { display: flex; align-items: center; gap: 11px; margin-bottom: 13px; border: 1px solid #c9beda; border-radius: 10px; padding: 11px 13px; background: var(--plum-soft); color: var(--plum); }
+.board-context-banner > div { min-width: 0; }
+.board-context-banner strong, .board-context-banner span { display: block; }
+.board-context-banner strong { color: var(--ink); font-size: 11px; }
+.board-context-banner > div > span { margin-top: 2px; color: var(--muted); font-size: 9px; }
+.board-context-banner .spacer { flex: 1; }
 .session-banner { display: flex; align-items: center; gap: 12px; border: 1px solid var(--rule); border-radius: 10px; padding: 13px; background: var(--paper); }
 .session-date { display: grid; width: 48px; height: 52px; flex: 0 0 48px; place-items: center; border-radius: 8px; background: var(--navy); color: #fff; line-height: 1; }
 .session-date strong { display: block; font-family: var(--font-reading); font-size: 22px; }
@@ -976,6 +982,8 @@ dialog::backdrop { background: rgba(16, 34, 45, .56); backdrop-filter: blur(2px)
 @media (max-width: 1120px) {
   .context-chip:nth-of-type(2) { display: none; }
   .case-grid, .case-grid.patient-workspace-grid, .integration-grid { grid-template-columns: 1fr; }
+  .board-context-banner { align-items: flex-start; flex-wrap: wrap; }
+  .board-context-banner .spacer { display: none; }
   .board-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 720px) {
