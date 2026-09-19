@@ -276,24 +276,22 @@
         </section>
 
         <section class="view" id="view-alerts" data-view="alerts" aria-labelledby="alerts-title">
-          <div class="view-header"><div class="view-heading"><h1 id="alerts-title">Inbox</h1><p>Updates, messages, and assigned work stay connected to the trial, patient, or handoff that created them.</p></div><div class="header-actions"><span class="priority-badge p0">Operational only</span><button class="button" id="mark-alerts-read" type="button"><svg class="icon"><use href="#i-check"/></svg>Mark all read</button><button class="button primary" id="new-alert-rule" type="button"><svg class="icon"><use href="#i-bell"/></svg>New alert rule</button></div></div>
-          <div class="safety-strip"><svg class="icon"><use href="#i-shield"/></svg><strong>Status updates, not clinical advice.</strong><span>Inbox items report a source change or a human workflow event. They never say that a trial is right for a patient.</span></div>
-          <div class="inbox-groups" aria-label="Inbox groups">
-            <button class="inbox-group active" type="button" aria-current="page"><span>Updates</span><strong id="inbox-update-count">4</strong></button>
-            <button class="inbox-group" type="button" data-context-target="inquiries"><span>Messages</span><strong id="inquiry-count">2</strong></button>
-            <button class="inbox-group" type="button" data-context-target="verification"><span>Tasks</span><strong id="verify-count">3</strong></button>
+          <div class="view-header"><div class="view-heading"><h1 id="alerts-title">Inbox</h1><p>Updates, messages, and assigned work stay connected to the trial, thread, or handoff that created them.</p></div><div class="header-actions"><span class="priority-badge p0">Operational only</span><button class="button" id="mark-alerts-read" type="button"><svg class="icon"><use href="#i-check"/></svg>Mark visible read</button><button class="button primary" id="new-alert-rule" type="button"><svg class="icon"><use href="#i-bell"/></svg>New alert rule</button></div></div>
+          <div class="safety-strip"><svg class="icon"><use href="#i-shield"/></svg><strong>Status and ownership, not clinical advice.</strong><span>Every row names why it exists, who owns the next step, its due state, and its source. Nothing here states that a trial is right for a patient.</span></div>
+          <div class="inbox-groups" role="tablist" aria-label="Inbox views">
+            <button class="inbox-group active" type="button" role="tab" aria-selected="true" data-inbox-kind="updates"><span>Updates</span><strong id="inbox-update-count">0</strong></button>
+            <button class="inbox-group" type="button" role="tab" aria-selected="false" data-inbox-kind="messages"><span>Messages</span><strong id="inbox-message-count">0</strong></button>
+            <button class="inbox-group" type="button" role="tab" aria-selected="false" data-inbox-kind="tasks"><span>Tasks</span><strong id="inbox-task-count">0</strong></button>
           </div>
-          <div class="alert-layout">
-            <article class="panel"><div class="panel-head"><div><h2>Alert inbox</h2><p>Unread first · grouped by trial and workflow</p></div><span class="spacer"></span><select class="sort-select" id="alert-filter"><option value="all">All alerts</option><option value="trial">Trial status</option><option value="verification">Site verification</option><option value="handoff">Referral and EMR</option></select></div><div class="alert-list" id="alerts-list"></div></article>
-            <div class="case-stack">
-              <article class="panel"><div class="panel-head"><div><h2>Following</h2><p>Changes to these trials can trigger alerts</p></div><span class="spacer"></span><span class="status-pill good"><span class="status-dot"></span><span id="followed-count">2</span> trials</span></div><div class="panel-body" id="followed-trials"></div></article>
-              <article class="panel"><div class="panel-head"><div><h2>Who gets what</h2><p>Role-based defaults; each rule can be narrowed</p></div></div><div class="panel-body"><div class="rule-builder">
-                <div class="alert-rule-card"><strong>Registry or site status changes</strong><p>Send to the trial follower and verification owner.</p><div class="channel-row"><span class="channel">In app</span><span class="channel">EMR inbox</span></div></div>
-                <div class="alert-rule-card"><strong>Verification expires or conflicts</strong><p>Send to the research coordinator and site steward.</p><div class="channel-row"><span class="channel">In app</span><span class="channel">EMR Task</span></div></div>
-                <div class="alert-rule-card"><strong>Referral or board task changes</strong><p>Send to the task owner, treating unit, and board presenter where applicable.</p><div class="channel-row"><span class="channel">In app</span><span class="channel">EMR Task</span><span class="channel">Approved email</span></div></div>
-                <div class="alert-rule-card"><strong>Trial-team eligibility outcome</strong><p>Show only the authorised trial team's recorded decision to the treating team and coordinator.</p><div class="channel-row"><span class="channel">In app</span><span class="channel">EMR inbox</span></div></div>
-              </div></div></article>
-              <article class="panel"><div class="panel-head"><div><h2>Alert controls</h2><p>Reduce noise and prevent disclosure</p></div></div><div class="panel-body"><ul class="rule-list"><li><span class="check">1</span><span>Deduplicate the same source change.</span></li><li><span class="check">2</span><span>Do not put clinical details in external notifications.</span></li><li><span class="check">3</span><span>Stop alerts when interest, access, or task ownership ends.</span></li><li><span class="check">4</span><span>Escalate only through an approved policy.</span></li></ul></div></article>
+          <div class="inbox-layout">
+            <article class="panel inbox-panel">
+              <div class="panel-head"><div><h2 id="inbox-stream-title" tabindex="-1">Updates</h2><p id="inbox-stream-summary">Source and workflow changes · unread first</p></div><span class="spacer"></span><span class="status-pill neutral" id="inbox-visible-count"><span class="status-dot"></span>0 visible</span></div>
+              <div class="inbox-stream" id="inbox-stream" role="list" aria-live="polite"></div>
+            </article>
+            <div class="case-stack inbox-context">
+              <article class="panel"><div class="panel-head"><div><h2>Following</h2><p>Followed trials contribute factual status updates</p></div><span class="spacer"></span><span class="status-pill good"><span class="status-dot"></span><span id="followed-count">0</span> trials</span></div><div class="panel-body" id="followed-trials"></div></article>
+              <article class="panel"><div class="panel-head"><div><h2>One item, one queue</h2><p>Classification rules prevent duplicate global work</p></div></div><div class="panel-body"><ul class="rule-list"><li><span class="check">1</span><span><strong>Updates</strong> report source or workflow changes.</span></li><li><span class="check">2</span><span><strong>Messages</strong> contain a human response or conversation state.</span></li><li><span class="check">3</span><span><strong>Tasks</strong> name one owner and due state.</span></li><li><span class="check">4</span><span>A linked event appears in only one Inbox view.</span></li></ul></div></article>
+              <article class="panel"><div class="panel-head"><div><h2>Delivery boundary</h2><p>External channels remain separately governed</p></div></div><div class="panel-body"><p class="inbox-boundary-copy">In-app items may link to the source context. Any future external message must contain only a minimal operational notice and secure link—never patient or clinical details.</p></div></article>
             </div>
           </div>
         </section>

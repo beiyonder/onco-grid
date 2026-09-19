@@ -161,7 +161,8 @@ On 2026-09-19 the owner authorised the agent to push and merge future implementa
 | `C2` | `P5` | `.harness/reports/20260919T104204Z-P5-trial-relay-source-split.md` | Complete; merged through pull request `#3` |
 | `C2` | `P5` | `.harness/reports/20260919T105058Z-P5-trial-library.md` | Complete; merged through pull request `#4` |
 | `C2` | `P5` | `.harness/reports/20260919T110551Z-P5-trial-profile.md` | Complete; merged through pull request `#5` |
-| `C2` | `P5` | `.harness/reports/20260919T112052Z-P5-trial-room.md` | Complete; Phase 1 Trial room ready for autonomous merge |
+| `C2` | `P5` | `.harness/reports/20260919T112052Z-P5-trial-room.md` | Complete; merged through pull request `#6` |
+| `C2` | `P5` | `.harness/reports/20260919T113355Z-P5-unified-inbox.md` | Complete; Phase 2 unified Inbox ready for autonomous merge |
 
 ## References
 
@@ -193,3 +194,4 @@ On 2026-09-19 the owner authorised the agent to push and merge future implementa
 - `.harness/reports/20260919T105058Z-P5-trial-library.md`
 - `.harness/reports/20260919T110551Z-P5-trial-profile.md`
 - `.harness/reports/20260919T112052Z-P5-trial-room.md`
+- `.harness/reports/20260919T113355Z-P5-unified-inbox.md`
