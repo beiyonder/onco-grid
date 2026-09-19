@@ -187,10 +187,10 @@ The owner decides whether to retain, simplify, supplement, or stop each major ca
 
 ## Current slice
 
-**Branch:** `feat/criterion-review`
+**Branch:** `feat/missing-information-tasks`
 
-**Pull request outcome:** deliver Phase 3 slice 2 — explicit clinician-driven trial selection and per-criterion review in the exact sequence `Criterion → Source record → Human review state → Next action`. The review set preserves the first four exact registry excerpts, lets only the treating oncologist link one of four synthetic EMR references and record a permitted human state, names reviewer/date, and reports count progress without a score.
+**Pull request outcome:** deliver Phase 3 slice 3 — create a named missing-information task only from a criterion in Needs clarification, preserving the exact criterion, clinician-linked source, current human state, task type, named owner, due date, expected operational outcome, creator, and explicit no-guessing boundary. The task appears once in Inbox and can complete or end unable to obtain without changing the criterion answer.
 
-**Acceptance scenario:** choose Find trials to review and confirm the general 285-record library is neither ranked nor filtered by patient context; select a trial and use Review this trial for the patient; inspect four exact, unaltered numbered registry excerpts; block coordinator changes; as treating oncologist link source records and record Confirmed and Needs clarification states; verify reviewer/date, state-specific next actions, `2 of 4` progress, source opening, and the persistent no-aggregate-eligibility boundary; preserve sequence on narrow mobile.
+**Acceptance scenario:** as treating oncologist mark criterion 2 Needs clarification, then as coordinator create a task from its exact context; verify four bounded task types, named owner, due date, criterion/source/state provenance, and safe confirmation; see `MISS-001` in the criterion, Recent work, and Inbox with task count increased; open the exact criterion from Inbox; complete the task and confirm it leaves active Tasks while the criterion remains Needs clarification; create a follow-up and record Unable to obtain with the same no-inference behavior; retain coherent desktop/mobile layouts.
 
-**Explicit non-goals for this slice:** no automated criteria extraction beyond deterministic list segmentation, semantic matching, eligibility conclusion, aggregate score, patient-specific trial ranking/filtering, missing-information task creation, real patient data, backend, persistence, authentication, new data source, or deployment change.
+**Explicit non-goals for this slice:** no inferred missing answer, automated source request, external message, criterion-state mutation from task completion, bulk assignment, real patient data, backend, persistence, authentication, new data source, or deployment change.

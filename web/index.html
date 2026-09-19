@@ -494,6 +494,24 @@
     </form>
   </dialog>
 
+  <dialog id="missing-info-dialog" aria-labelledby="missing-info-title">
+    <form id="missing-info-form">
+      <div class="dialog-head"><div><h2 id="missing-info-title">Create missing-information task</h2><p id="missing-info-context">Synthetic patient workspace · criterion context</p></div><button class="icon-button close-dialog" type="button" aria-label="Close missing-information task"><svg class="icon"><use href="#i-x"/></svg></button></div>
+      <div class="dialog-body">
+        <div class="notice" style="margin-bottom:13px"><strong>Identify the gap; never guess the answer.</strong> This task records the missing source or unanswered operational question, its owner, due date, and provenance. It does not change the criterion review state.</div>
+        <div class="missing-task-provenance" id="missing-task-provenance"></div>
+        <div class="form-grid">
+          <div class="form-row"><label for="missing-task-type">Task type</label><select class="select" id="missing-task-type" required><option>Request missing source record</option><option>Ask site whether a method is accepted</option><option>Request human clarification</option><option>Route question to tumour board</option></select></div>
+          <div class="form-row"><label for="missing-task-owner">Named owner</label><select class="select" id="missing-task-owner" required><option>A. Rao — research coordinator</option><option>Dr M. Shah — treating oncologist</option><option>Board presenter — thoracic board</option><option>Site steward — verified trial site</option></select></div>
+          <div class="form-row"><label for="missing-task-due">Due date</label><input class="field" id="missing-task-due" type="date" required></div>
+          <div class="form-row full"><label for="missing-task-note">Expected operational outcome</label><textarea class="field" id="missing-task-note" maxlength="280" required placeholder="Example: Obtain the original report or an authorised answer about the accepted method. Do not enter or infer the missing result."></textarea><p class="field-help">Synthetic workflow note only. Record what must be obtained or clarified—not the answer.</p></div>
+          <div class="form-row full"><label class="checkbox-row"><input id="missing-task-safe" type="checkbox" required><span>I confirm this task uses the synthetic patient workspace, preserves the linked source and criterion, and does not guess clinical information.</span></label></div>
+        </div>
+      </div>
+      <div class="dialog-foot"><button class="button close-dialog" type="button">Cancel</button><button class="button primary" type="submit"><svg class="icon"><use href="#i-check"/></svg>Create owned task</button></div>
+    </form>
+  </dialog>
+
   <dialog id="board-dialog" aria-labelledby="board-dialog-title">
     <form id="board-form">
       <div class="dialog-head"><div><h2 id="board-dialog-title">Record human board decision</h2><p>Operational disposition only · reference the signed clinical record</p></div><button class="icon-button close-dialog" type="button" aria-label="Close board decision form"><svg class="icon"><use href="#i-x"/></svg></button></div>
