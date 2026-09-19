@@ -158,7 +158,8 @@ On 2026-09-19 the owner authorised the agent to push and merge future implementa
 | `C5` | `P5` | `.harness/reports/20260913T134521Z-P5-ctri-data-access-quality.md` | Complete; dated non-commercial WHO mirror only, no product-data-source approval |
 | `C5` | `P5` | `.harness/reports/20260917T133754Z-P5-live-validation-deployment.md` | Complete; real ClinicalTrials.gov snapshot deployed for owner-authorised oncologist validation |
 | `C2` | `P5` | `.harness/reports/20260919T102253Z-P5-trial-relay-home.md` | Complete; merged through pull request `#2` |
-| `C2` | `P5` | `.harness/reports/20260919T104204Z-P5-trial-relay-source-split.md` | Complete; behavior-preserving source split ready for autonomous merge |
+| `C2` | `P5` | `.harness/reports/20260919T104204Z-P5-trial-relay-source-split.md` | Complete; merged through pull request `#3` |
+| `C2` | `P5` | `.harness/reports/20260919T105058Z-P5-trial-library.md` | Complete; Phase 1 Trial library ready for autonomous merge |
 
 ## References
 
@@ -187,3 +188,4 @@ On 2026-09-19 the owner authorised the agent to push and merge future implementa
 - `.harness/reports/20260917T133754Z-P5-live-validation-deployment.md`
 - `.harness/reports/20260919T102253Z-P5-trial-relay-home.md`
 - `.harness/reports/20260919T104204Z-P5-trial-relay-source-split.md`
+- `.harness/reports/20260919T105058Z-P5-trial-library.md`

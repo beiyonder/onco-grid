@@ -187,8 +187,10 @@ The owner decides whether to retain, simplify, supplement, or stop each major ca
 
 ## Current slice
 
-**Branch:** `refactor/split-web-source`
+**Branch:** `feat/trial-library`
 
-**Pull request outcome:** deliver Phase 0 slice 2 — extract stable CSS and JavaScript from `web/index.html` without changing behavior, preserve the dependency-free local run path, and establish file boundaries for later trial, Inbox, patient, and handoff slices.
+**Pull request outcome:** deliver Phase 1 slice 1 — a source-first Trial library with precise result hierarchy, compact labelled filters, persistent result and snapshot context, an explicit List/Map roadmap control, separate registry and site-confirmation traces, stable loading/empty/error states, and keyboard focus preserved when selecting a result.
 
-**Explicit non-goals for this slice:** no framework, package dependency, backend, persistence, authentication, trial-data change, patient-data change, matching logic, map, Trial room, or deployment change.
+**Acceptance scenario:** load the 285-record ClinicalTrials.gov snapshot; identify the source date and separate registry/site states; search `Mumbai`; clear to restore all records; select a result by keyboard without losing focus; observe deterministic loading, empty, and source-failure recovery states; retain zero horizontal overflow on desktop and narrow mobile.
+
+**Explicit non-goals for this slice:** no working map, trial-profile restructuring, Trial room, persistence, authentication, backend, new data source, patient-context filter, patient-specific ranking, matching logic, or deployment change.
