@@ -77,8 +77,12 @@ let alerts = [
 ];
 
 let selectedTrialId = trials[0].id;
+let profileOpen = true;
+let profileOriginId = selectedTrialId;
+let profileOriginScrollY = 0;
+let profileOriginListScrollTop = 0;
 let selectedVerificationId = trials[2].id;
-let activeTab = 'summary';
+let activeTab = 'overview';
 let ctriOutage = false;
 let caseSelectedTrialId = trials[0].id;
 let currentArtifactName = '';
@@ -103,7 +107,7 @@ const icon = (name) => `<svg class="icon" aria-hidden="true"><use href="#i-${nam
 const trialById = (id) => trials.find(t => t.id === id);
 const formatDate = (value) => {
   if(!value) return 'Not reported';
-  const normalized=/^\\d{4}-\\d{2}$/.test(value)?`${value}-01`:value;
+  const normalized=/^\d{4}-\d{2}$/.test(value)?`${value}-01`:value;
   const parsed=new Date(`${normalized}T00:00:00`);
   return Number.isNaN(parsed.getTime())?value:new Intl.DateTimeFormat('en-IN',{day:'2-digit',month:'short',year:'numeric'}).format(parsed);
 };
@@ -127,8 +131,8 @@ let registryLoadRequest = 0;
 
 function fullDate(value) {
   if(!value) return today;
-  if(/^\\d{4}-\\d{2}$/.test(value)) return `${value}-01`;
-  return /^\\d{4}-\\d{2}-\\d{2}$/.test(value)?value:today;
+  if(/^\d{4}-\d{2}$/.test(value)) return `${value}-01`;
+  return /^\d{4}-\d{2}-\d{2}$/.test(value)?value:today;
 }
 
 function ageLabel(value) {
@@ -167,6 +171,7 @@ function mapRegistryTrial(raw) {
     city: escapeHTML(location.city||'City not reported'),
     phase: Array.isArray(raw.phases)&&raw.phases.length?raw.phases.map(escapeHTML).join(' / '):'Phase not reported',
     title: escapeHTML(raw.briefTitle||'Title not reported'),
+    officialTitle: escapeHTML(raw.officialTitle||raw.briefTitle||'Official title not reported'),
     summary: escapeHTML(raw.briefSummary||'Summary not reported in the registry record.'),
     registryStatus: escapeHTML(raw.statusLabel||raw.overallStatus||'Status not reported'),
     registryUpdated: registryDate,
@@ -231,6 +236,7 @@ function seedRegistryWorkflowData() {
 async function loadRegistrySnapshot() {
   const requestId=++registryLoadRequest;
   const bar=$('#registry-data-bar');
+  const previousSelectedId=selectedTrialId;
   const refreshButton=$('#refresh-results');
   registryLoadState='loading';
   registryLoadError='';
@@ -252,14 +258,16 @@ async function loadRegistrySnapshot() {
     const mapped=snapshot.trials.map(mapRegistryTrial).filter(Boolean);
     if(!mapped.length) throw new Error('No usable trial records');
     trials=mapped;
-    selectedTrialId=trials[0].id;
+    selectedTrialId=trials.some(trial=>trial.id===previousSelectedId)?previousSelectedId:trials[0].id;
     selectedVerificationId=trials.find(trial=>trial.registryStatus==='Recruiting')?.id||trials[0].id;
     caseSelectedTrialId=selectedTrialId;
     seedRegistryWorkflowData();
     populateRegistryFilters();
     const initialRows=filteredTrials();
-    if(initialRows.length) selectedTrialId=initialRows[0].id;
+    if(initialRows.length&&!initialRows.slice(0,60).some(trial=>trial.id===selectedTrialId))selectedTrialId=initialRows[0].id;
     caseSelectedTrialId=selectedTrialId;
+    profileOriginId=selectedTrialId;
+    activeTab='overview';
     registryLoadState='ready';
     $('#record-type-label').textContent='Real registry records · synthetic cases';
     bar.classList.remove('error');
@@ -340,11 +348,14 @@ function renderTrials() {
     return;
   }
 
-  if(!rows.some(trial=>trial.id===selectedTrialId))selectedTrialId=rows[0].id;
+  if(!visibleRows.some(trial=>trial.id===selectedTrialId)){
+    selectedTrialId=visibleRows[0].id;
+    if(profileOpen)profileOriginId=selectedTrialId;
+  }
   list.innerHTML=errorState+visibleRows.map(trial=>{
     const siteCount=(trial.indiaLocations||[]).length;
     return `
-      <button class="trial-card ${trial.id===selectedTrialId?'selected':''}" type="button" data-trial-id="${trial.id}" aria-pressed="${trial.id===selectedTrialId}">
+      <button class="trial-card ${profileOpen&&trial.id===selectedTrialId?'selected':''}" type="button" data-trial-id="${trial.id}" aria-pressed="${profileOpen&&trial.id===selectedTrialId}">
         <div class="trial-card-top"><span class="tag">${trial.phase}</span><span class="tag">${siteCount} India site${siteCount===1?'':'s'}</span><span class="updated">${trial.city}, ${trial.state}</span></div>
         <h2>${trial.title}</h2>
         <div class="trial-source-trace"><strong>${trial.source}</strong><span>${trial.id}</span><span>registry updated ${formatDate(trial.registryUpdated)}</span></div>
@@ -354,37 +365,146 @@ function renderTrials() {
   }).join('')+(rows.length>visibleRows.length?`<div class="notice"><strong>${rows.length-visibleRows.length} more records.</strong> Narrow the condition, state, status, or search text to review them.</div>`:'');
   $$('.trial-card',list).forEach(button=>button.addEventListener('click',()=>{
     selectedTrialId=button.dataset.trialId;
-    activeTab='summary';
+    profileOriginId=selectedTrialId;
+    profileOriginScrollY=window.scrollY;
+    profileOriginListScrollTop=list.scrollTop;
+    profileOpen=true;
+    activeTab='overview';
     renderTrials();
-    $$('.trial-card',list).find(candidate=>candidate.dataset.trialId===selectedTrialId)?.focus({preventScroll:true});
+    $('#trial-profile-title')?.focus({preventScroll:window.innerWidth>720});
   }));
   $('#retry-registry-load')?.addEventListener('click',loadRegistrySnapshot);
-  renderDetail(trialById(selectedTrialId));
+  if(profileOpen){
+    detail.classList.remove('profile-closed');
+    renderDetail(trialById(selectedTrialId));
+  }else{
+    detail.classList.add('profile-closed');
+    const selected=trialById(selectedTrialId);
+    detail.innerHTML=`<div class="detail-prompt"><div class="empty-symbol">${icon('compass')}</div><h2>Choose a trial to inspect</h2><p>${selected?`Returned from ${selected.id}. `:''}Your filters and list position remain unchanged.</p></div>`;
+  }
 }
 
 function renderDetail(t) {
-  const target = $('#trial-detail');
-  const tabData = {
-    summary: `<div class="detail-grid"><div class="fact"><label>Cancer area</label><strong>${t.cancer}</strong></div><div class="fact"><label>Study phase</label><strong>${t.phase}</strong></div><div class="fact"><label>Study design</label><strong>${t.design}</strong></div><div class="fact"><label>Lead sponsor</label><strong>${t.sponsor}</strong></div><div class="fact"><label>Indian location</label><strong>${t.city}, ${t.state}</strong></div><div class="fact"><label>Data readiness</label><strong>${t.confidence}/100 · registry freshness + India-site status</strong></div><div class="fact wide"><label>Why this record is here</label><p>${t.operational}</p></div><div class="notice wide"><strong>Human boundary:</strong> This view does not determine whether any person qualifies. Contact the trial team for protocol screening and formal eligibility.</div></div>`,
-    sites: `<div class="detail-grid"><div class="fact wide"><label>First listed India site</label><strong>${t.location}</strong></div><div class="fact"><label>Site verification</label><strong>${t.verifyLabel}</strong></div><div class="fact"><label>Date shown</label><strong>${formatDate(t.verifiedAt)} · ${t.verifyKey==='unverified'?'registry date':'site confirmation'}</strong></div><div class="fact"><label>Evidence route</label><strong>${t.verifyMethod}</strong></div><div class="fact wide"><label>India sites in snapshot</label><p>${(t.indiaLocations||[]).slice(0,12).map(location=>`${location.facility} — ${location.city}, ${location.state} (${location.status.replaceAll('_',' ').toLowerCase()})`).join('<br>')||'No India site details retained.'}${(t.indiaLocations||[]).length>12?`<br>+ ${(t.indiaLocations||[]).length-12} more on the source record`:''}</p></div><div class="fact wide"><label>Operational note</label><p>${t.operational}</p></div><div class="notice wide"><strong>Important:</strong> Registry-declared location and status are not proof that a site can enrol today. Verify with an authorised site or sponsor contact through the source record.</div></div>`,
-    criteria: `<div class="detail-grid"><div class="fact wide"><label>Registry summary of criteria</label><p>${t.generalCriteria}</p></div><div class="notice wide"><strong>Not a pre-screen:</strong> Registry text can be incomplete or method-specific. The trial coordinator and investigator review every applicable criterion and source record.</div><div class="fact wide"><label>Allowed use here</label><p>Read general protocol language, preserve its source, and ask the site an operational question. Do not paste a patient's facts or request a match.</p></div></div>`,
-    provenance: `<div class="detail-grid"><div class="fact"><label>Primary source</label><strong>${t.source}</strong></div><div class="fact"><label>Record ID</label><strong>${t.id}</strong></div><div class="fact"><label>Declared secondary ID</label><strong>${t.secondary}</strong></div><div class="fact"><label>Registry updated</label><strong>${formatDate(t.registryUpdated)}</strong></div><div class="fact"><label>Snapshot retrieved</label><strong>${t.realRegistryRecord?(registrySnapshotMeta?.retrievedAtLabel||'Current snapshot'):'Synthetic fallback'}</strong></div><div class="fact"><label>Normalization rule</label><strong>${t.realRegistryRecord?'CTGOV-SNAPSHOT-V1':'DEMO-RULESET-1'}</strong></div><div class="notice wide"><strong>${t.realRegistryRecord?'Real registry record':'Synthetic fallback'}:</strong> ${t.realRegistryRecord?'The displayed trial facts come from ClinicalTrials.gov. Status is registry-declared, not proof of current site capacity or patient eligibility.':'This fallback record is fictional and appears only when the registry snapshot cannot load.'}</div></div>`,
-    activity: `<div class="timeline">${t.activity.map(a=>`<div class="timeline-item"><strong>${a[1]}</strong><span>${a[0]} · ${a[2]}</span></div>`).join('')}</div>`
+  const target=$('#trial-detail');
+  const snapshotDate=registrySnapshotMeta?.dataTimestamp?.slice(0,10);
+  const retrievedLabel=t.realRegistryRecord?(registrySnapshotMeta?.retrievedAtLabel||'Snapshot retrieval time unavailable'):'Synthetic fallback fixture';
+  const conditions=(t.conditions?.length?t.conditions:[t.cancer]).filter(Boolean);
+  const interventions=(t.interventions||[]).filter(Boolean);
+  const sites=t.indiaLocations?.length?t.indiaLocations:[{
+    facility:t.location,
+    city:t.city,
+    state:t.state,
+    status:t.registryStatus
+  }];
+  const sitesByState=new Map();
+  sites.forEach(site=>{
+    const state=site.state||'State not reported';
+    if(!sitesByState.has(state))sitesByState.set(state,[]);
+    sitesByState.get(state).push(site);
+  });
+  const siteGroups=[...sitesByState.entries()]
+    .sort(([a],[b])=>a.localeCompare(b))
+    .map(([state,stateSites])=>`
+      <section class="site-group">
+        <header><h3>${state}</h3><span>${stateSites.length} site${stateSites.length===1?'':'s'} in snapshot</span></header>
+        <div class="site-list">
+          ${stateSites
+            .sort((a,b)=>(a.city||'').localeCompare(b.city||'')||(a.facility||'').localeCompare(b.facility||''))
+            .map(site=>`
+              <div class="site-row">
+                <div class="site-identity"><strong>${site.facility||'Facility not reported'}</strong><span>${site.city||'City not reported'} · Registry site state: ${String(site.status||'not reported').replaceAll('_',' ').toLowerCase()}</span></div>
+                <div class="site-assertion"><span>Site confirmation</span><strong>${t.realRegistryRecord?'Not independently confirmed':t.verifyLabel}</strong></div>
+              </div>`).join('')}
+        </div>
+      </section>`).join('');
+  const confirmationUnknown=['unverified','no_authoritative_response'].includes(t.verifyKey);
+  const confirmationConflict=t.discrepancy||t.verifyKey==='registry_site_discrepancy';
+  const confirmationTone=confirmationConflict?'conflict':confirmationUnknown?'unknown':'confirmed';
+  const confirmationTitle=confirmationConflict?'Registry and site sources conflict':confirmationUnknown?'Site confirmation remains unknown':'Human site confirmation recorded';
+  const confirmationCopy=confirmationConflict
+    ?`${t.verifyLabel}. The registry declaration remains ${t.registryStatus}; neither assertion overwrites the other.`
+    :confirmationUnknown
+      ?`${t.verifyLabel}. Registry recruitment state does not establish whether any listed India site can screen today.`
+      :`${t.verifyLabel}. Authority: ${t.verifyMethod}; recorded ${formatDate(t.verifiedAt)}.`;
+  const activityTimeline=`<div class="timeline">${t.activity.map(item=>`<div class="timeline-item"><strong>${item[1]}</strong><span>${item[0]} · ${item[2]}</span></div>`).join('')}</div>`;
+  const sourceLink=t.realRegistryRecord?`<a href="${t.sourceUrl}" target="_blank" rel="noopener noreferrer">Open the authoritative registry record</a>`:'Synthetic fallback has no external registry source.';
+  const tabData={
+    overview:`
+      <section class="profile-section" aria-labelledby="profile-overview-heading">
+        <div class="profile-section-heading"><div><span>Overview</span><h3 id="profile-overview-heading">Registry facts in context</h3></div><p>General trial information only; no patient context affects this view.</p></div>
+        <div class="profile-fact-grid">
+          <div class="fact"><label>Phase</label><strong>${t.phase}</strong></div>
+          <div class="fact"><label>Lead sponsor</label><strong>${t.sponsor}</strong></div>
+          <div class="fact"><label>Study design</label><strong>${t.design}</strong></div>
+          <div class="fact"><label>Conditions</label><strong>${conditions.join(' · ')||'Not reported'}</strong></div>
+          <div class="fact wide"><label>Official registry title</label><p>${t.officialTitle||t.title}</p></div>
+          <div class="fact wide"><label>Interventions</label><p>${interventions.join(' · ')||'Not reported in the retained snapshot fields.'}</p></div>
+          <div class="fact wide"><label>Why this record is here</label><p>${t.operational}</p></div>
+        </div>
+        <details class="profile-disclosure">
+          <summary>Registry eligibility text</summary>
+          <div class="disclosure-body"><p>${t.generalCriteria}</p><div class="notice"><strong>Not a pre-screen:</strong> Registry text can be incomplete or method-specific. The trial team performs formal screening; Trial Relay does not calculate eligibility.</div></div>
+        </details>
+        <details class="profile-disclosure">
+          <summary>Source provenance and change history</summary>
+          <div class="disclosure-body">
+            <div class="profile-fact-grid">
+              <div class="fact"><label>Primary source</label><strong>${t.source}</strong></div>
+              <div class="fact"><label>Primary identifier</label><strong>${t.id}</strong></div>
+              <div class="fact"><label>Declared secondary identifier</label><strong>${t.secondary}</strong></div>
+              <div class="fact"><label>Registry updated</label><strong>${formatDate(t.registryUpdated)}</strong></div>
+              <div class="fact"><label>Snapshot data date</label><strong>${snapshotDate?formatDate(snapshotDate):'Not reported'}</strong></div>
+              <div class="fact"><label>Snapshot retrieved</label><strong>${retrievedLabel}</strong></div>
+              <div class="fact wide"><label>Authoritative link</label><p>${sourceLink}</p></div>
+            </div>
+            ${activityTimeline}
+          </div>
+        </details>
+      </section>`,
+    sites:`
+      <section class="profile-section" aria-labelledby="profile-sites-heading">
+        <div class="profile-section-heading"><div><span>Sites and status</span><h3 id="profile-sites-heading">${sites.length} retained India site${sites.length===1?'':'s'}</h3></div><p>Registry site state and human operational confirmation remain separate.</p></div>
+        <div class="contact-route"><div>${icon('link')}<span><strong>Current authorised contact route</strong><small>Use the source registry record. Contact names, email addresses, and phone numbers are not retained in this snapshot.</small></span></div>${t.realRegistryRecord?`<a class="button small" href="${t.sourceUrl}" target="_blank" rel="noopener noreferrer">Open source</a>`:''}</div>
+        <div class="site-groups">${siteGroups}</div>
+        <details class="profile-disclosure">
+          <summary>Verification and source history</summary>
+          <div class="disclosure-body">${activityTimeline}</div>
+        </details>
+      </section>`
   };
-  target.innerHTML = `
-    <div class="detail-head"><div class="detail-overline"><span class="tag">${t.source}</span><span class="record-id">${t.id}</span><span class="priority-badge ${t.realRegistryRecord?'p1':'p0'}">${t.realRegistryRecord?'real registry':'synthetic fallback'}</span></div><h2>${t.title}</h2><p class="summary">${t.summary}</p></div>
-    <div class="dual-status"><div class="status-block"><span class="status-label">Registry declares</span><div class="status-value">${t.registryStatus}</div><p>${t.source} · updated ${formatDate(t.registryUpdated)} · ${t.registryAge}</p></div><div class="status-block verified ${t.verifyTone}"><span class="status-label">Site verification</span><div class="status-value">${statusPill(t)}</div><p>${t.verifyMethod} · ${t.verifyAge}</p></div></div>
+  if(!tabData[activeTab])activeTab='overview';
+  target.innerHTML=`
+    <div class="detail-head trial-entity">
+      <button class="button small ghost detail-close" type="button" id="close-trial-profile">${icon('x')}Close profile</button>
+      <div class="profile-source-plane"><span>Registry source</span><strong>${t.source} · ${t.id}</strong><small>Registry updated ${formatDate(t.registryUpdated)} · snapshot ${snapshotDate?formatDate(snapshotDate):'date unavailable'}</small></div>
+      <div class="detail-overline"><span class="priority-badge ${t.realRegistryRecord?'p1':'p0'}">${t.realRegistryRecord?'real registry record':'synthetic fallback'}</span><span class="record-id">${t.secondary}</span></div>
+      <h2 id="trial-profile-title" tabindex="-1">${t.title}</h2>
+      <p class="summary">${t.summary}</p>
+    </div>
+    <div class="profile-status-relationship">
+      <section class="profile-status registry"><span class="status-label">Registry declares</span><strong>${t.registryStatus}</strong><p>${t.source} · ${formatDate(t.registryUpdated)} · ${t.registryAge}</p></section>
+      <section class="profile-status site ${confirmationTone}"><span class="status-label">Independent site confirmation</span><strong>${t.verifyLabel}</strong><p>${confirmationUnknown?'No separate current site assertion retained':`${t.verifyMethod} · ${formatDate(t.verifiedAt)}`}</p></section>
+    </div>
+    <div class="profile-assertion ${confirmationTone}" role="${confirmationConflict?'alert':'note'}">${icon(confirmationConflict?'warning':confirmationUnknown?'clock':'check')}<div><strong>${confirmationTitle}</strong><span>${confirmationCopy}</span></div></div>
     <div class="detail-actions"><button class="button primary" type="button" id="review-with-case">${icon('user')}Review with synthetic EMR case</button><button class="button" type="button" id="start-inquiry">${icon('send')}General site inquiry</button><button class="button" type="button" id="compare-sources">${icon('link')}Compare sources</button><button class="button ${followedTrialIds.has(t.id)?'success':''}" type="button" id="toggle-follow">${icon('bell')}${followedTrialIds.has(t.id)?'Following trial':'Follow trial'}</button>${t.realRegistryRecord?`<a class="button" href="${t.sourceUrl}" target="_blank" rel="noopener noreferrer">${icon('link')}Open registry record</a>`:''}<button class="button" type="button" id="copy-reference">${icon('copy')}Copy reference</button></div>
-    <div class="tabs" role="tablist" aria-label="Trial detail sections">${[['summary','Summary'],['sites','Sites & status'],['criteria','Criteria'],['provenance','Provenance'],['activity','Activity']].map(([key,label])=>`<button class="tab-button ${activeTab===key?'active':''}" type="button" role="tab" aria-selected="${activeTab===key}" data-tab="${key}">${label}</button>`).join('')}</div>
-    <div class="tab-content">${tabData[activeTab]}</div>`;
-  $('#review-with-case').addEventListener('click', () => {
+    <div class="tabs" role="tablist" aria-label="Trial profile sections">${[['overview','Overview'],['sites','Sites & status']].map(([key,label])=>`<button class="tab-button ${activeTab===key?'active':''}" type="button" role="tab" aria-selected="${activeTab===key}" aria-controls="trial-profile-panel" data-tab="${key}">${label}</button>`).join('')}</div>
+    <div class="tab-content" id="trial-profile-panel">${tabData[activeTab]}</div>`;
+  $('#close-trial-profile').addEventListener('click',()=>{
+    profileOpen=false;
+    activeTab='overview';
+    renderTrials();
+    $('#result-list').scrollTop=profileOriginListScrollTop;
+    window.scrollTo({top:profileOriginScrollY,behavior:'instant'});
+    $$('.trial-card',$('#result-list')).find(button=>button.dataset.trialId===profileOriginId)?.focus({preventScroll:true});
+  });
+  $('#review-with-case').addEventListener('click',()=>{
     caseSelectedTrialId=t.id;
     renderCase();
     switchView('case');
   });
-  $('#start-inquiry').addEventListener('click', () => openInquiry(t.id));
-  $('#compare-sources').addEventListener('click', () => openCompare(t.id));
-  $('#toggle-follow').addEventListener('click', () => {
+  $('#start-inquiry').addEventListener('click',()=>openInquiry(t.id));
+  $('#compare-sources').addEventListener('click',()=>openCompare(t.id));
+  $('#toggle-follow').addEventListener('click',()=>{
     if(followedTrialIds.has(t.id)){
       followedTrialIds.delete(t.id);
       showToast(`Stopped following ${t.id}. New trial-status alerts will stop.`);
@@ -393,10 +513,15 @@ function renderDetail(t) {
       showToast(`Following ${t.id}. Your team can now receive factual status alerts.`);
     }
     renderDetail(t);
+    $('#toggle-follow')?.focus({preventScroll:true});
     renderAlerts();
   });
-  $('#copy-reference').addEventListener('click', () => copyText(`${t.id} — ${plainText(t.title)} — ${t.realRegistryRecord?'ClinicalTrials.gov registry record':'synthetic fallback record'}`, 'Reference copied.'));
-  $$('.tab-button', target).forEach(btn=>btn.addEventListener('click',()=>{activeTab=btn.dataset.tab;renderDetail(t);}));
+  $('#copy-reference').addEventListener('click',()=>copyText(`${t.id} — ${plainText(t.title)} — ${t.realRegistryRecord?'ClinicalTrials.gov registry record':'synthetic fallback record'}`,'Reference copied.'));
+  $$('.tab-button',target).forEach(button=>button.addEventListener('click',()=>{
+    activeTab=button.dataset.tab;
+    renderDetail(t);
+    $(`.tab-button[data-tab="${activeTab}"]`,target)?.focus({preventScroll:true});
+  }));
 }
 
 function clearFilters() {
