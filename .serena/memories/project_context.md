@@ -110,6 +110,7 @@ Owner sign-off is required for changes to goal, scope, non-goals, acceptance thr
 - 2026-09-19 implementation state: pull request `#11` merged clinician-led exact-criterion review into `main`. The missing-information slice creates a named, due, source-linked task only from Needs clarification; it appears once in Inbox and can complete or end unable to obtain without guessing an answer or changing criterion state.
 - 2026-09-19 implementation state: pull request `#12` merged source-linked missing-information tasks into `main`. The referral-packet slice adds version, selected trial/site, exact synthetic EMR manifest, purpose, recipient, owner, expiry, clinician-review state, approval state, creator/history, and a separate-human-approval-before-release boundary.
 - 2026-09-19 implementation state: pull request `#13` merged versioned referral packet drafts into `main`. The lifecycle slice adds version-bound human approval, Sent, Acknowledged, Trial-team screening, Closed, actor/date/source history, canonical Inbox reclassification, unable-to-contact, and correction that invalidates approval and requires a new version.
+- 2026-09-19 implementation state: pull request `#14` merged the version-bound referral lifecycle into `main`. The tumour-board slice requires a bounded board-purpose packet, records only a signed human EMR decision reference and authorised operational task, preserves packet/audit history, and previews/writes reference-only synthetic EMR metadata without generating or copying clinical content.
 
 ## References
 

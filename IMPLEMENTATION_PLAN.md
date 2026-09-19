@@ -187,10 +187,10 @@ The owner decides whether to retain, simplify, supplement, or stop each major ca
 
 ## Current slice
 
-**Branch:** `feat/referral-lifecycle`
+**Branch:** `feat/tumour-board-context`
 
-**Pull request outcome:** deliver Phase 4 slice 2 — a version-bound referral lifecycle `Draft → Human approved → Sent → Acknowledged → Trial-team screening → Closed`, with one permissible next action, actor/date/source history for every transition, Inbox reclassification without duplication, unable-to-contact, and a correction path that invalidates approval and requires a new packet version.
+**Pull request outcome:** deliver Phase 4 slice 3 — route one bounded Tumour-board discussion packet into a human board workspace, expose its exact purpose/trial/source/access context, record only a signed human decision reference and authorised operational disposition, assign recipient/owner/due date, preserve packet and audit history, and preview/write only reference-plus-task metadata to the synthetic EMR.
 
-**Acceptance scenario:** create `REF-2201 v1.0`; inspect six lifecycle stages and Draft history; approve it and verify approval actor/date/version; send only after approval; record acknowledgement and observe canonical move from Tasks to Messages; begin screening and retain exactly one canonical row; close the handoff with all six stages/history events; separately approve then request correction, confirm status Correction required and null approval, and reopen Patients to see `v2.0` as a fresh unapproved draft; verify mobile lifecycle readability.
+**Acceptance scenario:** choose Add to board without a packet and receive a preconfigured Tumour-board discussion draft; create and route `REF-2201 v1.0`; inspect dynamic agenda, three-source manifest, participant boundary, and routed history; record `MDT-DEMO-20260919-2201` only after confirming human authorship; verify operational disposition, owner, recipient, due date, and packet history without generated clinical prose; preview a synthetic Task plus signed DocumentReference where clinical content is not copied; write the task and observe lifecycle/recent-work/audit/Inbox continuity; retain coherent desktop/mobile layouts.
 
-**Explicit non-goals for this slice:** no automatic transition, actual packet transmission, clinical screening outcome, patient eligibility conclusion, packet editing in place, real patient data, backend, persistence, authentication, new data source, or deployment change.
+**Explicit non-goals for this slice:** no generated or summarized board decision, meeting transcription, autonomous packet routing, actual EMR write, external transmission, clinical recommendation, trial-team outcome, real patient data, backend, persistence, authentication, new data source, or deployment change.
