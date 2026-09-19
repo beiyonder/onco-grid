@@ -93,6 +93,8 @@ const trialRoomThreads = new Map();
 let trialRoomSequence = 1;
 let currentInboxKind = 'updates';
 const inboxReadIds = new Set();
+let selectedInboxItemId = null;
+let pendingInboxFocusId = null;
 let inquiries = [
   {id:'INQ-1042', trialId:'DEMO-CTRI-003', question:'Resolve registry discrepancy', owner:'A. Rao', due:'2026-09-14', route:'Site trial office', status:'sent', created:'2026-09-12'},
   {id:'INQ-1038', trialId:'DEMO-CTRI-002', question:'Confirm site recruitment', owner:'Trial office', due:'2026-09-15', route:'Registry public-query channel', status:'acknowledged', created:'2026-09-07'}
@@ -890,11 +892,47 @@ function buildInboxItems() {
       source:`${trial.source} · registry updated ${formatDate(trial.registryUpdated)}`,
       tone:trial.discrepancy?'bad':'warn',
       unread:false,
+
       targetView:'verification',
       trialId:trial.id
     });
   });
   return items;
+}
+function inboxInspectorMarkup(item) {
+  const linkedInquiry=inquiries.find(inquiry=>inquiry.id===item.inquiryId);
+  const linkedTrial=trialById(item.trialId);
+  const nextInquiryState=linkedInquiry?{draft:'approved',approved:'sent',sent:'acknowledged',acknowledged:'closed'}[linkedInquiry.status]:null;
+  const nextInquiryLabel=nextInquiryState?{
+    approved:'Approve draft',
+    sent:'Mark sent',
+    acknowledged:'Record acknowledgement',
+    closed:'Close handoff'
+  }[nextInquiryState]:null;
+  return `
+    <section class="inbox-inspector" data-inbox-inspector="${item.id}" aria-labelledby="inbox-inspector-heading">
+      <header>
+        <div><span>Context inspection</span><h3 id="inbox-inspector-heading" tabindex="-1">${escapeHTML(item.title)}</h3></div>
+        <button class="button small ghost" type="button" data-inbox-close>${icon('x')}Close</button>
+      </header>
+      <p>${escapeHTML(item.body)}</p>
+      <div class="inbox-inspector-facts">
+        <div><span>Attached context</span><strong>${escapeHTML(item.context)}</strong></div>
+        <div><span>Current owner</span><strong>${escapeHTML(item.owner)}</strong></div>
+        <div><span>Due state</span><strong>${escapeHTML(item.due)}</strong></div>
+        <div><span>Source authority</span><strong>${escapeHTML(item.source)}</strong></div>
+      </div>
+      ${linkedInquiry?`<div class="inbox-inspector-state"><span>Handoff state</span><strong>${statusHuman[linkedInquiry.status]||linkedInquiry.status}</strong><small>${linkedInquiry.id} · ${linkedInquiry.route} · owner ${linkedInquiry.owner}</small></div>`:''}
+      ${item.targetView==='verification'&&linkedTrial?`<div class="inbox-inspector-state"><span>Source comparison</span><strong>Registry: ${linkedTrial.registryStatus} · Site: ${linkedTrial.verifyLabel}</strong><small>${linkedTrial.source} updated ${formatDate(linkedTrial.registryUpdated)}. Unknown remains unknown until an authorised source responds.</small></div>`:''}
+      <div class="inbox-inspector-actions">
+        ${item.unread?`<button class="button" type="button" data-inbox-read="${item.id}">${icon('check')}Mark read</button>`:''}
+        ${nextInquiryLabel?`<button class="button primary" type="button" data-inbox-advance="${linkedInquiry.id}">${icon('arrow')}${nextInquiryLabel}</button>`:''}
+        ${linkedInquiry&&['draft','approved','sent'].includes(linkedInquiry.status)?`<button class="button danger" type="button" data-inbox-unable="${linkedInquiry.id}">${icon('warning')}Unable to contact</button>`:''}
+        ${item.targetView==='verification'&&item.trialId?`<button class="button primary" type="button" data-inbox-verify="${item.trialId}">${icon('check')}Record verification</button>`:''}
+        <button class="button" type="button" data-inbox-open="${item.id}">${icon('arrow')}Go to full context</button>
+      </div>
+      <div class="inbox-inspector-boundary">${icon('shield')}<span>Only a human-recorded operational action changes workflow state. Opening or reading this item never changes a registry assertion, site confirmation, or clinical conclusion.</span></div>
+    </section>`;
 }
 
 function renderAlerts() {
@@ -928,6 +966,7 @@ function renderAlerts() {
   const visibleRows=rows.slice(0,60);
   $('#inbox-visible-count').innerHTML=`<span class="status-dot"></span>${rows.length} visible`;
   const stream=$('#inbox-stream');
+  if(selectedInboxItemId&&!visibleRows.some(item=>item.id===selectedInboxItemId))selectedInboxItemId=null;
   stream.innerHTML=visibleRows.length?visibleRows.map(item=>`
     <article class="inbox-row ${item.unread?'unread':''}" role="listitem" data-inbox-id="${item.id}">
       <div class="inbox-row-symbol ${item.tone==='bad'?'bad':item.tone==='warn'?'warn':item.tone==='good'?'good':''}">${icon(item.kind==='updates'?'database':item.kind==='messages'?'send':'check')}</div>
@@ -943,10 +982,12 @@ function renderAlerts() {
       </div>
       <div class="inbox-row-actions">
         <span class="status-pill ${item.unread?'good':item.tone==='bad'?'bad':'neutral'}"><span class="status-dot"></span>${item.unread?'Unread':item.kind==='tasks'?item.due:'Read'}</span>
-        <button class="button small" type="button" data-inbox-open="${item.id}">Open context</button>
+        <button class="button small" type="button" data-inbox-inspect="${item.id}" aria-expanded="${selectedInboxItemId===item.id}">Inspect</button>
+        <button class="button small" type="button" data-inbox-open="${item.id}">Go to context</button>
         ${item.unread?`<button class="button small ghost" type="button" data-inbox-read="${item.id}">Mark read</button>`:''}
       </div>
-    </article>`).join('')+(rows.length>visibleRows.length?`<div class="notice"><strong>${rows.length-visibleRows.length} more tasks.</strong> Open the attached verification or handoff context to work the complete queue.</div>`:''):`<div class="empty-state"><div class="empty-symbol">${icon(currentInboxKind==='updates'?'database':currentInboxKind==='messages'?'send':'check')}</div><h2>No ${labels[currentInboxKind][0].toLowerCase()}</h2><p>This browser-session workspace has no items in this Inbox view.</p></div>`;
+    </article>
+    ${selectedInboxItemId===item.id?inboxInspectorMarkup(item):''}`).join('')+(rows.length>visibleRows.length?`<div class="notice"><strong>${rows.length-visibleRows.length} more tasks.</strong> Open the attached verification or handoff context to work the complete queue.</div>`:''):`<div class="empty-state"><div class="empty-symbol">${icon(currentInboxKind==='updates'?'database':currentInboxKind==='messages'?'send':'check')}</div><h2>No ${labels[currentInboxKind][0].toLowerCase()}</h2><p>This browser-session workspace has no items in this Inbox view.</p></div>`;
   const markRead=item=>{
     inboxReadIds.add(item.id);
     if(item.alertId){
@@ -954,10 +995,70 @@ function renderAlerts() {
       if(alert)alert.unread=false;
     }
   };
+  const focusInboxOrigin=(itemId,preferInspector=true)=>{
+    requestAnimationFrame(()=>{
+      const inspector=$('#inbox-inspector-heading');
+      if(preferInspector&&inspector){
+        inspector.focus({preventScroll:true});
+        return;
+      }
+      const origin=$(`[data-inbox-inspect="${itemId}"]`,stream);
+      (origin||$('#inbox-stream-title')).focus({preventScroll:true});
+    });
+  };
+  $$('[data-inbox-inspect]',stream).forEach(button=>button.addEventListener('click',()=>{
+    selectedInboxItemId=button.dataset.inboxInspect;
+    renderAlerts();
+    focusInboxOrigin(selectedInboxItemId,true);
+  }));
+  $('[data-inbox-close]',stream)?.addEventListener('click',()=>{
+    const originId=selectedInboxItemId;
+    selectedInboxItemId=null;
+    renderAlerts();
+    focusInboxOrigin(originId,false);
+  });
+  $$('[data-inbox-advance]',stream).forEach(button=>button.addEventListener('click',()=>{
+    const inquiry=inquiries.find(item=>item.id===button.dataset.inboxAdvance);
+    if(!inquiry)return;
+    const previousStatus=inquiry.status;
+    const priorItem=items.find(item=>item.inquiryId===inquiry.id&&item.id===selectedInboxItemId);
+    advanceInquiry(inquiry.id);
+    if(previousStatus==='sent'){
+      currentInboxKind='messages';
+      const canonical=buildInboxItems().find(item=>item.kind==='messages'&&item.inquiryId===inquiry.id);
+      selectedInboxItemId=canonical?.id||null;
+    }else{
+      selectedInboxItemId=priorItem?.id||null;
+    }
+    renderAlerts();
+    focusInboxOrigin(selectedInboxItemId,true);
+  }));
+  $$('[data-inbox-unable]',stream).forEach(button=>button.addEventListener('click',()=>{
+    setInquiryUnable(button.dataset.inboxUnable);
+    selectedInboxItemId=null;
+    renderAlerts();
+    focusInboxOrigin('',false);
+  }));
+  $$('[data-inbox-verify]',stream).forEach(button=>button.addEventListener('click',()=>{
+    pendingInboxFocusId=selectedInboxItemId;
+    const dialog=$('#verification-dialog');
+    dialog.addEventListener('close',()=>{
+      if($('.view.active')?.dataset.view==='alerts'){
+        const persists=buildInboxItems().some(item=>item.id===pendingInboxFocusId);
+        selectedInboxItemId=persists?pendingInboxFocusId:null;
+        renderAlerts();
+        focusInboxOrigin(selectedInboxItemId,Boolean(selectedInboxItemId));
+      }
+      pendingInboxFocusId=null;
+    },{once:true});
+    openVerification(button.dataset.inboxVerify);
+  }));
   $$('[data-inbox-read]',stream).forEach(button=>button.addEventListener('click',()=>{
     const item=items.find(candidate=>candidate.id===button.dataset.inboxRead);
+    const inspectorOpen=item&&selectedInboxItemId===item.id;
     if(item)markRead(item);
     renderAlerts();
+    if(item)focusInboxOrigin(item.id,inspectorOpen);
   }));
   $$('[data-inbox-open]',stream).forEach(button=>button.addEventListener('click',()=>{
     const item=items.find(candidate=>candidate.id===button.dataset.inboxOpen);
@@ -1257,6 +1358,7 @@ $('#mark-alerts-read').addEventListener('click',()=>{
 });
 $$('[data-inbox-kind]').forEach(button=>button.addEventListener('click',()=>{
   currentInboxKind=button.dataset.inboxKind;
+  selectedInboxItemId=null;
   renderAlerts();
   $('#inbox-stream-title').focus({preventScroll:true});
 }));

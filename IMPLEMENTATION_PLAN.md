@@ -187,10 +187,10 @@ The owner decides whether to retain, simplify, supplement, or stop each major ca
 
 ## Current slice
 
-**Branch:** `feat/unified-inbox`
+**Branch:** `feat/inbox-context-resolution`
 
-**Pull request outcome:** deliver Phase 2 slice 1 — one Inbox surface with Updates, Messages, and Tasks views over a single normalized stream. Each row names its event, attached context, owner, due state, source, read state, and exact source-context route; Trial room outcomes and task conversions appear once rather than duplicating their generated alerts or handoffs.
+**Pull request outcome:** deliver Phase 2 slice 2 — an inline Inbox context inspector with exact accountability facts, explicit workflow state, safe operational actions, full-context navigation, and deterministic focus return. Handoff tasks can advance or close in place, unable-to-contact remains explicit, and verification tasks open the existing authority-gated form without leaving Inbox.
 
-**Acceptance scenario:** load the current browser-session workspace and distinguish update, message, and task counts; confirm every visible row includes context, owner, due state, and source; mark Updates read without clearing unread Messages; see owned overdue handoffs before unscheduled verification work; open an inquiry, verification task, and Trial room response into the correct source context; resolve a followed Trial room thread and observe exactly one canonical Message row; retain a 60-row task rendering cap and zero horizontal overflow on desktop and narrow mobile.
+**Acceptance scenario:** inspect an Update in place and close back to its originating row; inspect a sent handoff Task, record acknowledgement, observe its canonical move to Messages, then close it without losing focus; close another task as unable to contact and remove it from the active queue; open a verification Task, cancel back to the inspector, then record an authorised site assertion and return to the Inbox heading when the completed task disappears; retain explicit registry/site separation and zero horizontal overflow on desktop and narrow mobile.
 
-**Explicit non-goals for this slice:** no inline resolution workbench, notification-rule redesign, persistence, external delivery, production identity or authorization, patient-specific content, backend, new data source, or deployment change.
+**Explicit non-goals for this slice:** no notification-rule redesign, bulk task mutation, automatic acknowledgement, persistence, external delivery, production identity or authorization, patient-specific content, backend, new data source, or deployment change.
