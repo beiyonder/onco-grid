@@ -23,7 +23,7 @@ export function AppShell() {
 
   useEffect(() => {
     const navigationState = location.state as { libraryFocusId?: string } | null;
-    if ((location.pathname === "/trials" && navigationState?.libraryFocusId) || location.search.includes("message=")) return;
+    if ((location.pathname === "/trials" && navigationState?.libraryFocusId) || location.search.includes("message=") || location.search.includes("criterion=")) return;
     const frame = requestAnimationFrame(() => {
       document.querySelector<HTMLElement>("main h1")?.focus({ preventScroll: true });
       window.scrollTo({ top: 0, behavior: "auto" });

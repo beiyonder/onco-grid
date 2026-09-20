@@ -123,6 +123,7 @@ Owner sign-off is required for changes to goal, scope, non-goals, acceptance thr
 - 2026-09-20 owner review: `product/TRIAL_RELAY_EVIDENCE_LED_REVIEW.md` authorises twenty reversible clarity, workflow, and demo-safe remediation items. Seven future product hypotheses plus five direct-validation/product-lock tasks remain governance-gated.
 - 2026-09-20 architecture decision: the review's routing, duplicated state/render logic, testability, and delivery-friction evidence met the typed-component-stack trigger. The static validation surface is migrating to React 19, TypeScript 7, React Router 7, and Vite 8 with hash routes, a separately emitted dated registry asset, browser-memory-only state, four global destinations, and unchanged clinical/privacy boundaries. Report: `.harness/reports/20260920T144329Z-P5-typed-routed-foundation.md`.
 - 2026-09-20 evidence-led Trial workflow: the React surface now has concise/paginated normalized Trial Library rows, non-hover preview, stable full detail with raw provenance and complete criteria, preserved return state/focus, chronological Trial Room replies and exact-message focus, human resolution, and evidence-linked correction tickets. Report: `.harness/reports/20260920T150108Z-P5-evidence-led-trial-workflow.md`.
+- 2026-09-20 evidence-led Patient workflow: Patients now has searchable/sortable owner-filtered synthetic workspace index, controlled no-identity/no-upload fixture creation, sectioned pages, per-fact source badges, explicit manual selection from the unranked library, coherent `SYN-2047` × `NCT06345729`, all 23 retained criterion excerpts, prominent 3/23 completeness, and explicitly human-created missing-information work. Report: `.harness/reports/20260920T151051Z-P5-evidence-led-patient-workflow.md`.
 
 ## References
 
@@ -154,3 +155,4 @@ Owner sign-off is required for changes to goal, scope, non-goals, acceptance thr
 - `product/TRIAL_RELAY_EVIDENCE_LED_REVIEW.md`
 - `.harness/reports/20260920T144329Z-P5-typed-routed-foundation.md`
 - `.harness/reports/20260920T150108Z-P5-evidence-led-trial-workflow.md`
+- `.harness/reports/20260920T151051Z-P5-evidence-led-patient-workflow.md`

@@ -113,18 +113,20 @@ export function criterionExcerpts(trial: TrialRecord): CriterionExcerpt[] {
   const normalized = trial.eligibilityCriteria
     .replace(/\r/g, "")
     .replace(/\s*\*\s*/g, "\n")
-    .replace(/\s+(?=(?:Inclusion|Exclusion) Criteria:?)/gi, "\n")
+    .replace(/\s+(?=(?:Inclusion|Exclusion) Criteria:)/g, "\n")
     .trim();
 
   const sourceLines = normalized
     .split(/\n+/)
     .map((line) => line.replace(/^[-•]\s*/, "").trim())
     .filter(Boolean);
+  const hasSectionLabels = sourceLines.some((line) => /^(?:Inclusion|Exclusion) Criteria:/i.test(line));
 
   let section: CriterionExcerpt["section"] = "Protocol";
   const excerpts: CriterionExcerpt[] = [];
 
   sourceLines.forEach((line) => {
+    if (section === "Protocol" && hasSectionLabels && /criteria include but are not limited to the following:?$/i.test(line)) return;
     const inclusionMatch = line.match(/^Inclusion Criteria:?\s*(.*)$/i);
     const exclusionMatch = line.match(/^Exclusion Criteria:?\s*(.*)$/i);
     if (inclusionMatch) {

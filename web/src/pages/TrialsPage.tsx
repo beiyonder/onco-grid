@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate, useSearchParams } from "react-router-do
 import { Icon } from "../components/Icon";
 import { EmptyState, PageHeader, SafetyNote, StatusChip } from "../components/Primitives";
 import { displayConditions, displayStates, formatSourceDate, normalizeState } from "../data/trials";
+import { useAppState } from "../state/AppState";
 import { useTrialData } from "../state/TrialData";
 import type { TrialRecord } from "../types";
 
@@ -13,11 +14,14 @@ export function TrialsPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { error, retry, snapshot, status, trials } = useTrialData();
+  const { patients, startPatientTrialReview } = useAppState();
   const query = searchParams.get("q") ?? "";
   const [draftQuery, setDraftQuery] = useState(query);
   const condition = searchParams.get("condition") ?? "all";
   const state = searchParams.get("state") ?? "all";
   const previewId = searchParams.get("preview");
+  const reviewFor = searchParams.get("reviewFor");
+  const reviewPatient = patients.find((patient) => patient.id === reviewFor);
   const requestedPage = Number(searchParams.get("page") ?? "1");
   const requestedPageSize = Number(searchParams.get("limit") ?? "12");
   const page = Number.isFinite(requestedPage) && requestedPage > 0 ? Math.floor(requestedPage) : 1;
@@ -107,6 +111,12 @@ export function TrialsPage() {
     requestAnimationFrame(() => document.getElementById(`preview-${closingId}`)?.focus());
   };
 
+  const startReview = (trial: TrialRecord) => {
+    if (!reviewPatient) return;
+    startPatientTrialReview(reviewPatient.id, trial.id);
+    navigate(`/patients/${reviewPatient.id}/reviews/${trial.id}`);
+  };
+
   if (status === "loading") {
     return <div className="page"><PageHeader eyebrow="Public registry discovery" title="Trial Library" description="Loading the dated ClinicalTrials.gov snapshot…" /><div className="surface"><EmptyState icon="source" title="Loading public trial records">The library remains empty until its source artifact is available.</EmptyState></div></div>;
   }
@@ -119,6 +129,7 @@ export function TrialsPage() {
     <div className="page">
       <PageHeader eyebrow="Public registry discovery" title="Trial Library" description="Scan concise rows, inspect an accessible preview, then move to a stable source-first Trial Detail. Registry and independent site status remain separate." />
       <SafetyNote><p><strong>General discovery only.</strong> No patient facts, eligibility score, patient ranking, or treatment recommendation influences this list.</p></SafetyNote>
+      {reviewPatient ? <div className="manual-selection-note" role="note"><Icon name="patients" /><span><strong>Manual selection for {reviewPatient.label}</strong>The general library order is unchanged and contains no patient-specific ranking. Opening a review records only your explicit selection.</span><Link className="text-action" to={`/patients/${reviewPatient.id}?section=reviews`}>Return to workspace</Link></div> : null}
 
       <section className="surface library-surface" aria-labelledby="library-results-heading">
         <form className="filter-grid" onSubmit={submitSearch}>
@@ -156,7 +167,7 @@ export function TrialsPage() {
             <div className="preview-status"><span><small>Registry study status</small><StatusChip tone="source">{previewTrial.statusLabel}</StatusChip></span><span><small>Independent site confirmation</small><StatusChip tone="attention">Unknown</StatusChip></span></div>
             <p>{previewTrial.briefSummary}</p>
             <dl><div><dt>Displayed condition</dt><dd>{displayConditions(previewTrial).slice(0, 3).join(", ")}</dd></div><div><dt>India sites</dt><dd>{previewTrial.indiaLocations.length} registry-listed</dd></div><div><dt>Source</dt><dd>{previewTrial.source} · updated {previewTrial.lastUpdatePostedDate}</dd></div></dl>
-            <div className="preview-actions"><button className="button primary" type="button" onClick={() => openTrial(previewTrial)}>Open full Trial Detail</button><a className="button secondary" href={previewTrial.sourceUrl} target="_blank" rel="noreferrer">Open source <Icon name="external" /></a></div>
+            <div className="preview-actions">{reviewPatient ? <button className="button primary" type="button" onClick={() => startReview(previewTrial)}>Start human review for {reviewPatient.label}</button> : null}<button className={reviewPatient ? "button secondary" : "button primary"} type="button" onClick={() => openTrial(previewTrial)}>Open full Trial Detail</button><a className="button secondary" href={previewTrial.sourceUrl} target="_blank" rel="noreferrer">Open source <Icon name="external" /></a></div>
           </aside> : null}
         </div>
 
