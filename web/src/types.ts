@@ -74,6 +74,7 @@ export type PatientFactSource =
   | "Clinician confirmed"
   | "Synthetic document"
   | "Manual synthetic entry"
+  | "Approved de-identified research data"
   | "Conceptual future EMR";
 
 export interface PatientFact {
@@ -91,6 +92,8 @@ export interface PatientWorkspace {
   context: string;
   owner: string;
   institution: string;
+  dataBoundary: "Synthetic demo" | "Approved de-identified research";
+  approvalReference?: string;
   lastActivity: string;
   facts: PatientFact[];
   reviewTrialIds: string[];

@@ -88,19 +88,20 @@ export function PatientTrialReviewPage() {
   }
 
   if (!patient || !trial) {
-    return <div className="page"><EmptyState icon="warning" title="Review context not found">Both a synthetic patient workspace and a public trial record are required.</EmptyState></div>;
+    return <div className="page"><EmptyState icon="warning" title="Review context not found">Both a browser-only patient workspace and a public trial record are required.</EmptyState></div>;
   }
 
   const criteria = criterionExcerpts(trial);
   const review = reviews.find((candidate) => candidate.patientId === patient.id && candidate.trialId === trial.id);
   const reviewedCount = criteria.filter((criterion) => review?.criteria[criterion.id]?.state && review.criteria[criterion.id]?.state !== "Not reviewed").length;
   const notReviewedCount = criteria.length - reviewedCount;
+  const approvedResearch = patient.dataBoundary === "Approved de-identified research";
 
   return (
     <div className="page review-page">
       <Link className="back-link" to={`/patients/${patient.id}?section=reviews`}>← Back to {patient.label}</Link>
-      <PageHeader eyebrow={`${patient.id} × ${trial.id}`} title="Patient–Trial Review" description="A clinician records criterion-level observations from named synthetic sources. Trial Relay provides no aggregate score, fit label, ranking, recommendation, or eligibility conclusion." actions={<a className="button secondary" href={trial.sourceUrl} target="_blank" rel="noreferrer">Open complete source <Icon name="external" /></a>} />
-      <SafetyNote><p><strong>Clinician-led review, not matching.</strong> This trial was selected manually from the general library. The synthetic diagnosis, Stage IV, and PD-L1 60% context are coherent with the trial topic; KRAS G12C remains explicitly unknown and must not be inferred from the protocol.</p></SafetyNote>
+      <PageHeader eyebrow={`${patient.id} × ${trial.id}`} title="Patient–Trial Review" description="A clinician records criterion-level observations from named source-labelled facts. Trial Relay provides no aggregate score, fit label, ranking, recommendation, or eligibility conclusion." actions={<a className="button secondary" href={trial.sourceUrl} target="_blank" rel="noreferrer">Open complete source <Icon name="external" /></a>} />
+      <SafetyNote><p><strong>Clinician-led review, not matching.</strong> This trial was selected explicitly. {approvedResearch ? <>The workspace contains institutionally approved de-identified research facts held only in this browser and excluded from the AI assistant.</> : <>The workspace contains synthetic demonstration facts.</>} Every unknown remains unknown until a human reviewer records a sourced state; no criterion or overall conclusion is inferred.</p></SafetyNote>
 
       <section className="review-completeness" aria-labelledby="completeness-heading">
         <div><p className="eyebrow">Completeness</p><h2 id="completeness-heading">{reviewedCount} of {criteria.length} retained registry criteria reviewed</h2><p><strong>{notReviewedCount} remain Not reviewed.</strong> A partial review is never presented as a complete protocol assessment.</p></div>

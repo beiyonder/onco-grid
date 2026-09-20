@@ -17,22 +17,23 @@ export function PatientWorkspacePage() {
   const section: PatientSection = requestedSection && sections.includes(requestedSection) ? requestedSection : "overview";
 
   if (!patient) {
-    return <div className="page"><EmptyState icon="warning" title="Synthetic workspace not found">This browser session does not contain the requested workspace.</EmptyState></div>;
+    return <div className="page"><EmptyState icon="warning" title="Workspace not found">This browser session does not contain the requested synthetic or approved de-identified research workspace.</EmptyState></div>;
   }
 
   const patientTasks = workItems.filter((item) => item.route.includes(patient.id) && item.kind === "task");
   const patientHandoffs = handoffs.filter((handoff) => handoff.patientId === patient.id);
+  const approvedResearch = patient.dataBoundary === "Approved de-identified research";
 
   return (
     <div className="page patient-page">
       <Link className="back-link" to="/patients">← Back to Patient Workspaces</Link>
       <PageHeader
-        eyebrow={`${patient.id} · Synthetic demo data`}
+        eyebrow={`${patient.id} · ${patient.dataBoundary}`}
         title={patient.label}
         description={`${patient.context} · owned by ${patient.owner} at ${patient.institution}`}
         actions={<Link className="button secondary" to={`/trials?reviewFor=${patient.id}`}>Find trials to review manually</Link>}
       />
-      <SafetyNote><p><strong>EMR remains the clinical system of record.</strong> These are source-labelled synthetic facts and browser-memory workflow states. Trial Relay does not infer diagnosis, stage, biomarkers, response, risk, fit, or eligibility.</p></SafetyNote>
+      <SafetyNote><p>{approvedResearch ? <><strong>Approved de-identified research workspace.</strong> This browser-only record carries no direct identifiers, is not a system of record, and is not sent to the AI assistant. Approval reference: {patient.approvalReference}.</> : <><strong>EMR remains the clinical system of record.</strong> These are source-labelled synthetic facts and browser-memory workflow states.</>} Trial Relay does not infer diagnosis, stage, biomarkers, response, risk, fit, or eligibility.</p></SafetyNote>
       <nav className="section-tabs" aria-label="Patient workspace sections">
         {sections.map((candidate) => <button className={section === candidate ? "active" : ""} type="button" key={candidate} onClick={() => {
           const next = new URLSearchParams(searchParams);
@@ -42,7 +43,7 @@ export function PatientWorkspacePage() {
       </nav>
 
       {section === "overview" ? <section className="workspace-section" aria-labelledby="overview-heading">
-        <div className="section-heading"><div><p className="eyebrow">At a glance</p><h2 id="overview-heading">Workspace overview</h2></div><StatusChip tone="human">Synthetic only</StatusChip></div>
+        <div className="section-heading"><div><p className="eyebrow">At a glance</p><h2 id="overview-heading">Workspace overview</h2></div><StatusChip tone={approvedResearch ? "source" : "human"}>{patient.dataBoundary}</StatusChip></div>
         <div className="fact-grid">{patient.facts.slice(0, 4).map((fact) => <article className="fact-card" key={fact.id}><span>{fact.label}</span><strong>{fact.value}</strong><SourceBadge source={fact.sourceType} /><small>{fact.sourceLabel}</small></article>)}</div>
       </section> : null}
 

@@ -5,22 +5,25 @@
 - **OWNER DECISION — 2026-09-19:** begin implementation from [`product/TRIAL_RELAY_EXPERIENCE_BLUEPRINT.md`](product/TRIAL_RELAY_EXPERIENCE_BLUEPRINT.md) and [`product/TRIAL_RELAY_VISUAL_DESIGN_LANGUAGE.md`](product/TRIAL_RELAY_VISUAL_DESIGN_LANGUAGE.md).
 - **OWNER DECISION — 2026-09-19:** the agent may push and merge implementation pull requests without separate owner review after the required evidence, privacy, and safety checks pass; direct pushes to `main` remain prohibited.
 - **OWNER DECISION — 2026-09-19:** the implementation may leave the monolithic HTML architecture and adopt a more sustainable frontend stack when a named slice demonstrates a material maintainability or delivery need. This is conditional frontend authority, not approval for a backend, new data source, production identity or persistence boundary, deployment-topology change, or clinical capability.
-- **FACT:** the current runnable surface is the dependency-free static validation app in `web/`; it loads the dated ClinicalTrials.gov snapshot in `web/data/india-oncology-trials.json`.
-- **DECISION:** evolve that surface in small, reversible, user-observable slices before selecting a production runtime, backend, identity provider, database, or deployment topology.
+- **OWNER DECISION — 2026-09-20:** authorize the previously gated expansion only within these boundaries: explicit criterion/source coverage without match score, ranking, “best trial,” close-match label, or eligibility conclusion; institutionally approved de-identified research records with no identifiers; Supabase-authenticated staff communication and audited referral-state handoff with no PHI; an official-source-only OpenAI assistant with citations and no patient facts; and an approximate Three.js registry map with no travel, route, access, or site-availability claim.
+- **OWNER COST DECISION — 2026-09-20:** the assistant must use the cheapest available OpenAI model without exception. Official OpenAI documentation identifies pinned `gpt-5-nano-2025-08-07` as the cheapest GPT-5 model at the decision date.
+- **SECRET BOUNDARY:** an API credential was exposed in conversation and is treated as compromised. It must be revoked and rotated. The repository, reports, logs, prompts, browser bundle, and memories must never contain or use it; a replacement may exist only as server-side `OPENAI_API_KEY`.
+- **FACT:** the current runnable surface is the React/TypeScript/Vite validation app in `web/`; it loads the dated ClinicalTrials.gov snapshot in `web/data/india-oncology-trials.json`.
+- **DECISION:** deliver the authorised expansion in dependent, reversible slices. Supabase and Vercel Functions are pilot infrastructure, not product lock or approval for PHI.
 - **INFERENCE:** the blueprints are the target experience for implementation, not evidence that the workflow or product value has been validated.
 - **OPEN:** `P5` validation, persona ownership, buyer, local burden, and the operational KPI remain unresolved. Implementation does not close those gates.
 
 ## Current frontend architecture decision
 
 - **FACT — 2026-09-20 review:** [`product/TRIAL_RELAY_EVIDENCE_LED_REVIEW.md`](product/TRIAL_RELAY_EVIDENCE_LED_REVIEW.md) found a 4,433-line browser-native frontend with duplicated global state and render logic, no stable routes, and poor testability. It also observed materially unreadable typography, composite views, and delivery friction across the core journeys.
-- **DECISION:** the documented typed-component-stack trigger is met. Migrate the validation surface to React, TypeScript, and Vite with static-host-safe hash routes. Retain the dated `web/data/india-oncology-trials.json` artifact, static hosting, browser-memory-only workflow state, four global destinations, source/site authority separation, and synthetic-only patient/workflow data.
-- **RATIONALE:** routing, typed domain models, component boundaries, explicit loading/error states, and independently reviewable pages now solve demonstrated product and maintenance failures. A backend, persistence layer, production identity, external messaging channel, or new data source would not solve those failures and remains outside authority.
+- **DECISION:** the documented typed-component-stack trigger is met. Use React, TypeScript, and Vite with static-host-safe hash routes. Retain the dated `web/data/india-oncology-trials.json` artifact, four global destinations, source/site authority separation, browser-memory patient facts (synthetic or approved de-identified research), and fail-closed optional pilot services.
+- **RATIONALE:** routing, typed domain models, component boundaries, explicit loading/error states, and independently reviewable pages solve demonstrated product and maintenance failures. The owner has now separately approved a named Supabase/Vercel pilot boundary for authenticated no-PHI communication, official-source APIs, and a source-only assistant; all other backend, identity, data, and clinical uses remain prohibited.
 - **RUNTIME CONTRACT:** `npm run dev` serves the validation surface; `npm run build` performs strict TypeScript validation and produces static output. The registry snapshot is emitted as a separate static asset rather than copied into the application bundle.
 - **REASSESSMENT TRIGGER:** revisit this stack only if direct Phase 6 evidence or an approved production boundary introduces a requirement it cannot meet. Dependency novelty alone is not a reason to migrate again.
 
 ## Product boundary
 
-The implementation may support general trial discovery, source and status comparison, human-authored questions, owned operational tasks, synthetic patient workspaces, explicit human review, and closed-loop referral tracking.
+The implementation may support general trial discovery, source and status comparison, human-authored questions, owned operational tasks, synthetic patient workspaces, institutionally approved de-identified browser-only research workspaces, explicit human criterion review, deterministic unranked cohort filters, official-source evidence, authenticated no-PHI collaboration, audited no-PHI referral-state handoff, and approximate registry geography.
 
 It must not:
 
@@ -32,8 +35,13 @@ It must not:
 - replace the EMR, registry, tumour board, treating clinician, or trial team as the authoritative source;
 - add CTRI or WHO ICTRP product ingestion without approved access and reuse terms;
 - imply that registry recruitment status proves that an India site can enrol today.
+- send patient facts, uploaded research facts, identifiers, or PHI to OpenAI, Supabase communication, evidence APIs, analytics, logs, or map providers;
+- describe deterministic source coverage or explicit cohort filters as a match, close match, recommendation, ranking, or eligibility result;
+- accept free-form files or schema fields containing identity, contact, full-date, or long-identifier data;
+- represent source-only AI output as an official site response or clinical conclusion;
+- represent approximate map placement as route, travel feasibility, access, capacity, or current site availability.
 
-Real registry trial data and synthetic patient, EMR, board, referral, and workflow examples must remain visibly distinct.
+Real registry trial data, approved de-identified research facts, synthetic workflow data, human-authored state, and generated source summaries must remain visibly distinct.
 
 ## Delivery principles
 
@@ -69,7 +77,7 @@ Real registry trial data and synthetic patient, EMR, board, referral, and workfl
 8. Verify keyboard navigation, visible focus, no page-level horizontal overflow, and reduced-motion behavior for changed interactions.
 9. Observe the browser console for errors and warnings.
 10. Record the exact scenario, observed result, remaining risk, and evidence report when the slice forms a governance checkpoint.
-11. For the evidence-led redesign, verify that no automated site task, patient ranking, eligibility conclusion, real-data input, external transmission, or production persistence is introduced.
+11. For the authorised expansion, verify fail-closed configuration, no identifiers or PHI, no patient facts outside browser memory, no patient data in AI prompts, no rank/score/eligibility language, explicit source citations, RLS/audit contracts, and approximate-map precision disclosures.
 
 ## Evidence-led remediation sequence
 
@@ -249,17 +257,27 @@ Stop and rework before further sessions if the interface causes a participant to
 
 All twenty implementation-authorized roadmap items in the 2026-09-20 evidence-led review are represented in the validation surface. This is implementation evidence, not direct oncology-user validation or product lock.
 
-## Governance-gated deferrals
+## Owner-authorized expansion sequence
 
-| Review item | State | Required gate before work |
+1. **Explicit coverage and discovery** — Trial Detail patient launcher, strict approved de-identified JSON import, manual criterion review, deterministic cohort-filter counts, and transparent unranked public-registry discovery.
+2. **Official evidence and source-only assistant** — current ClinicalTrials.gov evidence API/feed and authenticated `gpt-5-nano-2025-08-07` Trial Room assistant with citations, no patient context, and no official-response authority.
+3. **Authenticated communication and no-PHI handoff** — Supabase Auth, RLS, realtime room messages, membership/authority controls, referral-state metadata, and immutable audit events; no patient payload or attachment.
+4. **Approximate spatial lens** — Three.js/React Three Fiber India diorama using a Natural Earth boundary and the approved curated city/state centroid table, with visible unplaced coverage and no route/travel/access claim.
+5. **Integrated qualification** — dependency audit, API and RLS contracts, desktop/mobile/keyboard/console/reduced/print, source failure, privacy scans, and live-service blockers.
+
+Missing Supabase project configuration and a rotated server-side OpenAI key block live external-service acceptance; they do not permit a mock or browser-exposed fallback.
+
+## Expansion authorization state
+
+| Review item | State | Authorised implementation boundary |
 |---|---|---|
-| Transparent unranked assisted discovery | **DEFERRED** | Separate clinical-governance decision, transparent input/source model, and comparative recall/misunderstanding evidence |
-| Cohort-based library filtering | **DEFERRED** | Authorization model, explicit patient selection, no-ranking design, and coordinator task evidence |
-| Trial-specific evidence feed | **DEFERRED** | Data licences, editorial/source policy, and evidence that it changes trial-review work |
-| AI Trial Room assistant | **DEFERRED** | Identity, citations, data boundary, factuality/omission evaluation, and authority-confusion evidence |
-| Real Trial Room communication | **BLOCKED** | Site participation, verified identity, consent, moderation, retention, security/privacy approval, and controlled-pilot authority |
-| Secure referral handoff | **BLOCKED** | Backend, RBAC, encryption, audit, legal/privacy approval, institutional participation, and controlled-pilot authority |
-| Map as an access-planning lens | **DEFERRED** | Accurate geospatial/site data and direct evidence of a real geography decision |
+| Transparent unranked assisted discovery | **AUTHORIZED** | Deterministic visible registry filters and input trace; patient-neutral order |
+| Cohort-based library filtering | **AUTHORIZED** | Clinician-selected explicit fact filters, unranked workspace count, manual review only |
+| Trial-specific evidence feed | **AUTHORIZED** | Official trial/regulator sources with provenance and current-source comparison |
+| AI Trial Room assistant | **AUTHORIZED** | Server-side pinned cheapest model; official sources and room context only; citations; no patient facts or official-response authority |
+| Real Trial Room communication | **AUTHORIZED PILOT** | Supabase authenticated staff, membership/RLS/realtime/audit, no PHI |
+| Secure referral handoff | **AUTHORIZED PILOT** | Audited ownership/state metadata only; no patient payload, file, or external clinical exchange |
+| Map as an access-planning lens | **AUTHORIZED APPROXIMATE LENS** | Three.js India boundary plus curated approximate registry centroids; no route/travel/access/capacity claim |
 | Treating-oncologist trial-first sessions | **BLOCKED** | Owner-set participant threshold plus exact recruitment/contact authorization |
 | Coordinator patient-first sessions | **BLOCKED** | Owner-set participant threshold plus exact recruitment/contact authorization |
 | Trial-side role sessions | **BLOCKED** | Owner-set participant threshold, trial-side access, and exact recruitment/contact authorization |
@@ -268,4 +286,4 @@ All twenty implementation-authorized roadmap items in the 2026-09-20 evidence-le
 
 ## Current governed work
 
-`P5` and Phase 6 remain open. The next permitted work is direct, role-specific observation using synthetic data under the frozen protocol. The repository owner must set the participant threshold and separately authorize any external recruitment or contact. Stop and rework if a participant infers current site availability, patient eligibility, treatment recommendation, autonomous referral release, durable transmission, or a system-authored clinical decision.
+The owner-authorized expansion sequence is current engineering work. `P5` and Phase 6 remain open: implementation does not establish workflow fit, clinical effectiveness, institutional acceptance, or product lock. Treating-oncologist, coordinator, trial-side, and comparative workflow sessions still require owner-set thresholds and exact recruitment/contact authorization.

@@ -14,6 +14,7 @@ import {
   initialWorkItems,
   roles,
 } from "../data/demo";
+import { createApprovedResearchWorkspace, type ApprovedResearchRecord } from "../data/researchImport";
 import type {
   CorrectionTicket,
   HandoffRecord,
@@ -41,6 +42,7 @@ interface AppStateValue {
   setRoleId: (roleId: RoleId) => void;
   patients: PatientWorkspace[];
   createSyntheticWorkspace: (context: string, owner: string) => string;
+  importApprovedResearchWorkspace: (record: ApprovedResearchRecord) => string;
   startPatientTrialReview: (patientId: string, trialId: string) => void;
   followedTrialIds: string[];
   toggleFollowTrial: (trialId: string) => void;
@@ -89,6 +91,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
         context,
         owner,
         institution: "Validation workspace",
+        dataBoundary: "Synthetic demo",
         lastActivity: new Date().toISOString(),
         reviewTrialIds: [],
         facts: [
@@ -104,6 +107,12 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       };
       setPatients((current) => [...current, workspace]);
       return id;
+    },
+    importApprovedResearchWorkspace(record) {
+      const sequence = patients.filter((patient) => patient.dataBoundary === "Approved de-identified research").length + 1;
+      const workspace = createApprovedResearchWorkspace(record, sequence);
+      setPatients((current) => [...current, workspace]);
+      return workspace.id;
     },
     startPatientTrialReview(patientId, trialId) {
       setPatients((current) => current.map((patient) => patient.id === patientId && !patient.reviewTrialIds.includes(trialId)

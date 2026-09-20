@@ -131,12 +131,15 @@ On 2026-09-20 the owner supplied [`product/TRIAL_RELAY_EVIDENCE_LED_REVIEW.md`](
 
 The evidence-led remediation was delivered through pull requests `#21`–`#25`. All twenty implementation-authorized items are represented in the validation surface and passed the integrated C3 evidence report. This completion does not close `P5`: seven future product hypotheses remain `DEFERRED` or `BLOCKED`, five direct-validation/product-lock tasks remain `BLOCKED`, and the owner still controls participant threshold, recruitment/contact, evidence interpretation, product lock, and every production or clinical boundary.
 
+On 2026-09-20 the owner explicitly authorised the seven previously gated product hypotheses under a narrower pilot contract: deterministic unranked assisted discovery; explicit cohort-filter counts; official-source evidence; a server-side citation-bound OpenAI assistant that excludes all patient facts and can never author an official response; Supabase-authenticated staff communication and audited referral-state handoff with no PHI; and an approximate Three.js registry map with no route, travel, access, capacity, or availability claim. Patient/trial work is explicit human criterion/source coverage only—never a score, ranking, close-match label, recommendation, or eligibility conclusion. Approved de-identified research JSON may exist only in browser memory after strict identifier rejection. The owner selected the cheapest pinned OpenAI model. A credential exposed in conversation is treated as compromised and must be revoked; it is not authorised for use, storage, logging, commit, prompt, or memory.
+
 ## Gap register
 
 | Gap | Status | Evidence | Owner | Next action |
 |---|---|---|---|---|
 | `GAP-SERENA-LANGUAGE` | Closed | `research/validate_ledger.py` became the first real source file; Python was configured, one file indexed, and Serena health-check passed | Agent | Re-index after future source-language changes. |
 | `GAP-SETUP` | Closed for the validation surface | `web/package.json` defines the React/TypeScript/Vite development, strict typecheck, static build, and preview commands; the research ledger remains the canonical research check | Agent | Keep runtime and validation commands current when the frontend stack changes. |
+| `GAP-PILOT-SERVICE-CONFIG` | Open | Supabase pilot was authorised but no project URL/publishable key is configured; the exposed OpenAI credential is rejected and a rotated server-side secret is not configured | Repository owner | Configure an approved Supabase project and rotated `OPENAI_API_KEY` through deployment/local secret stores; never send values in chat or commit them. Live auth/realtime/AI acceptance remains blocked until then. |
 | `GAP-MCP-ACTIVATION` | Open | `.omp/mcp.json` is present, but OMP loads project MCP at session startup | Owner or next session | Launch OMP from the repository root, then run `/mcp list` and `/mcp test serena`. |
 | `GAP-PUBLICATION-SANITIZATION` | Mitigated for the approved PR; open for raw-source publication | Root `.gitignore` excludes `chatroom_notes.md`, `Oncologist Pain Points_v2.docx`, private research inputs/recordings, local secrets, credentials, and key material; pre-push scanning is required | Repository owner | Publish only de-identified analysis by PR. Never publish the raw expanded DOCX or chat source without a separately approved sanitized replacement. |
 | `GAP-DIRECT-WORKFLOW-OBSERVATION` | Accepted research limitation | Direct oncologist access has proven difficult; current phase uses independent research and internal analyst clarification | Repository owner | Keep transfer limits visible and do not claim desk research or selected accounts prove local workflow prevalence. |
@@ -187,6 +190,7 @@ The evidence-led remediation was delivered through pull requests `#21`–`#25`. 
 | `C3` | `P5` | `.harness/reports/20260920T152948Z-P5-evidence-led-integration.md` | Complete; integrated through pull request `#25`; Phase 6 remains open |
 | `C2` | `P5` | `.harness/reports/20260920T155218Z-P5-trial-site-spacing.md` | Complete; merged through pull request `#26` |
 | `C2` | `P5` | `.harness/reports/20260920T160905Z-P5-registry-criteria-formatting.md` | Complete; merged through pull request `#27` |
+| `C2` | `P5` | `.harness/reports/20260920T164029Z-P5-explicit-coverage-discovery.md` | Complete; merged through pull request `#28` |
 
 ## References
 
@@ -240,3 +244,4 @@ The evidence-led remediation was delivered through pull requests `#21`–`#25`. 
 - `.harness/reports/20260920T152948Z-P5-evidence-led-integration.md`
 - `.harness/reports/20260920T155218Z-P5-trial-site-spacing.md`
 - `.harness/reports/20260920T160905Z-P5-registry-criteria-formatting.md`
+- `.harness/reports/20260920T164029Z-P5-explicit-coverage-discovery.md`

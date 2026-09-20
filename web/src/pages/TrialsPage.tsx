@@ -19,6 +19,9 @@ export function TrialsPage() {
   const [draftQuery, setDraftQuery] = useState(query);
   const condition = searchParams.get("condition") ?? "all";
   const state = searchParams.get("state") ?? "all";
+  const phase = searchParams.get("phase") ?? "all";
+  const registryStatus = searchParams.get("registry") ?? "all";
+  const city = searchParams.get("city") ?? "all";
   const previewId = searchParams.get("preview");
   const reviewFor = searchParams.get("reviewFor");
   const reviewPatient = patients.find((patient) => patient.id === reviewFor);
@@ -53,12 +56,18 @@ export function TrialsPage() {
     const values = trials.flatMap(displayStates);
     return Array.from(new Map(values.map((value) => [value.toLocaleLowerCase(), value])).values()).sort((left, right) => left.localeCompare(right));
   }, [trials]);
+  const phaseOptions = useMemo(() => Array.from(new Set(trials.flatMap((trial) => trial.phases))).sort(), [trials]);
+  const registryStatusOptions = useMemo(() => Array.from(new Set(trials.map((trial) => trial.statusLabel))).sort(), [trials]);
+  const cityOptions = useMemo(() => Array.from(new Set(trials.flatMap((trial) => trial.indiaLocations.map((site) => site.city)).filter(Boolean))).sort(), [trials]);
 
   const filteredTrials = useMemo(() => {
     const term = draftQuery.trim().toLocaleLowerCase();
     return trials.filter((trial) => {
       if (condition !== "all" && !displayConditions(trial).includes(condition)) return false;
       if (state !== "all" && !trial.indiaLocations.some((site) => normalizeState(site.state) === state)) return false;
+      if (phase !== "all" && !trial.phases.includes(phase)) return false;
+      if (registryStatus !== "all" && trial.statusLabel !== registryStatus) return false;
+      if (city !== "all" && !trial.indiaLocations.some((site) => site.city === city)) return false;
       if (!term) return true;
       return [
         trial.id,
@@ -68,7 +77,7 @@ export function TrialsPage() {
         trial.indiaLocations.map((site) => `${site.city} ${site.state}`).join(" "),
       ].join(" ").toLocaleLowerCase().includes(term);
     });
-  }, [condition, draftQuery, state, trials]);
+  }, [city, condition, draftQuery, phase, registryStatus, state, trials]);
 
   const pageCount = Math.max(1, Math.ceil(filteredTrials.length / pageSize));
   const currentPage = Math.min(page, pageCount);
@@ -86,6 +95,22 @@ export function TrialsPage() {
     event.preventDefault();
     setParam("q", draftQuery.trim(), "");
   };
+
+  const resetFilters = () => {
+    setDraftQuery("");
+    const next = new URLSearchParams();
+    if (reviewFor) next.set("reviewFor", reviewFor);
+    setSearchParams(next);
+  };
+
+  const activeDiscoveryInputs = [
+    draftQuery.trim() ? `Search: ${draftQuery.trim()}` : null,
+    condition !== "all" ? `Condition: ${condition}` : null,
+    state !== "all" ? `State: ${state}` : null,
+    phase !== "all" ? `Phase: ${phase}` : null,
+    registryStatus !== "all" ? `Registry status: ${registryStatus}` : null,
+    city !== "all" ? `City: ${city}` : null,
+  ].filter((value): value is string => Boolean(value));
 
   const openTrial = (trial: TrialRecord) => {
     const returnParams = new URLSearchParams(searchParams);
@@ -136,8 +161,21 @@ export function TrialsPage() {
           <div className="search-field"><label htmlFor="trial-search">Search public trial records</label><span className="input-with-icon"><Icon name="search" /><input id="trial-search" value={draftQuery} onChange={(event) => setDraftQuery(event.target.value)} type="search" placeholder="Condition, trial ID, intervention, or city" /><button className="search-submit" type="submit">Search</button></span></div>
           <label><span>Displayed condition</span><select value={condition} onChange={(event) => setParam("condition", event.target.value)}><option value="all">All conditions</option>{conditionOptions.map((option) => <option key={option}>{option}</option>)}</select></label>
           <label><span>Displayed state</span><select value={state} onChange={(event) => setParam("state", event.target.value)}><option value="all">All states</option>{stateOptions.map((option) => <option key={option}>{option}</option>)}</select></label>
-          <button className="button quiet" type="button" onClick={() => { setDraftQuery(""); setSearchParams({}); }}><Icon name="close" /> Reset</button>
+          <button className="button quiet" type="button" onClick={resetFilters}><Icon name="close" /> Reset</button>
         </form>
+
+        <details className="assisted-discovery">
+          <summary><span><strong>Transparent assisted discovery</strong><small>Add explicit public-registry filters; result order remains patient-neutral and unranked.</small></span><Icon name="filter" /></summary>
+          <div className="assisted-discovery-body">
+            <div className="assisted-filter-grid">
+              <label><span>Phase</span><select value={phase} onChange={(event) => setParam("phase", event.target.value)}><option value="all">All phases</option>{phaseOptions.map((option) => <option key={option}>{option}</option>)}</select></label>
+              <label><span>Registry study status</span><select value={registryStatus} onChange={(event) => setParam("registry", event.target.value)}><option value="all">All registry statuses</option>{registryStatusOptions.map((option) => <option key={option}>{option}</option>)}</select></label>
+              <label><span>Registry-listed city</span><select value={city} onChange={(event) => setParam("city", event.target.value)}><option value="all">All listed cities</option>{cityOptions.map((option) => <option key={option}>{option}</option>)}</select></label>
+            </div>
+            <div className="discovery-input-trace" aria-label="Active discovery inputs"><strong>Inputs used</strong>{activeDiscoveryInputs.length ? activeDiscoveryInputs.map((input) => <span key={input}>{input}</span>) : <span>No filters · complete dated snapshot</span>}</div>
+            <p><Icon name="shield" /><span><strong>What assistance means here:</strong> deterministic filtering over visible public registry fields. No patient facts, semantic ranking, inferred eligibility, or hidden recommendation.</span></p>
+          </div>
+        </details>
 
         <div className="library-toolbar compact">
           <div className="result-count"><strong id="library-results-heading">{filteredTrials.length} matching trials</strong><span>of {snapshot.retainedCount} retained · snapshot {formatSourceDate(snapshot.source.dataTimestamp)}</span></div>
