@@ -273,9 +273,9 @@ Missing Supabase project configuration and a rotated server-side OpenAI key bloc
 |---|---|---|
 | Explicit coverage and discovery | Pull request `#28` | **FACT — implemented** |
 | Official evidence and source-only assistant | Pull request `#29` | **FACT — implemented; live assistant acceptance BLOCKED by service configuration** |
-| Authenticated communication and no-PHI handoff | Planned pull request `#30` | **CURRENT** |
-| Approximate Three.js spatial lens | Planned pull request `#31` | **READY** |
-| Integrated qualification | Planned pull request `#32` | **READY after dependencies** |
+| Authenticated communication and no-PHI handoff | Pull request `#30` | **FACT — schema/client implemented; live auth/realtime acceptance BLOCKED by Supabase configuration** |
+| Approximate Three.js spatial lens | Planned pull request `#31` | **CURRENT** |
+| Integrated qualification | Planned pull request `#32` | **READY after map slice** |
 
 ## Expansion authorization state
 

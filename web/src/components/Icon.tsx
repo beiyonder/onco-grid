@@ -9,6 +9,7 @@ export type IconName =
   | "arrow"
   | "source"
   | "shield"
+  | "lock"
   | "clock"
   | "message"
   | "task"
@@ -30,6 +31,7 @@ const paths: Record<IconName, React.ReactNode> = {
   arrow: <><path d="M5 12h14M14 7l5 5-5 5"/></>,
   source: <><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></>,
   shield: <><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></>,
+  lock: <><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></>,
   clock: <><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></>,
   message: <><path d="M4 4h16v12H8l-4 4Z"/><path d="M8 8h8M8 12h5"/></>,
   task: <><rect x="4" y="3" width="16" height="18" rx="2"/><path d="m8 12 2 2 5-5M8 17h8"/></>,

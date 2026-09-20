@@ -2,8 +2,10 @@ import { type FormEvent, useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { EmptyState, PageHeader, SafetyNote, StatusChip } from "../components/Primitives";
+import { PilotTrialChannel } from "../components/PilotTrialChannel";
 import { TrialSourceAssistant } from "../components/TrialSourceAssistant";
 import { useAppState } from "../state/AppState";
+import { usePilotService } from "../state/PilotService";
 import { useTrialData } from "../state/TrialData";
 
 export function TrialRoomPage() {
@@ -19,6 +21,7 @@ export function TrialRoomPage() {
     role,
     roomMessages,
   } = useAppState();
+  const { accessToken, configured: pilotConfigured, session: pilotSession } = usePilotService();
   const [message, setMessage] = useState("");
   const [includeSource, setIncludeSource] = useState(true);
   const [replyToId, setReplyToId] = useState<string | undefined>();
@@ -43,6 +46,7 @@ export function TrialRoomPage() {
   const messages = roomMessages.filter((candidate) => candidate.trialId === trial.id);
   const trialCorrections = corrections.filter((candidate) => candidate.trialId === trial.id);
   const replyTarget = messages.find((candidate) => candidate.id === replyToId);
+  const livePilotRoom = pilotConfigured && Boolean(pilotSession);
 
   const submitMessage = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -65,10 +69,10 @@ export function TrialRoomPage() {
     <div className="page room-page">
       <Link className="back-link" to={`/trials/${trial.id}`}>← Back to Trial Detail</Link>
       <PageHeader eyebrow={`Trial Room · ${trial.id}`} title="Clarify the operational question" description={trial.briefTitle} />
-      <SafetyNote><p><strong>Conversation is synthetic and stays in this browser.</strong> Only a message from the selected authorised trial-side role is styled as an official response. Silence and unresolved questions never become a negative answer.</p></SafetyNote>
+      <SafetyNote><p>{livePilotRoom ? <><strong>Authenticated no-PHI pilot room.</strong> Messages use verified Supabase staff identity, membership, RLS, realtime delivery, and source links. Patient facts and attachments are prohibited.</> : <><strong>Conversation is synthetic and stays in this browser.</strong> Configure and sign in to the Supabase pilot to enable real staff communication.</>} Silence and unresolved questions never become a negative answer.</p></SafetyNote>
 
       <div className="room-layout">
-        <section className="surface channel" aria-labelledby="channel-heading">
+        {livePilotRoom ? <PilotTrialChannel trial={trial} /> : <section className="surface channel" aria-labelledby="channel-heading">
           <div className="section-heading"><div><p className="eyebrow">Chronological channel</p><h2 id="channel-heading">Discussion</h2></div><StatusChip tone="human">{messages.length} messages</StatusChip></div>
           <ol className="message-timeline">
             {messages.map((entry) => {
@@ -92,10 +96,10 @@ export function TrialRoomPage() {
             <label><span>Message as {role.name} · {role.title}</span><textarea id="room-composer" value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Ask an operational question or record a human clarification…" rows={4} /></label>
             <div className="composer-foot"><label className="check-control"><input type="checkbox" checked={includeSource} onChange={(event) => setIncludeSource(event.target.checked)} /> Link the public registry source</label><button className="button primary" type="submit" disabled={!message.trim()}><Icon name="message" /> Add synthetic message</button></div>
           </form>
-        </section>
+        </section>}
 
         <aside className="room-context">
-          <section className="surface pinned-context" aria-labelledby="pinned-heading"><p className="eyebrow">Pinned context</p><h2 id="pinned-heading">Authority boundary</h2><dl><div><dt>Registry status</dt><dd>{trial.statusLabel}</dd></div><div><dt>India site confirmation</dt><dd>Unknown</dd></div><div><dt>Conversation authority</dt><dd>{messages.some((entry) => entry.authority === "Authorised site response") ? "Contains an authorised role response" : "General discussion only"}</dd></div></dl><Link className="text-action" to={`/trials/${trial.id}`}>Open source-first detail <Icon name="arrow" /></Link></section>
+          <section className="surface pinned-context" aria-labelledby="pinned-heading"><p className="eyebrow">Pinned context</p><h2 id="pinned-heading">Authority boundary</h2><dl><div><dt>Registry status</dt><dd>{trial.statusLabel}</dd></div><div><dt>India site confirmation</dt><dd>Unknown</dd></div><div><dt>Conversation authority</dt><dd>{livePilotRoom ? "Verified pilot membership; official responses require separate site authority grant" : messages.some((entry) => entry.authority === "Authorised site response") ? "Synthetic authorised-role example" : "General synthetic discussion only"}</dd></div></dl><Link className="text-action" to={`/trials/${trial.id}`}>Open source-first detail <Icon name="arrow" /></Link></section>
 
           <section className="surface correction-panel" aria-labelledby="correction-heading">
             <p className="eyebrow">Evidence-linked work</p><h2 id="correction-heading">Raise a correction</h2><p>A correction records a contradiction against a named source. It does not rewrite registry or site status.</p>
@@ -104,7 +108,7 @@ export function TrialRoomPage() {
             {trialCorrections.map((ticket) => <article className="correction-row" key={ticket.id}><span><code>{ticket.id}</code><strong>{ticket.title}</strong><small>{ticket.createdBy} · source linked</small></span><StatusChip tone="attention">{ticket.status}</StatusChip></article>)}
           </section>
 
-          <TrialSourceAssistant trial={trial} messages={messages} />
+          <TrialSourceAssistant accessToken={accessToken} trial={trial} messages={livePilotRoom ? [] : messages} />
         </aside>
       </div>
     </div>

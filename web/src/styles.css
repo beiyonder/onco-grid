@@ -678,3 +678,79 @@ textarea { width: 100%; resize: vertical; }
 @media print {
   .source-assistant form, .source-assistant .form-error { display: none !important; }
 }
+
+.pilot-service-state { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.55rem; border: 1px solid var(--rule); border-radius: var(--radius-sm); color: var(--ink-muted); }
+.pilot-service-state svg { flex: none; }
+.pilot-service-state span, .pilot-service-state strong, .pilot-service-state small { display: block; }
+.pilot-service-state strong { color: var(--ink-secondary); font-size: 0.8125rem; }
+.pilot-service-state small { font-size: 0.8125rem; }
+.pilot-identity { position: relative; }
+.pilot-identity > summary { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.55rem; border: 1px solid #bad8ca; border-radius: var(--radius-sm); color: var(--green); cursor: pointer; list-style: none; }
+.pilot-identity > summary::-webkit-details-marker { display: none; }
+.pilot-identity > summary span, .pilot-identity > summary strong, .pilot-identity > summary small { display: block; }
+.pilot-identity > summary strong { font-size: 0.8125rem; }
+.pilot-identity > summary small { color: var(--ink-muted); font-size: 0.8125rem; }
+.pilot-identity-panel { position: absolute; z-index: 40; top: calc(100% + 0.45rem); right: 0; display: grid; width: min(22rem, calc(100vw - 1.5rem)); gap: 0.7rem; padding: 0.9rem; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); }
+.pilot-identity-panel form { display: grid; gap: 0.55rem; }
+.pilot-identity-panel p { margin: 0; color: var(--ink-secondary); font-size: 0.875rem; }
+.pilot-identity-panel p strong { display: block; }
+.pilot-identity-panel label { color: var(--ink-secondary); font-size: 0.8125rem; font-weight: 750; }
+.pilot-identity-panel input { width: 100%; }
+
+.pilot-channel { padding: 1.25rem; border-color: #bad8ca; }
+.pilot-channel-identity { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.7rem; padding: 0.7rem 0.8rem; border-radius: var(--radius); background: var(--green-soft); color: var(--green); }
+.pilot-channel-identity span, .pilot-channel-identity strong { display: block; }
+.pilot-channel .composer-foot > span { color: var(--ink-muted); font-size: 0.8125rem; }
+.room-members { margin-top: 0.8rem; border-top: 1px solid var(--rule); }
+.room-members > summary { padding: 0.8rem 0; cursor: pointer; color: var(--blue); font-size: 0.875rem; font-weight: 750; }
+.room-members form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.7fr) auto; align-items: end; gap: 0.6rem; padding-bottom: 0.5rem; }
+.room-members label > span { display: block; margin-bottom: 0.3rem; color: var(--ink-secondary); font-size: 0.8125rem; font-weight: 750; }
+.room-members select { width: 100%; }
+.empty-state.compact { padding: 1.6rem 1rem; }
+.empty-state.compact .empty-icon { width: 2.7rem; height: 2.7rem; margin-bottom: 0.65rem; }
+.empty-state.compact h3 { font-family: Charter, "Iowan Old Style", Georgia, serif; font-size: 1.2rem; }
+
+.pilot-handoff-unavailable { display: flex; align-items: flex-start; gap: 0.65rem; margin-bottom: 1rem; padding: 0.85rem 0.95rem; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface-secondary); color: var(--ink-muted); }
+.pilot-handoff-unavailable svg { flex: none; }
+.pilot-handoff-unavailable p, .pilot-handoff-unavailable strong { display: block; margin: 0; }
+.pilot-handoff-unavailable strong { color: var(--ink-secondary); }
+.pilot-handoffs { display: grid; gap: 0.9rem; margin-bottom: 1.4rem; padding: 1rem; border: 1px solid #bad8ca; border-radius: var(--radius); background: var(--green-soft); }
+.pilot-handoff-form { display: grid; grid-template-columns: minmax(9rem, 0.55fr) minmax(13rem, 1fr) minmax(12rem, 0.8fr) auto; align-items: end; gap: 0.6rem; }
+.pilot-handoff-form label > span { display: block; margin-bottom: 0.3rem; color: var(--ink-secondary); font-size: 0.8125rem; font-weight: 750; }
+.pilot-handoff-form select { width: 100%; }
+.pilot-handoff-list { display: grid; gap: 0.65rem; }
+.pilot-handoff-list > article { display: grid; gap: 0.7rem; padding: 0.9rem; border: 1px solid #bad8ca; border-radius: var(--radius); background: var(--surface); }
+.pilot-handoff-list article > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.7rem; }
+.pilot-handoff-list header span, .pilot-handoff-list header code, .pilot-handoff-list header strong, .pilot-handoff-list header small { display: block; }
+.pilot-handoff-list header strong { margin: 0.2rem 0; }
+.pilot-handoff-list header small { color: var(--ink-muted); font-size: 0.8125rem; }
+.pilot-handoff-list ol { list-style: none; margin: 0; padding: 0; }
+.pilot-handoff-list li { display: flex; justify-content: space-between; gap: 0.7rem; padding: 0.45rem 0; border-top: 1px solid var(--rule); font-size: 0.8125rem; }
+.pilot-handoff-list time { color: var(--ink-muted); }
+.pilot-handoff-list .button { justify-self: start; }
+.pilot-handoff-foot { display: flex; align-items: flex-start; gap: 0.55rem; margin: 0; color: var(--ink-secondary); font-size: 0.8125rem; }
+.pilot-handoff-foot svg { flex: none; color: var(--green); }
+.pilot-handoff-foot span, .pilot-handoff-foot strong { display: block; }
+.subsection-heading { margin: 1.2rem 0 0.65rem; }
+.subsection-heading .eyebrow { margin-bottom: 0.15rem; }
+
+@media (prefers-reduced-transparency: reduce) {
+  .pilot-identity-panel { background: #fbfcfb; box-shadow: none; }
+}
+
+@media screen and (max-width: 64rem) {
+  .pilot-handoff-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media screen and (max-width: 48rem) {
+  .pilot-service-state small, .pilot-identity > summary small { display: none; }
+  .pilot-service-state { padding: 0.35rem; }
+  .pilot-identity > summary { padding: 0.35rem; }
+  .pilot-identity > summary span { display: none; }
+  .room-members form, .pilot-handoff-form { grid-template-columns: 1fr; }
+  .pilot-handoff-list article > header { flex-direction: column; }
+}
+
+@media print {
+  .pilot-identity, .pilot-service-state, .pilot-channel .composer, .room-members, .pilot-handoff-form, .pilot-handoff-list .button { display: none !important; }
+}
