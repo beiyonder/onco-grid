@@ -1,5 +1,5 @@
-import { type FormEvent, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { type FormEvent, useEffect, useState } from "react";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { EmptyState, PageHeader, SafetyNote, SourceBadge, StatusChip } from "../components/Primitives";
 import { criterionExcerpts } from "../data/trials";
@@ -7,7 +7,19 @@ import { useAppState } from "../state/AppState";
 import { useTrialData } from "../state/TrialData";
 import type { CriterionReviewState, PatientWorkspace, ReviewState, TrialRecord } from "../types";
 
-const reviewStates: ReviewState[] = ["Not reviewed", "Confirmed from source", "Needs clarification", "Does not appear met"];
+const reviewStates: ReviewState[] = [
+  "Not reviewed",
+  "Confirmed from source",
+  "Needs clarification",
+  "Does not appear met",
+];
+
+function reviewTone(state: ReviewState | undefined): "neutral" | "good" | "attention" | "danger" {
+  if (state === "Confirmed from source") return "good";
+  if (state === "Needs clarification") return "attention";
+  if (state === "Does not appear met") return "danger";
+  return "neutral";
+}
 
 function CriterionRow({
   criterion,
@@ -24,28 +36,33 @@ function CriterionRow({
   const [state, setState] = useState<ReviewState>(current?.state ?? "Not reviewed");
   const [evidence, setEvidence] = useState(current?.evidence ?? "");
   const [note, setNote] = useState(current?.note ?? "");
-  const [saved, setSaved] = useState(Boolean(current));
+  const [dirty, setDirty] = useState(false);
   const [taskId, setTaskId] = useState<string | null>(null);
+  const evidenceRequired = state !== "Not reviewed";
 
   const save = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (evidenceRequired && !evidence) return;
     updateCriterion({ patientId: patient.id, trialId: trial.id, criterionId: criterion.id, state, evidence, note });
-    setSaved(true);
+    setDirty(false);
   };
 
   return (
-    <article className="criterion-card" id={criterion.id}>
-      <header><span className="criterion-number">{criterion.id.replace("criterion-", "")}</span><span><small>{criterion.section} criterion · exact registry excerpt</small><p>{criterion.text}</p></span></header>
+    <article className="criterion-card" id={criterion.id} tabIndex={-1}>
+      <header>
+        <span className="criterion-number">{criterion.id.replace("criterion-", "")}</span>
+        <span><small>{criterion.section} criterion · exact registry excerpt</small><p>{criterion.text}</p></span>
+        <StatusChip tone={reviewTone(current?.state)}>{current?.state ?? "Not reviewed"}</StatusChip>
+      </header>
       <form onSubmit={save}>
-        <label><span>Human review state</span><select value={state} onChange={(event) => { setState(event.target.value as ReviewState); setSaved(false); }}>{reviewStates.map((candidate) => <option key={candidate}>{candidate}</option>)}</select></label>
-        <label><span>Evidence used</span><select value={evidence} onChange={(event) => { setEvidence(event.target.value); setSaved(false); }}><option value="">No evidence selected</option>{patient.facts.map((fact) => <option key={fact.id} value={`${fact.sourceLabel}: ${fact.value}`}>{fact.label} · {fact.sourceType}</option>)}</select></label>
-        <label className="wide"><span>Reviewer note</span><input value={note} onChange={(event) => { setNote(event.target.value); setSaved(false); }} placeholder="Record what the human reviewer checked; do not infer missing values" /></label>
-        <div className="criterion-actions"><button className="button primary" type="submit">Save human review</button>{state === "Needs clarification" ? <button className="button secondary" type="button" onClick={() => setTaskId(addMissingInformationTask(patient.id, trial.id, criterion.id))}>Create missing-information task</button> : null}</div>
+        <label><span>Human review state</span><select value={state} onChange={(event) => { setState(event.target.value as ReviewState); setDirty(true); }}>{reviewStates.map((candidate) => <option key={candidate}>{candidate}</option>)}</select></label>
+        <label><span>Evidence used {evidenceRequired ? "(required)" : ""}</span><select value={evidence} required={evidenceRequired} onChange={(event) => { setEvidence(event.target.value); setDirty(true); }}><option value="">No evidence selected</option><option value="No source available in current synthetic workspace">No source available in current synthetic workspace</option>{patient.facts.map((fact) => <option key={fact.id} value={`${fact.sourceLabel}: ${fact.value}`}>{fact.label} · {fact.sourceType}</option>)}</select></label>
+        <label className="wide"><span>Reviewer note</span><input value={note} onChange={(event) => { setNote(event.target.value); setDirty(true); }} placeholder="Record what the human reviewer checked; do not infer missing values" /></label>
+        <div className="criterion-actions"><button className="button primary" type="submit" disabled={(evidenceRequired && !evidence) || !dirty}>Save human review</button>{state === "Needs clarification" && !dirty ? <button className="button secondary" type="button" onClick={() => setTaskId(addMissingInformationTask(patient.id, trial.id, criterion.id))}>Create missing-information task</button> : null}</div>
       </form>
       <footer>
-        <span><strong>{saved ? current?.reviewer ?? "Current prototype role" : "Unsaved change"}</strong>{saved && current?.reviewedAt ? ` · ${current.reviewedAt}` : ""}</span>
-        {current?.evidence ? <span>Evidence: {current.evidence}</span> : <span>No evidence recorded</span>}
-        {taskId ? <StatusChip tone="attention">Task {taskId} created by a person</StatusChip> : null}
+        {dirty ? <span><strong>Unsaved change</strong> · reviewer/date/evidence unchanged</span> : current ? <><span><strong>{current.reviewer}</strong> · {current.reviewedAt}</span><span>Evidence: {current.evidence ?? "None recorded"}</span></> : <span><strong>Not reviewed</strong> · no reviewer, date, or evidence</span>}
+        {taskId ? <StatusChip tone="attention">Task {taskId} created explicitly by a person</StatusChip> : null}
       </footer>
     </article>
   );
@@ -53,10 +70,19 @@ function CriterionRow({
 
 export function PatientTrialReviewPage() {
   const { patientId, trialId } = useParams();
+  const [searchParams] = useSearchParams();
   const { patients, reviews } = useAppState();
   const { findTrial, status } = useTrialData();
   const patient = patients.find((candidate) => candidate.id === patientId);
   const trial = findTrial(trialId);
+  const requestedCriterion = searchParams.get("criterion");
+
+  useEffect(() => {
+    if (!requestedCriterion || status !== "ready") return;
+    const timeout = window.setTimeout(() => document.getElementById(requestedCriterion)?.focus({ preventScroll: false }), 0);
+    return () => window.clearTimeout(timeout);
+  }, [requestedCriterion, status]);
+
   if (status === "loading") {
     return <div className="page"><EmptyState icon="source" title="Loading review source">Retrieving the complete registry criteria.</EmptyState></div>;
   }
@@ -74,17 +100,17 @@ export function PatientTrialReviewPage() {
     <div className="page review-page">
       <Link className="back-link" to={`/patients/${patient.id}?section=reviews`}>← Back to {patient.label}</Link>
       <PageHeader eyebrow={`${patient.id} × ${trial.id}`} title="Patient–Trial Review" description="A clinician records criterion-level observations from named synthetic sources. Trial Relay provides no aggregate score, fit label, ranking, recommendation, or eligibility conclusion." actions={<a className="button secondary" href={trial.sourceUrl} target="_blank" rel="noreferrer">Open complete source <Icon name="external" /></a>} />
-      <SafetyNote><p><strong>Clinician-led review, not matching.</strong> This trial was selected manually from the general library. KRAS G12C remains explicitly unknown in the synthetic workspace and must not be inferred from the protocol.</p></SafetyNote>
+      <SafetyNote><p><strong>Clinician-led review, not matching.</strong> This trial was selected manually from the general library. The synthetic diagnosis, Stage IV, and PD-L1 60% context are coherent with the trial topic; KRAS G12C remains explicitly unknown and must not be inferred from the protocol.</p></SafetyNote>
 
       <section className="review-completeness" aria-labelledby="completeness-heading">
-        <div><p className="eyebrow">Completeness</p><h2 id="completeness-heading">{reviewedCount} of {criteria.length} registry excerpts reviewed</h2><p><strong>{notReviewedCount} remain Not reviewed.</strong> A partial review is never presented as a complete protocol assessment.</p></div>
+        <div><p className="eyebrow">Completeness</p><h2 id="completeness-heading">{reviewedCount} of {criteria.length} retained registry criteria reviewed</h2><p><strong>{notReviewedCount} remain Not reviewed.</strong> A partial review is never presented as a complete protocol assessment.</p></div>
         <div className="completion-meter" aria-label={`${reviewedCount} of ${criteria.length} criteria reviewed`}><span style={{ width: `${criteria.length ? (reviewedCount / criteria.length) * 100 : 0}%` }} /></div>
         <StatusChip tone={notReviewedCount === 0 ? "good" : "attention"}>{notReviewedCount === 0 ? "All displayed excerpts reviewed" : "Incomplete review"}</StatusChip>
       </section>
 
       <div className="review-layout">
         <section className="criteria-column" aria-labelledby="criteria-heading">
-          <div className="section-heading"><div><p className="eyebrow">Complete retained registry criteria</p><h2 id="criteria-heading">Exact source excerpts</h2><p>Text is segmented for review but not rewritten or interpreted.</p></div></div>
+          <div className="section-heading"><div><p className="eyebrow">Complete retained registry criteria</p><h2 id="criteria-heading">Exact source excerpts</h2><p>Text is segmented at registry bullets for review but is not rewritten or interpreted.</p></div><StatusChip tone="source">{criteria.length} source excerpts</StatusChip></div>
           {criteria.map((criterion) => <CriterionRow key={criterion.id} criterion={criterion} current={review?.criteria[criterion.id]} patient={patient} trial={trial} />)}
         </section>
         <aside className="review-source-panel" aria-labelledby="patient-evidence-heading"><p className="eyebrow">Synthetic patient evidence</p><h2 id="patient-evidence-heading">Available facts</h2>{patient.facts.map((fact) => <article key={fact.id}><span>{fact.label}</span><strong>{fact.value}</strong><SourceBadge source={fact.sourceType} /><small>{fact.sourceLabel}</small></article>)}</aside>

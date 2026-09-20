@@ -239,10 +239,10 @@ Stop and rework before further sessions if the interface causes a participant to
 
 ## Current slice
 
-**Branch:** `feat/evidence-led-trial-workflow`
+**Branch:** `feat/evidence-led-patient-workflow`
 
-**Pull request outcome:** make Trial Library a concise scan-and-compare surface with normalized display taxonomy, explicit result counts/page limits, non-hover preview, stable full-detail route, preserved search/focus/position, source-first detail hierarchy, chronological Trial Room replies, authorised-response styling, human resolution, and evidence-linked correction tickets.
+**Pull request outcome:** make Patients a reusable synthetic workspace system with search, ownership and sorting; controlled synthetic-only creation; several coherent fixtures; sectioned workspace pages; per-fact source badges; explicit manual selection from the unranked general library; and a dedicated, complete, criterion-level Patient–Trial Review with prominent completeness and human-created missing-information work.
 
-**Acceptance scenario:** filter to `NCT06345729`, open and close its accessible preview, move to the stable Trial Detail, inspect registry versus independently confirmed site status, all India sites, raw source taxonomy and complete retained criteria, return without losing query or focus, open the Trial Room at an exact message, reply with the public source attached, and create a correction that retains a source link without mutating registry or site status.
+**Acceptance scenario:** find and filter three existing synthetic workspaces, create a fourth controlled fixture without any free-text identity or upload field, open `SYN-2047`, identify the source type of every fact, manually select `NCT06345729` from the unchanged general library, observe the coherent NSCLC/Stage IV/PD-L1 context and explicit unknown KRAS G12C fact, identify that 3 of 23 retained criteria are reviewed and 20 remain Not reviewed, open exact `criterion-3`, and explicitly create or reuse its source-retrieval task.
 
-**Explicit non-goals for this slice:** no map investment, patient-specific discovery, matching/ranking, eligibility conclusion, automated site verification, generated official response, real communication, external notification, backend, persistence, real patient data, or new source.
+**Explicit non-goals for this slice:** no real patient entry or upload, EMR integration, durable patient record, cohort matching/filtering, patient-specific ranking, strong/weak match label, aggregate score, eligibility conclusion, treatment recommendation, inferred fact, autonomous task, or external handoff.

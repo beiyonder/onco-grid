@@ -117,7 +117,7 @@ export const initialPatients: PatientWorkspace[] = [
 
 export const initialWorkItems: WorkItem[] = [
   {
-    id: "TASK-2047-KRAS",
+    id: "TASK-SYN-2047-criterion-3",
     kind: "task",
     title: "Retrieve KRAS G12C source result",
     summary: "Human-created missing-information task for Synthetic Cedar workspace.",
@@ -125,7 +125,7 @@ export const initialWorkItems: WorkItem[] = [
     owner: "A. Rao",
     occurredAt: "2026-09-19T13:42:00Z",
     status: "open",
-    route: "/patients/SYN-2047/reviews/NCT06345729",
+    route: "/patients/SYN-2047/reviews/NCT06345729?criterion=criterion-3",
     roleIds: ["coordinator", "oncologist"],
   },
   {
@@ -221,15 +221,22 @@ export const initialReviews: ReviewRecord[] = [
         state: "Confirmed from source",
         reviewer: "Dr M. Shah",
         reviewedAt: "2026-09-19",
-        evidence: "Synthetic pathology summary PATH-SYN-2047",
+        evidence: "Synthetic pathology summary PATH-SYN-2047: Non-small cell lung cancer",
         note: "Diagnosis text confirmed in the synthetic source.",
       },
       "criterion-2": {
+        state: "Confirmed from source",
+        reviewer: "Dr M. Shah",
+        reviewedAt: "2026-09-19",
+        evidence: "Synthetic treating-team note NOTE-SYN-2047: Stage IV",
+        note: "Stage IV text confirmed in the synthetic source.",
+      },
+      "criterion-3": {
         state: "Needs clarification",
         reviewer: "Dr M. Shah",
         reviewedAt: "2026-09-19",
-        evidence: "No KRAS result present in current synthetic sources",
-        note: "Human-created retrieval task TASK-2047-KRAS.",
+        evidence: "No source available in current synthetic workspace",
+        note: "Human-created retrieval task TASK-SYN-2047-criterion-3.",
       },
     },
   },

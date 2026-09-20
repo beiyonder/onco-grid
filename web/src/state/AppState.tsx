@@ -42,6 +42,7 @@ interface AppStateValue {
   setRoleId: (roleId: RoleId) => void;
   patients: PatientWorkspace[];
   createSyntheticWorkspace: (context: string, owner: string) => string;
+  startPatientTrialReview: (patientId: string, trialId: string) => void;
   followedTrialIds: string[];
   toggleFollowTrial: (trialId: string) => void;
   workItems: WorkItem[];
@@ -105,6 +106,11 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       setPatients((current) => [...current, workspace]);
       return id;
     },
+    startPatientTrialReview(patientId, trialId) {
+      setPatients((current) => current.map((patient) => patient.id === patientId && !patient.reviewTrialIds.includes(trialId)
+        ? { ...patient, reviewTrialIds: [...patient.reviewTrialIds, trialId], lastActivity: new Date().toISOString() }
+        : patient));
+    },
     followedTrialIds,
     toggleFollowTrial(trialId) {
       setFollowedTrialIds((current) => current.includes(trialId)
@@ -130,7 +136,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
         owner: role.name,
         occurredAt: new Date().toISOString(),
         status: "open",
-        route: `/patients/${patientId}/reviews/${trialId}#${criterionId}`,
+        route: `/patients/${patientId}/reviews/${trialId}?criterion=${criterionId}`,
         roleIds: ["coordinator", "oncologist"],
       };
       setWorkItems((current) => [item, ...current]);

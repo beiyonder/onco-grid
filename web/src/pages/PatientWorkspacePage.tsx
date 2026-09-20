@@ -30,7 +30,7 @@ export function PatientWorkspacePage() {
         eyebrow={`${patient.id} · Synthetic demo data`}
         title={patient.label}
         description={`${patient.context} · owned by ${patient.owner} at ${patient.institution}`}
-        actions={<Link className="button secondary" to="/trials">Find trials to review manually</Link>}
+        actions={<Link className="button secondary" to={`/trials?reviewFor=${patient.id}`}>Find trials to review manually</Link>}
       />
       <SafetyNote><p><strong>EMR remains the clinical system of record.</strong> These are source-labelled synthetic facts and browser-memory workflow states. Trial Relay does not infer diagnosis, stage, biomarkers, response, risk, fit, or eligibility.</p></SafetyNote>
       <nav className="section-tabs" aria-label="Patient workspace sections">
@@ -52,7 +52,7 @@ export function PatientWorkspacePage() {
       </section> : null}
 
       {section === "reviews" ? <section className="workspace-section" aria-labelledby="reviews-heading">
-        <div className="section-heading"><div><p className="eyebrow">Clinician-selected only</p><h2 id="reviews-heading">Patient–Trial Reviews</h2></div><Link className="button secondary" to="/trials">Select from general library</Link></div>
+        <div className="section-heading"><div><p className="eyebrow">Clinician-selected only</p><h2 id="reviews-heading">Patient–Trial Reviews</h2></div><Link className="button secondary" to={`/trials?reviewFor=${patient.id}`}>Select from general library</Link></div>
         {trialDataStatus === "loading" ? <EmptyState icon="source" title="Loading public trial source">Review links appear after the dated registry snapshot loads.</EmptyState> : patient.reviewTrialIds.length ? <div className="review-card-list">{patient.reviewTrialIds.map((trialId) => { const trial = findTrial(trialId); return trial ? <Link className="review-card" key={trialId} to={`/patients/${patient.id}/reviews/${trial.id}`}><span><code>{trial.id}</code><strong>{trial.briefTitle}</strong><small>Selected manually by the treating team · no recommendation</small></span><Icon name="arrow" /></Link> : null; })}</div> : <EmptyState icon="trials" title="No trial selected for review">Open the general Trial Library and choose a record manually. The product does not rank or recommend trials for this workspace.</EmptyState>}
       </section> : null}
 
