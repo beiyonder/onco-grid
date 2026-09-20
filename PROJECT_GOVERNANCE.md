@@ -193,6 +193,7 @@ On 2026-09-20 the owner explicitly authorised the seven previously gated product
 | `C2` | `P5` | `.harness/reports/20260920T164029Z-P5-explicit-coverage-discovery.md` | Complete; merged through pull request `#28` |
 | `C2` | `P5` | `.harness/reports/20260920T165548Z-P5-source-evidence-assistant.md` | Complete; merged through pull request `#29`; live AI acceptance blocked by service configuration |
 | `C2` | `P5` | `.harness/reports/20260920T171636Z-P5-authenticated-no-phi-pilot.md` | Complete; merged through pull request `#30`; live Supabase acceptance blocked by project configuration |
+| `C2` | `P5` | `.harness/reports/20260920T173557Z-P5-threejs-india-spatial-lens.md` | Complete; merged through pull request `#31` |
 
 ## References
 
@@ -249,3 +250,4 @@ On 2026-09-20 the owner explicitly authorised the seven previously gated product
 - `.harness/reports/20260920T164029Z-P5-explicit-coverage-discovery.md`
 - `.harness/reports/20260920T165548Z-P5-source-evidence-assistant.md`
 - `.harness/reports/20260920T171636Z-P5-authenticated-no-phi-pilot.md`
+- `.harness/reports/20260920T173557Z-P5-threejs-india-spatial-lens.md`

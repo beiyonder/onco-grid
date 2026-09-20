@@ -7,5 +7,16 @@ export default defineConfig({
   build: {
     outDir: "dist",
     emptyOutDir: true,
+    chunkSizeWarningLimit: 750,
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            { name: "three-spatial", test: /node_modules\/three/ },
+            { name: "supabase-pilot", test: /node_modules\/@supabase/ },
+          ],
+        },
+      },
+    },
   },
 });

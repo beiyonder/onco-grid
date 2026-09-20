@@ -754,3 +754,76 @@ textarea { width: 100%; resize: vertical; }
 @media print {
   .pilot-identity, .pilot-service-state, .pilot-channel .composer, .room-members, .pilot-handoff-form, .pilot-handoff-list .button { display: none !important; }
 }
+
+.library-view-switch { display: inline-flex; gap: 0.2rem; padding: 0.25rem; border: 1px solid var(--rule); border-radius: 0.65rem; background: var(--surface-secondary); }
+.library-view-switch button { min-height: 2.35rem; padding: 0.4rem 0.7rem; border: 0; border-radius: 0.45rem; background: transparent; color: var(--ink-secondary); font-size: 0.8125rem; font-weight: 750; cursor: pointer; }
+.library-view-switch button.active { background: var(--surface); color: var(--navy); box-shadow: 0 1px 5px rgba(24, 38, 48, 0.12); }
+.map-result-note { color: var(--ink-muted); font-size: 0.8125rem; }
+.spatial-loading { display: flex; align-items: center; gap: 0.65rem; min-height: 28rem; justify-content: center; color: var(--ink-muted); }
+.spatial-loading p, .spatial-loading strong { display: block; margin: 0; }
+
+.spatial-lens { display: grid; gap: 0.9rem; }
+.spatial-lens > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+.spatial-lens > header p:last-child { max-width: 48rem; margin: 0.3rem 0 0; color: var(--ink-secondary); }
+.spatial-boundary { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.8rem 0.9rem; border-left: 4px solid var(--amber); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; background: var(--amber-soft); color: var(--ink-secondary); }
+.spatial-boundary svg { flex: none; color: var(--amber); }
+.spatial-boundary p { margin: 0; font-size: 0.875rem; }
+.spatial-layout { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(20rem, 0.65fr); gap: 0.9rem; align-items: start; }
+.spatial-canvas-shell { position: relative; overflow: hidden; border: 1px solid #c7d4ce; border-radius: 1.2rem; background: rgba(244, 247, 245, 0.82); box-shadow: 0 1rem 2.8rem rgba(24, 38, 48, 0.12); }
+.spatial-canvas { width: 100%; min-height: 32rem; }
+.spatial-canvas canvas { display: block; width: 100%; cursor: grab; touch-action: none; }
+.spatial-canvas canvas:active { cursor: grabbing; }
+.spatial-legend { position: absolute; right: 0.75rem; bottom: 0.75rem; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.35rem 0.65rem; max-width: calc(100% - 1.5rem); padding: 0.55rem 0.7rem; border: 1px solid rgba(211, 220, 216, 0.9); border-radius: 0.65rem; background: rgba(251, 252, 251, 0.9); backdrop-filter: blur(12px); color: var(--ink-secondary); font-size: 0.8125rem; }
+.spatial-legend span { display: inline-flex; align-items: center; gap: 0.3rem; }
+.spatial-legend i { width: 0.65rem; height: 0.65rem; border-radius: 50%; background: var(--blue); }
+.spatial-legend i.state { background: var(--amber); }
+.spatial-legend i.unplaced { border: 1px dashed var(--ink-muted); background: transparent; }
+.spatial-context { display: grid; gap: 0.75rem; }
+.spatial-coverage { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.55rem; }
+.spatial-coverage > div { padding: 0.75rem; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface-secondary); }
+.spatial-coverage strong, .spatial-coverage span { display: block; }
+.spatial-coverage strong { font-family: Charter, "Iowan Old Style", Georgia, serif; font-size: 1.35rem; }
+.spatial-coverage span { color: var(--ink-muted); font-size: 0.8125rem; }
+.selected-cluster { padding: 1rem; border: 1px solid #b7cbd8; border-radius: var(--radius); background: var(--blue-soft); }
+.selected-cluster h3 { font-family: Charter, "Iowan Old Style", Georgia, serif; font-size: 1.45rem; }
+.selected-cluster > span { color: var(--blue); font-size: 0.8125rem; font-weight: 750; }
+.selected-cluster > p:not(.eyebrow) { margin: 0.55rem 0; color: var(--ink-secondary); font-size: 0.875rem; }
+.selected-cluster > div { display: grid; gap: 0.35rem; margin-top: 0.7rem; }
+.selected-cluster button { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 0.5rem; padding: 0.55rem; border: 1px solid rgba(183, 203, 216, 0.9); border-radius: 0.55rem; background: var(--surface); color: var(--ink); text-align: left; cursor: pointer; }
+.selected-cluster button span { min-width: 0; overflow: hidden; font-size: 0.8125rem; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.selected-cluster button svg { width: 0.9rem; height: 0.9rem; color: var(--blue); }
+.cluster-list { border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); }
+.cluster-list > summary { padding: 0.75rem 0.85rem; cursor: pointer; color: var(--blue); font-size: 0.875rem; font-weight: 750; }
+.cluster-list > div { display: grid; max-height: 18rem; overflow: auto; border-top: 1px solid var(--rule); }
+.cluster-list button { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; padding: 0.65rem 0.8rem; border: 0; border-top: 1px solid var(--rule); background: transparent; color: var(--ink-secondary); text-align: left; cursor: pointer; }
+.cluster-list button:first-child { border-top: 0; }
+.cluster-list button.active { background: var(--blue-soft); color: var(--navy); }
+.cluster-list button span, .cluster-list button strong, .cluster-list button small { display: block; }
+.cluster-list button small, .cluster-list button > span:last-child { color: var(--ink-muted); font-size: 0.8125rem; }
+.spatial-lens > footer { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; color: var(--ink-muted); font-size: 0.8125rem; }
+
+@media (prefers-reduced-transparency: reduce) {
+  .spatial-canvas-shell, .spatial-legend { background: #f4f7f5; box-shadow: none; backdrop-filter: none; }
+}
+
+@media screen and (max-width: 68rem) {
+  .spatial-layout { grid-template-columns: 1fr; }
+  .spatial-context { grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.55fr); }
+  .cluster-list { grid-column: 1 / -1; }
+}
+
+@media screen and (max-width: 48rem) {
+  .spatial-lens > header { flex-direction: column; }
+  .spatial-canvas { min-height: 27rem; }
+  .spatial-context { grid-template-columns: 1fr; }
+  .cluster-list { grid-column: 1; }
+  .spatial-legend { left: 0.55rem; right: 0.55rem; justify-content: flex-start; font-size: 0.8125rem; }
+  .library-view-switch { width: 100%; }
+  .library-view-switch button { flex: 1; }
+}
+
+@media print {
+  .spatial-canvas-shell { display: none !important; }
+  .spatial-layout { display: block; }
+  .cluster-list > div { max-height: none; overflow: visible; }
+}
