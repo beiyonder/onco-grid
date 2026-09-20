@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { EmptyState, PageHeader, SafetyNote, StatusChip } from "../components/Primitives";
-import { displayConditions, displayStates, formatDate } from "../data/trials";
+import { displayConditions, displayStates, formatDate, registryCriteriaSections } from "../data/trials";
 import { useAppState } from "../state/AppState";
 import { useTrialData } from "../state/TrialData";
 
@@ -26,6 +26,8 @@ export function TrialDetailPage() {
   const isFollowed = followedTrialIds.includes(trial.id);
   const trialMessages = roomMessages.filter((message) => message.trialId === trial.id);
   const trialCorrections = corrections.filter((correction) => correction.trialId === trial.id);
+  const criteriaSections = registryCriteriaSections(trial);
+  const totalCriteria = criteriaSections.reduce((total, section) => total + section.items.length, 0);
 
   return (
     <div className="page detail-page">
@@ -61,7 +63,28 @@ export function TrialDetailPage() {
 
           <section className="surface protocol-source" aria-labelledby="criteria-source-heading">
             <div className="section-heading"><div><p className="eyebrow">Complete retained source</p><h2 id="criteria-source-heading">Eligibility criteria</h2><p>Original registry text for human review; not interpreted by Trial Relay.</p></div><StatusChip tone="source">{trial.eligibilityCriteriaTruncated ? "Source excerpt" : "Complete retained text"}</StatusChip></div>
-            <details><summary>Read registry criteria</summary><p>{trial.eligibilityCriteria}</p></details>
+            <details className="criteria-disclosure">
+              <summary>
+                <span><strong>Read registry criteria</strong><small>Exact source text, structured for careful reading</small></span>
+                <span className="criteria-summary-count">{totalCriteria} criteria</span>
+              </summary>
+              <div className="criteria-document">
+                <div className="criteria-document-note" role="note"><Icon name="source" /><p><strong>Source text, not interpretation.</strong> Trial Relay separates the registry wording into sections and numbered rows without deciding whether any person meets a criterion.</p></div>
+                {criteriaSections.map((section) => (
+                  <section className={`criteria-group ${section.title.toLocaleLowerCase()}`} aria-labelledby={`criteria-${section.title.toLocaleLowerCase()}`} key={section.title}>
+                    <header><div><p className="eyebrow">{section.title === "Protocol" ? "Registry wording" : `${section.title} criteria`}</p><h3 id={`criteria-${section.title.toLocaleLowerCase()}`}>{section.title === "Protocol" ? "Protocol criteria" : section.title}</h3></div><span>{section.items.length} {section.items.length === 1 ? "item" : "items"}</span></header>
+                    <ol className="criteria-list">
+                      {section.items.map((item, index) => (
+                        <li key={`${section.title}-${item.sourceNumber}-${index}`}>
+                          <span className="criteria-marker" aria-hidden="true">{item.sourceNumber}</span>
+                          <div><p>{item.text}</p>{item.subitems.length > 0 ? <ul>{item.subitems.map((subitem, subindex) => <li key={`${item.sourceNumber}-${subindex}`}>{subitem}</li>)}</ul> : null}</div>
+                        </li>
+                      ))}
+                    </ol>
+                  </section>
+                ))}
+              </div>
+            </details>
           </section>
 
           <section className="surface trial-activity" aria-labelledby="trial-activity-heading">

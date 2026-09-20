@@ -109,6 +109,69 @@ export interface CriterionExcerpt {
   text: string;
 }
 
+export interface RegistryCriterionItem {
+  sourceNumber: string;
+  text: string;
+  subitems: string[];
+}
+
+export interface RegistryCriteriaSection {
+  title: CriterionExcerpt["section"];
+  items: RegistryCriterionItem[];
+}
+
+export function registryCriteriaSections(trial: TrialRecord): RegistryCriteriaSection[] {
+  const normalized = trial.eligibilityCriteria
+    .replace(/\r/g, "")
+    .replace(/\\([<>])/g, "$1")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const chunks = normalized
+    .split(/(?=(?:Inclusion|Exclusion) Criteria:)/g)
+    .map((chunk) => chunk.trim())
+    .filter(Boolean);
+
+  return chunks.reduce<RegistryCriteriaSection[]>((sections, chunk) => {
+    const label = chunk.match(/^(Inclusion|Exclusion) Criteria:\s*/);
+    const title: CriterionExcerpt["section"] = label
+      ? label[1] as CriterionExcerpt["section"]
+      : "Protocol";
+    const content = label ? chunk.slice(label[0].length).trim() : chunk;
+
+    if (
+      title === "Protocol"
+      && /criteria include but are not limited to the following:?$/i.test(content)
+    ) {
+      return sections;
+    }
+
+    const numbered = /(?:^|\s)\d+\.\s/.test(content);
+    const parts = numbered
+      ? content.split(/(?:^|\s)(?=\d+\.\s)/).map((part) => part.trim()).filter(Boolean)
+      : content.includes("*")
+        ? content.split(/\s*\*\s*/).map((part) => part.trim()).filter(Boolean)
+        : content ? [content] : [];
+
+    const items = parts.map<RegistryCriterionItem>((part, index) => {
+      const number = part.match(/^(\d+)\.\s*/);
+      const body = number ? part.slice(number[0].length).trim() : part;
+      const nested = numbered
+        ? body.split(/\s*\*\s*/).map((item) => item.trim()).filter(Boolean)
+        : [body];
+
+      return {
+        sourceNumber: number?.[1] ?? String(index + 1),
+        text: nested[0] ?? "",
+        subitems: nested.slice(1),
+      };
+    });
+
+    if (items.length > 0) sections.push({ title, items });
+    return sections;
+  }, []);
+}
+
 export function criterionExcerpts(trial: TrialRecord): CriterionExcerpt[] {
   const normalized = trial.eligibilityCriteria
     .replace(/\r/g, "")
