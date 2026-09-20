@@ -275,19 +275,19 @@ Missing Supabase project configuration and a rotated server-side OpenAI key bloc
 | Official evidence and source-only assistant | Pull request `#29` | **FACT — implemented; live assistant acceptance BLOCKED by service configuration** |
 | Authenticated communication and no-PHI handoff | Pull request `#30` | **FACT — schema/client implemented; live auth/realtime acceptance BLOCKED by Supabase configuration** |
 | Approximate Three.js spatial lens | Pull request `#31` | **FACT — implemented** |
-| Integrated qualification | Planned pull request `#32` | **CURRENT** |
+| Integrated qualification | Pull request `#32` | **FACT — reachable implementation verified; live Supabase/OpenAI acceptance BLOCKED by configuration** |
 
 ## Expansion authorization state
 
 | Review item | State | Authorised implementation boundary |
 |---|---|---|
-| Transparent unranked assisted discovery | **AUTHORIZED** | Deterministic visible registry filters and input trace; patient-neutral order |
-| Cohort-based library filtering | **AUTHORIZED** | Clinician-selected explicit fact filters, unranked workspace count, manual review only |
-| Trial-specific evidence feed | **AUTHORIZED** | Official trial/regulator sources with provenance and current-source comparison |
-| AI Trial Room assistant | **AUTHORIZED** | Server-side pinned cheapest model; official sources and room context only; citations; no patient facts or official-response authority |
-| Real Trial Room communication | **AUTHORIZED PILOT** | Supabase authenticated staff, membership/RLS/realtime/audit, no PHI |
-| Secure referral handoff | **AUTHORIZED PILOT** | Audited ownership/state metadata only; no patient payload, file, or external clinical exchange |
-| Map as an access-planning lens | **AUTHORIZED APPROXIMATE LENS** | Three.js India boundary plus curated approximate registry centroids; no route/travel/access/capacity claim |
+| Transparent unranked assisted discovery | **FACT — implemented** | Deterministic visible registry filters and input trace; patient-neutral order |
+| Cohort-based library filtering | **FACT — implemented** | Clinician-selected explicit fact filters, unranked workspace count, manual review only |
+| Trial-specific evidence feed | **FACT — implemented** | Official trial source with provenance and current-source comparison |
+| AI Trial Room assistant | **FACT — implemented; LIVE BLOCKED** | Server-side pinned cheapest model; official sources and room context only; citations; no patient facts or official-response authority |
+| Real Trial Room communication | **FACT — implemented; LIVE BLOCKED** | Supabase authenticated staff, membership/RLS/realtime/audit, no PHI |
+| Secure referral handoff | **FACT — implemented; LIVE BLOCKED** | Audited ownership/state metadata only; no patient payload, file, or external clinical exchange |
+| Map as an access-planning lens | **FACT — implemented as approximate lens** | Three.js India boundary plus curated approximate registry centroids; no route/travel/access/capacity claim |
 | Treating-oncologist trial-first sessions | **BLOCKED** | Owner-set participant threshold plus exact recruitment/contact authorization |
 | Coordinator patient-first sessions | **BLOCKED** | Owner-set participant threshold plus exact recruitment/contact authorization |
 | Trial-side role sessions | **BLOCKED** | Owner-set participant threshold, trial-side access, and exact recruitment/contact authorization |
@@ -296,4 +296,4 @@ Missing Supabase project configuration and a rotated server-side OpenAI key bloc
 
 ## Current governed work
 
-The owner-authorized expansion sequence is current engineering work. `P5` and Phase 6 remain open: implementation does not establish workflow fit, clinical effectiveness, institutional acceptance, or product lock. Treating-oncologist, coordinator, trial-side, and comparative workflow sessions still require owner-set thresholds and exact recruitment/contact authorization.
+The owner-authorized expansion is implemented through pull requests `#28`–`#32`. Reachable local and official-source behavior passes; live Supabase auth/RLS/realtime/two-user handoff and live OpenAI output remain blocked until approved configuration and a rotated server-side key exist. `P5` and Phase 6 remain open: implementation does not establish workflow fit, clinical effectiveness, institutional acceptance, or product lock. Direct sessions still require owner-set thresholds and exact recruitment/contact authorization.
