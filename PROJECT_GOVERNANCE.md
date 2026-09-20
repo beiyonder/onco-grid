@@ -201,6 +201,7 @@ The owner-authorized expansion was delivered through pull requests `#28`–`#32`
 ## References
 
 - `AGENTS.md`
+- `PILOT_ACTIVATION_RUNBOOK.md`
 - `CONTEXT.md`
 - `FOUNDATION.md`
 - `HEALTHATHON_OFFICIAL.md`

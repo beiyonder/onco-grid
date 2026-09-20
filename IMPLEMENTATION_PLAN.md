@@ -297,3 +297,5 @@ Missing Supabase project configuration and a rotated server-side OpenAI key bloc
 ## Current governed work
 
 The owner-authorized expansion is implemented through pull requests `#28`–`#32`. Reachable local and official-source behavior passes; live Supabase auth/RLS/realtime/two-user handoff and live OpenAI output remain blocked until approved configuration and a rotated server-side key exist. `P5` and Phase 6 remain open: implementation does not establish workflow fit, clinical effectiveness, institutional acceptance, or product lock. Direct sessions still require owner-set thresholds and exact recruitment/contact authorization.
+
+Operational pickup instructions for service configuration, migration, live qualification, open gates, and rollback are maintained in [`PILOT_ACTIVATION_RUNBOOK.md`](PILOT_ACTIVATION_RUNBOOK.md).
