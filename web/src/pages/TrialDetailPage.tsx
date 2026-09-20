@@ -52,7 +52,7 @@ export function TrialDetailPage() {
             <p className="eyebrow">Registry summary</p><h2 id="summary-heading">Study overview</h2><p>{trial.briefSummary}</p>
           </section>
 
-          <section className="surface" aria-labelledby="sites-heading">
+          <section className="surface site-section" aria-labelledby="sites-heading">
             <div className="section-heading"><div><p className="eyebrow">Registry-listed locations</p><h2 id="sites-heading">India sites</h2></div><StatusChip tone="neutral">{trial.indiaLocations.length} listed</StatusChip></div>
             <div className="site-list">
               {trial.indiaLocations.map((location, index) => <div className="site-row" key={`${location.facility}-${index}`}><span><strong>{location.facility || "Facility not reported"}</strong><small>{[location.city, location.state].filter(Boolean).join(", ")}</small></span><span><StatusChip tone="source">Registry: {location.status || "Unknown"}</StatusChip><StatusChip tone="attention">Site: not independently confirmed</StatusChip></span></div>)}
