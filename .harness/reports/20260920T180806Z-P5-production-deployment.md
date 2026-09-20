@@ -15,6 +15,7 @@ Merge `PILOT_ACTIVATION_RUNBOOK.md` and version-controlled Vercel Vite settings 
 - Vercel contract — `web/vercel.json` specifies Framework Vite, `npm ci`, `npm run build`, `dist`, and bounded evidence/assistant function durations.
 - Vercel local production build — `vercel build --target production` passed browser/API TypeScript checks, Vite build, and Vercel Function transpilation; output was generated at `.vercel/output`.
 - Production deployment — prebuilt production deployment `dpl_4hNh6qcJyarCzx8roVA2nW2EqaDy` reached `READY`, deployment URL `https://onco-grid-trial-relay-validation-6zlx72dyi.vercel.app`, and was aliased to the public production URL.
+- Automatic Git deployment — after Root Directory correction, merged pull request `#35` produced production deployment `dpl_GaryB2hJHg2CvHAauca96KUPRKbQ`, reached `READY` in 20 seconds, built both serverless functions (`trial-assistant` 710.87kB and `trial-evidence` 9.96kB), retained the production alias, and served the 69-cluster spatial lens. This confirms future GitHub main deployments now use the `web` Vite project rather than an empty repository-root build.
 - Project settings — Vercel now reports Root Directory `web`, Framework `vite`, Build Command `npm run build`, Install Command `npm ci`, Output Directory `dist`, Node 24.x.
 - Production HTTP — the public alias returned HTTP 200 and the Vite document. Headers included noindex/nofollow/noarchive, strict transport security, CSP, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, restricted camera/microphone/geolocation, and strict-origin referrer policy.
 - Home — live title `Trial Relay — OncoGrid validation`, role Home heading, 285 public records, fail-closed pilot-services label, and zero desktop overflow.
@@ -30,11 +31,11 @@ Merge `PILOT_ACTIVATION_RUNBOOK.md` and version-controlled Vercel Vite settings 
 
 ## Risks and gaps
 
-Live Supabase/Auth/RLS/realtime/two-user communication, recipient handoff acknowledgement, administrative official-response grant, and live OpenAI output remain unverified because no approved service configuration exists. The exposed OpenAI key must be revoked and was not used. The direct Vercel deployment URL may require Vercel authentication under deployment protection; the public production alias is accessible. Future GitHub automatic deployment with the newly corrected `web` root has not yet been observed, although project settings now match the successful prebuilt deployment. `P5`, direct oncology-user evidence, and product lock remain open.
+Live Supabase/Auth/RLS/realtime/two-user communication, recipient handoff acknowledgement, administrative official-response grant, and live OpenAI output remain unverified because no approved service configuration exists. The exposed OpenAI key must be revoked and was not used. Direct deployment URLs may require Vercel authentication under deployment protection; the public production alias is accessible. `P5`, direct oncology-user evidence, and product lock remain open.
 
 ## Next
 
-Follow `PILOT_ACTIVATION_RUNBOOK.md`: revoke the exposed key, configure an approved Supabase project and rotated server-only OpenAI key outside chat, apply the migration, create multiple test staff identities, grant one approved site member official authority, and execute the live qualification matrix. For the next code change, confirm that GitHub auto-deploy uses the corrected `web` root and does not replace the production alias with an empty deployment.
+Follow `PILOT_ACTIVATION_RUNBOOK.md`: revoke the exposed key, configure an approved Supabase project and rotated server-only OpenAI key outside chat, apply the migration, create multiple test staff identities, grant one approved site member official authority, and execute the live qualification matrix.
 
 ## Sign-off needed
 
