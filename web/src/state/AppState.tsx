@@ -1,6 +1,5 @@
 import {
   createContext,
-  type FormEvent,
   type ReactNode,
   useContext,
   useMemo,
@@ -214,13 +213,17 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     },
     handoffs,
     advanceSimulatedHandoff(handoffId) {
-      setHandoffs((current) => current.map((handoff) => {
-        if (handoff.id !== handoffId) return handoff;
-        const state: HandoffRecord["state"] = handoff.state === "Draft"
-          ? "Ready for simulation"
-          : "Simulated acknowledgement";
-        return { ...handoff, state, updatedAt: new Date().toISOString() };
-      }));
+      const currentHandoff = handoffs.find((handoff) => handoff.id === handoffId);
+      if (!currentHandoff || currentHandoff.state === "Simulated acknowledgement") return;
+      const state: HandoffRecord["state"] = currentHandoff.state === "Draft"
+        ? "Ready for simulation"
+        : "Simulated acknowledgement";
+      setHandoffs((current) => current.map((handoff) => handoff.id === handoffId
+        ? { ...handoff, state, updatedAt: new Date().toISOString() }
+        : handoff));
+      if (state === "Simulated acknowledgement") {
+        setWorkItems((current) => current.map((item) => item.id === handoffId ? { ...item, status: "resolved" } : item));
+      }
     },
   }), [
     corrections,
@@ -241,8 +244,4 @@ export function useAppState(): AppStateValue {
   const context = useContext(AppStateContext);
   if (!context) throw new Error("useAppState must be used within AppStateProvider");
   return context;
-}
-
-export function preventFormNavigation(event: FormEvent<HTMLFormElement>) {
-  event.preventDefault();
 }

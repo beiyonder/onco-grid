@@ -485,3 +485,22 @@ textarea { width: 100%; resize: vertical; }
   .criterion-card > header { grid-template-columns: auto minmax(0, 1fr); }
   .criterion-card > header > .status-chip { grid-column: 2; }
 }
+
+.no-role-attention { margin: 0.7rem 0 1rem; padding: 0.85rem; border-radius: var(--radius); background: var(--surface-secondary); color: var(--ink-muted); }
+.no-role-attention strong { display: block; color: var(--ink-secondary); }
+.inbox-toolbar > div:first-child > p:last-child { margin: 0.3rem 0 0; color: var(--ink-muted); font-size: 0.875rem; }
+.inbox-filters { display: flex; align-items: flex-end; justify-content: flex-end; gap: 0.65rem; }
+.inbox-filters > label > span { display: block; margin-bottom: 0.35rem; color: var(--ink-secondary); font-size: 0.8125rem; font-weight: 750; }
+.inbox-filters select { min-width: 10rem; }
+.handoff-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 0.55rem; }
+
+@media (max-width: 58rem) {
+  .inbox-filters { align-items: stretch; flex-direction: column; }
+}
+
+@media (max-width: 48rem) {
+  .inbox-filters { width: 100%; }
+  .inbox-filters select { width: 100%; }
+  .handoff-card { align-items: flex-start; flex-direction: column; }
+  .handoff-actions { justify-content: flex-start; }
+}
