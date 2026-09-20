@@ -237,12 +237,35 @@ For each de-identified session, retain only:
 
 Stop and rework before further sessions if the interface causes a participant to infer current site availability, patient eligibility, treatment recommendation, autonomous packet release, or a system-generated board/trial-team decision. The owner still decides the participant threshold and closes or redirects `P5`.
 
-## Current slice
+## Evidence-led remediation status
 
-**Branch:** `feat/evidence-led-attention-workflow`
+| Delivery slice | Review items closed | Merge evidence | State |
+|---|---|---|---|
+| Typed routed foundation | Sustainable stack; readable type roles; collapsed mobile chrome | Pull request `#21` | **FACT — implemented** |
+| Trial workflow | Concise rows; normalized display taxonomy with raw provenance; explicit result limits/pagination; preview versus dedicated detail; chronological Trial Room; evidence-linked corrections | Pull request `#22` | **FACT — implemented** |
+| Patient workflow | Coherent pairing; searchable workspace list; dedicated review; sectioned workspace; several fixtures; synthetic-only creation; per-fact source badges; prominent completeness | Pull request `#23` | **FACT — implemented** |
+| Role and attention workflow | No automatic unverified-site tasks; attention Inbox; role-specific Home activity; explicitly unsent simulated handoff | Pull request `#24` | **FACT — implemented** |
+| Integrated evidence and reconciliation | Strict build; production failure/retry; desktop/mobile; keyboard/focus; console; reduced presentation; print; deterministic/privacy checks; governed deferrals | Pull request `#25` | **FACT — implemented** |
 
-**Pull request outcome:** make Home operationally role-specific; constrain Inbox to unread, owned, or explicitly accepted work for the selected role; remove all automatic unverified-site tasks; preserve exact message, criterion, trial, workspace, and handoff return positions; and reduce the downstream handoff to an unmistakably unsent browser-memory simulation.
+All twenty implementation-authorized roadmap items in the 2026-09-20 evidence-led review are represented in the validation surface. This is implementation evidence, not direct oncology-user validation or product lock.
 
-**Acceptance scenario:** switch among coordinator, oncologist, site, and auditor roles and observe different Home copy and attention counts; confirm the complete demo contains five deliberate starting work items rather than 285 automatic site gaps; open the oncologist message from Inbox and land on exact `ROOM-2`; advance the synthetic handoff from Draft to Ready for simulation to Simulated acknowledgement while every surface states nothing was sent; and observe the resolved handoff leave the coordinator attention view.
+## Governance-gated deferrals
 
-**Explicit non-goals for this slice:** no system-wide unknown-to-task conversion, notification-rule builder, external delivery channel, scheduler, production identity, durable queue, real referral, file transfer, site contact, acknowledgement claim, backend, persistence, or clinical decision.
+| Review item | State | Required gate before work |
+|---|---|---|
+| Transparent unranked assisted discovery | **DEFERRED** | Separate clinical-governance decision, transparent input/source model, and comparative recall/misunderstanding evidence |
+| Cohort-based library filtering | **DEFERRED** | Authorization model, explicit patient selection, no-ranking design, and coordinator task evidence |
+| Trial-specific evidence feed | **DEFERRED** | Data licences, editorial/source policy, and evidence that it changes trial-review work |
+| AI Trial Room assistant | **DEFERRED** | Identity, citations, data boundary, factuality/omission evaluation, and authority-confusion evidence |
+| Real Trial Room communication | **BLOCKED** | Site participation, verified identity, consent, moderation, retention, security/privacy approval, and controlled-pilot authority |
+| Secure referral handoff | **BLOCKED** | Backend, RBAC, encryption, audit, legal/privacy approval, institutional participation, and controlled-pilot authority |
+| Map as an access-planning lens | **DEFERRED** | Accurate geospatial/site data and direct evidence of a real geography decision |
+| Treating-oncologist trial-first sessions | **BLOCKED** | Owner-set participant threshold plus exact recruitment/contact authorization |
+| Coordinator patient-first sessions | **BLOCKED** | Owner-set participant threshold plus exact recruitment/contact authorization |
+| Trial-side role sessions | **BLOCKED** | Owner-set participant threshold, trial-side access, and exact recruitment/contact authorization |
+| Comparative workflow interview | **BLOCKED** | Approved recruitment/contact and aggregate-safe evidence protocol |
+| Product-lock decision | **BLOCKED** | Sufficient direct Phase 6 evidence and explicit repository-owner decision |
+
+## Current governed work
+
+`P5` and Phase 6 remain open. The next permitted work is direct, role-specific observation using synthetic data under the frozen protocol. The repository owner must set the participant threshold and separately authorize any external recruitment or contact. Stop and rework if a participant infers current site availability, patient eligibility, treatment recommendation, autonomous referral release, durable transmission, or a system-authored clinical decision.
