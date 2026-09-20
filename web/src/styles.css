@@ -176,12 +176,14 @@ dd { margin: 0; color: var(--ink-secondary); font-size: 0.9rem; }
 .reading-surface { padding: clamp(1.25rem, 3vw, 2rem); }
 .reading-surface h2 { font-size: 1.65rem; }
 .reading-surface p:last-child { margin-bottom: 0; color: var(--ink-secondary); font-family: Charter, "Iowan Old Style", Georgia, serif; font-size: 1.05rem; line-height: 1.7; }
-.detail-main > .surface:last-child { padding: 1.25rem; }
+.site-section { padding: clamp(1rem, 2vw, 1.4rem); overflow: hidden; }
+.site-section .section-heading { margin-bottom: 0.35rem; }
 .site-list { display: grid; }
-.site-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.85rem 0; border-top: 1px solid var(--rule); }
+.site-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(13rem, auto); align-items: center; gap: 1.25rem; padding: 1rem 0.25rem; border-top: 1px solid var(--rule); }
 .site-row > span, .site-row strong, .site-row small { display: block; }
-.site-row small { color: var(--ink-muted); font-size: 0.8125rem; }
-.site-row > span:last-child { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.35rem; }
+.site-row > span:first-child { min-width: 0; padding-right: 0.5rem; }
+.site-row small { margin-top: 0.2rem; color: var(--ink-muted); font-size: 0.8125rem; line-height: 1.45; }
+.site-row > span:last-child { display: grid; max-width: 17rem; justify-items: end; gap: 0.4rem; }
 .detail-aside { position: sticky; top: calc(var(--topbar) + 1rem); }
 .source-panel h2, .pinned-context h2 { margin-bottom: 0.8rem; }
 .source-panel .button { margin-top: 1rem; }
@@ -341,8 +343,8 @@ textarea { width: 100%; resize: vertical; }
   .pagination span { order: -1; width: 100%; text-align: left; }
   .pagination button { flex: 1; }
   .status-grid, .fact-grid { grid-template-columns: 1fr; }
-  .site-row { align-items: flex-start; flex-direction: column; }
-  .site-row > span:last-child { justify-content: flex-start; }
+  .site-row { grid-template-columns: 1fr; align-items: flex-start; gap: 0.65rem; padding-inline: 0.1rem; }
+  .site-row > span:last-child { max-width: none; justify-items: start; }
   .message { grid-template-columns: 2rem minmax(0, 1fr); }
   .message-avatar { width: 2rem; height: 2rem; }
   .composer-foot { align-items: stretch; flex-direction: column; }
