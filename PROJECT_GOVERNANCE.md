@@ -129,6 +129,8 @@ On 2026-09-19 the owner authorised the agent to push and merge future implementa
 
 On 2026-09-20 the owner supplied [`product/TRIAL_RELAY_EVIDENCE_LED_REVIEW.md`](product/TRIAL_RELAY_EVIDENCE_LED_REVIEW.md) and directed end-to-end remediation. The review establishes twenty reversible implementation items and identifies routing, duplicated state/render logic, testability, and delivery friction that satisfy the typed-component-stack trigger. React, TypeScript, and Vite are authorised for the static validation surface under the existing 2026-09-19 conditional frontend authority. The seven future product hypotheses and five direct-validation/product-lock items in the review remain governance-gated; this instruction does not authorise outreach, real data, external communication, persistence, production identity, patient ranking/matching, clinical capability, or `P5` closure.
 
+The evidence-led remediation was delivered through pull requests `#21`–`#25`. All twenty implementation-authorized items are represented in the validation surface and passed the integrated C3 evidence report. This completion does not close `P5`: seven future product hypotheses remain `DEFERRED` or `BLOCKED`, five direct-validation/product-lock tasks remain `BLOCKED`, and the owner still controls participant threshold, recruitment/contact, evidence interpretation, product lock, and every production or clinical boundary.
+
 ## Gap register
 
 | Gap | Status | Evidence | Owner | Next action |
@@ -178,10 +180,11 @@ On 2026-09-20 the owner supplied [`product/TRIAL_RELAY_EVIDENCE_LED_REVIEW.md`](
 | `C2` | `P5` | `.harness/reports/20260919T141239Z-P5-relationship-lenses.md` | Complete; merged through pull request `#18` |
 | `C2` | `P5` | `.harness/reports/20260919T142331Z-P5-responsive-presentation.md` | Complete; merged through pull request `#19` |
 | `C3` | `P5` | `.harness/reports/20260919T143549Z-P5-implementation-readiness.md` | Complete; Phase 0–5 integrated, Phase 6 oncology-user evidence remains open |
-| `C2` | `P5` | `.harness/reports/20260920T144329Z-P5-typed-routed-foundation.md` | Complete; typed routed foundation prepared for review |
-| `C2` | `P5` | `.harness/reports/20260920T150108Z-P5-evidence-led-trial-workflow.md` | Complete; evidence-led Trial workflow prepared for review |
-| `C2` | `P5` | `.harness/reports/20260920T151051Z-P5-evidence-led-patient-workflow.md` | Complete; evidence-led Patient workflow prepared for review |
-| `C2` | `P5` | `.harness/reports/20260920T151911Z-P5-evidence-led-attention-workflow.md` | Complete; evidence-led role and attention workflow prepared for review |
+| `C2` | `P5` | `.harness/reports/20260920T144329Z-P5-typed-routed-foundation.md` | Complete; merged through pull request `#21` |
+| `C2` | `P5` | `.harness/reports/20260920T150108Z-P5-evidence-led-trial-workflow.md` | Complete; merged through pull request `#22` |
+| `C2` | `P5` | `.harness/reports/20260920T151051Z-P5-evidence-led-patient-workflow.md` | Complete; merged through pull request `#23` |
+| `C2` | `P5` | `.harness/reports/20260920T151911Z-P5-evidence-led-attention-workflow.md` | Complete; merged through pull request `#24` |
+| `C3` | `P5` | `.harness/reports/20260920T152948Z-P5-evidence-led-integration.md` | Complete; integrated through pull request `#25`; Phase 6 remains open |
 
 ## References
 
@@ -232,3 +235,4 @@ On 2026-09-20 the owner supplied [`product/TRIAL_RELAY_EVIDENCE_LED_REVIEW.md`](
 - `.harness/reports/20260920T150108Z-P5-evidence-led-trial-workflow.md`
 - `.harness/reports/20260920T151051Z-P5-evidence-led-patient-workflow.md`
 - `.harness/reports/20260920T151911Z-P5-evidence-led-attention-workflow.md`
+- `.harness/reports/20260920T152948Z-P5-evidence-led-integration.md`

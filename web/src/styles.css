@@ -504,3 +504,18 @@ textarea { width: 100%; resize: vertical; }
   .handoff-card { align-items: flex-start; flex-direction: column; }
   .handoff-actions { justify-content: flex-start; }
 }
+
+@media (prefers-reduced-transparency: reduce) {
+  .sidebar, .topbar, .section-tabs, .trial-preview { background: #fbfcfb; }
+  .surface, .reading-surface, .workspace-section, .review-source-panel, .journey-card, .trial-preview { box-shadow: none; }
+}
+
+@media print {
+  .filter-grid, .library-toolbar, .trial-list, .pagination, .composer, .correction-panel form, .criterion-card form, .preview-close, .message-actions, .handoff-actions { display: none !important; }
+  .trial-preview, .room-context { position: static; box-shadow: none; background: #fff !important; }
+  .protocol-source details:not([open]) > :not(summary) { display: block !important; }
+  .protocol-source summary { display: none !important; }
+  .criterion-card, .message, .site-row, .source-fact-list article, .inbox-row { break-inside: avoid; }
+  .completion-meter { border: 1px solid #777; background: #fff; }
+  .completion-meter span { background: #333 !important; }
+}

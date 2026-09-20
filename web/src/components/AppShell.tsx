@@ -24,11 +24,11 @@ export function AppShell() {
   useEffect(() => {
     const navigationState = location.state as { libraryFocusId?: string } | null;
     if ((location.pathname === "/trials" && navigationState?.libraryFocusId) || location.search.includes("message=") || location.search.includes("criterion=")) return;
-    const frame = requestAnimationFrame(() => {
+    const timeout = window.setTimeout(() => {
       document.querySelector<HTMLElement>("main h1")?.focus({ preventScroll: true });
       window.scrollTo({ top: 0, behavior: "auto" });
-    });
-    return () => cancelAnimationFrame(frame);
+    }, 0);
+    return () => window.clearTimeout(timeout);
   }, [location.pathname, location.search, location.state]);
 
   return (

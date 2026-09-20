@@ -125,6 +125,7 @@ Owner sign-off is required for changes to goal, scope, non-goals, acceptance thr
 - 2026-09-20 evidence-led Trial workflow: the React surface now has concise/paginated normalized Trial Library rows, non-hover preview, stable full detail with raw provenance and complete criteria, preserved return state/focus, chronological Trial Room replies and exact-message focus, human resolution, and evidence-linked correction tickets. Report: `.harness/reports/20260920T150108Z-P5-evidence-led-trial-workflow.md`.
 - 2026-09-20 evidence-led Patient workflow: Patients now has searchable/sortable owner-filtered synthetic workspace index, controlled no-identity/no-upload fixture creation, sectioned pages, per-fact source badges, explicit manual selection from the unranked library, coherent `SYN-2047` × `NCT06345729`, all 23 retained criterion excerpts, prominent 3/23 completeness, and explicitly human-created missing-information work. Report: `.harness/reports/20260920T151051Z-P5-evidence-led-patient-workflow.md`.
 - 2026-09-20 evidence-led role/attention workflow: Home now changes copy and accepted activity by prototype role; Inbox defaults to unresolved role-owned/accepted work and starts with five deliberate items rather than auto-created site gaps; exact message/criterion routes retain focus; the only handoff control is an explicitly unsent browser-memory simulation whose acknowledgement resolves its queue item. Report: `.harness/reports/20260920T151911Z-P5-evidence-led-attention-workflow.md`.
+- 2026-09-20 integrated evidence-led state: pull requests `#21`–`#25` implement all twenty owner-authorized review items. The built static React surface passed production source failure/retry, full desktop workflow, eight-route 390px mobile matrix, exact focus restoration, clean console, reduced motion/transparency, opaque source-complete print, ledger 70, snapshot 285, npm audit 0 vulnerabilities, and privacy checks. Seven future hypotheses plus five direct-validation/product-lock activities remain explicitly deferred or blocked. `P5` and Phase 6 remain open. Report: `.harness/reports/20260920T152948Z-P5-evidence-led-integration.md`.
 
 ## References
 
@@ -158,3 +159,4 @@ Owner sign-off is required for changes to goal, scope, non-goals, acceptance thr
 - `.harness/reports/20260920T150108Z-P5-evidence-led-trial-workflow.md`
 - `.harness/reports/20260920T151051Z-P5-evidence-led-patient-workflow.md`
 - `.harness/reports/20260920T151911Z-P5-evidence-led-attention-workflow.md`
+- `.harness/reports/20260920T152948Z-P5-evidence-led-integration.md`
