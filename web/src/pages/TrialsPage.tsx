@@ -1,5 +1,6 @@
 import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { IndiaSpatialLens } from "../components/IndiaSpatialLens";
 import { Icon } from "../components/Icon";
 import { EmptyState, PageHeader, SafetyNote, StatusChip } from "../components/Primitives";
 import { displayConditions, displayStates, formatSourceDate, normalizeState } from "../data/trials";
@@ -8,6 +9,7 @@ import { useTrialData } from "../state/TrialData";
 import type { TrialRecord } from "../types";
 
 const pageSizes = [12, 24, 48];
+
 
 export function TrialsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -22,6 +24,7 @@ export function TrialsPage() {
   const phase = searchParams.get("phase") ?? "all";
   const registryStatus = searchParams.get("registry") ?? "all";
   const city = searchParams.get("city") ?? "all";
+  const viewMode = searchParams.get("view") === "map" ? "map" : "list";
   const previewId = searchParams.get("preview");
   const reviewFor = searchParams.get("reviewFor");
   const reviewPatient = patients.find((patient) => patient.id === reviewFor);
@@ -96,6 +99,14 @@ export function TrialsPage() {
     setParam("q", draftQuery.trim(), "");
   };
 
+  const setViewMode = (mode: "list" | "map") => {
+    const next = new URLSearchParams(searchParams);
+    next.delete("preview");
+    next.delete("page");
+    if (mode === "map") next.set("view", "map"); else next.delete("view");
+    setSearchParams(next);
+  };
+
   const resetFilters = () => {
     setDraftQuery("");
     const next = new URLSearchParams();
@@ -152,7 +163,7 @@ export function TrialsPage() {
 
   return (
     <div className="page">
-      <PageHeader eyebrow="Public registry discovery" title="Trial Library" description="Scan concise rows, inspect an accessible preview, then move to a stable source-first Trial Detail. Registry and independent site status remain separate." />
+      <PageHeader eyebrow="Public registry discovery" title="Trial Library" description="Scan concise rows or explore the same filtered source set through an approximate 2.5D India lens. Registry and independent site status remain separate." actions={<div className="library-view-switch" role="group" aria-label="Trial Library view"><button type="button" className={viewMode === "list" ? "active" : ""} aria-pressed={viewMode === "list"} onClick={() => setViewMode("list")}>List</button><button type="button" className={viewMode === "map" ? "active" : ""} aria-pressed={viewMode === "map"} onClick={() => setViewMode("map")}>Spatial lens</button></div>} />
       <SafetyNote><p><strong>General discovery only.</strong> No patient facts, eligibility score, patient ranking, or treatment recommendation influences this list.</p></SafetyNote>
       {reviewPatient ? <div className="manual-selection-note" role="note"><Icon name="patients" /><span><strong>Manual selection for {reviewPatient.label}</strong>The general library order is unchanged and contains no patient-specific ranking. Opening a review records only your explicit selection.</span><Link className="text-action" to={`/patients/${reviewPatient.id}?section=reviews`}>Return to workspace</Link></div> : null}
 
@@ -179,41 +190,43 @@ export function TrialsPage() {
 
         <div className="library-toolbar compact">
           <div className="result-count"><strong id="library-results-heading">{filteredTrials.length} matching trials</strong><span>of {snapshot.retainedCount} retained · snapshot {formatSourceDate(snapshot.source.dataTimestamp)}</span></div>
-          <label className="result-limit"><span>Rows per page</span><select value={pageSize} onChange={(event) => setParam("limit", event.target.value, "12")}>{pageSizes.map((size) => <option key={size} value={size}>{size}</option>)}</select></label>
+          {viewMode === "list" ? <label className="result-limit"><span>Rows per page</span><select value={pageSize} onChange={(event) => setParam("limit", event.target.value, "12")}>{pageSizes.map((size) => <option key={size} value={size}>{size}</option>)}</select></label> : <span className="map-result-note">Same filters · all {filteredTrials.length} matching trials</span>}
         </div>
 
-        <div className={`library-workspace${previewTrial ? " has-preview" : ""}`}>
-          <div className="trial-list" aria-live="polite">
-            {visibleTrials.map((trial) => (
-              <article className={`trial-row${previewId === trial.id ? " selected" : ""}`} key={trial.id}>
-                <div className="trial-row-main">
-                  <div className="trial-row-meta"><code>{trial.id}</code><StatusChip tone="source">{trial.statusLabel}</StatusChip><span>{trial.phases.join(", ") || "Phase not reported"}</span></div>
-                  <h2><button className="title-button" id={`trial-${trial.id}`} type="button" onClick={() => openTrial(trial)}>{trial.briefTitle}</button></h2>
-                  <p>{displayConditions(trial).slice(0, 2).join(" · ")}</p>
-                </div>
-                <div className="trial-row-side"><span>{trial.indiaLocations.length} India {trial.indiaLocations.length === 1 ? "site" : "sites"}</span><strong>Site confirmation unknown</strong><button className="preview-button" id={`preview-${trial.id}`} type="button" onClick={() => openPreview(trial.id)} aria-expanded={previewId === trial.id} aria-controls="trial-preview">Preview</button></div>
-              </article>
-            ))}
-            {visibleTrials.length === 0 ? <EmptyState icon="search" title="No trials match these filters">Reset one or more filters. No broader or patient-specific search is performed automatically.</EmptyState> : null}
+        {viewMode === "map" ? <IndiaSpatialLens trials={filteredTrials} onOpenTrial={openTrial} /> : <>
+          <div className={`library-workspace${previewTrial ? " has-preview" : ""}`}>
+            <div className="trial-list" aria-live="polite">
+              {visibleTrials.map((trial) => (
+                <article className={`trial-row${previewId === trial.id ? " selected" : ""}`} key={trial.id}>
+                  <div className="trial-row-main">
+                    <div className="trial-row-meta"><code>{trial.id}</code><StatusChip tone="source">{trial.statusLabel}</StatusChip><span>{trial.phases.join(", ") || "Phase not reported"}</span></div>
+                    <h2><button className="title-button" id={`trial-${trial.id}`} type="button" onClick={() => openTrial(trial)}>{trial.briefTitle}</button></h2>
+                    <p>{displayConditions(trial).slice(0, 2).join(" · ")}</p>
+                  </div>
+                  <div className="trial-row-side"><span>{trial.indiaLocations.length} India {trial.indiaLocations.length === 1 ? "site" : "sites"}</span><strong>Site confirmation unknown</strong><button className="preview-button" id={`preview-${trial.id}`} type="button" onClick={() => openPreview(trial.id)} aria-expanded={previewId === trial.id} aria-controls="trial-preview">Preview</button></div>
+                </article>
+              ))}
+              {visibleTrials.length === 0 ? <EmptyState icon="search" title="No trials match these filters">Reset one or more filters. No broader or patient-specific search is performed automatically.</EmptyState> : null}
+            </div>
+
+            {previewTrial ? <aside className="trial-preview" id="trial-preview" aria-labelledby="trial-preview-heading">
+              <button className="preview-close" type="button" onClick={closePreview} aria-label="Close trial preview"><Icon name="close" /></button>
+              <p className="eyebrow">Accessible preview</p>
+              <h2 id="trial-preview-heading" tabIndex={-1}>{previewTrial.briefTitle}</h2>
+              <code>{previewTrial.id}</code>
+              <div className="preview-status"><span><small>Registry study status</small><StatusChip tone="source">{previewTrial.statusLabel}</StatusChip></span><span><small>Independent site confirmation</small><StatusChip tone="attention">Unknown</StatusChip></span></div>
+              <p>{previewTrial.briefSummary}</p>
+              <dl><div><dt>Displayed condition</dt><dd>{displayConditions(previewTrial).slice(0, 3).join(", ")}</dd></div><div><dt>India sites</dt><dd>{previewTrial.indiaLocations.length} registry-listed</dd></div><div><dt>Source</dt><dd>{previewTrial.source} · updated {previewTrial.lastUpdatePostedDate}</dd></div></dl>
+              <div className="preview-actions">{reviewPatient ? <button className="button primary" type="button" onClick={() => startReview(previewTrial)}>Start human review for {reviewPatient.label}</button> : null}<button className={reviewPatient ? "button secondary" : "button primary"} type="button" onClick={() => openTrial(previewTrial)}>Open full Trial Detail</button><a className="button secondary" href={previewTrial.sourceUrl} target="_blank" rel="noreferrer">Open source <Icon name="external" /></a></div>
+            </aside> : null}
           </div>
 
-          {previewTrial ? <aside className="trial-preview" id="trial-preview" aria-labelledby="trial-preview-heading">
-            <button className="preview-close" type="button" onClick={closePreview} aria-label="Close trial preview"><Icon name="close" /></button>
-            <p className="eyebrow">Accessible preview</p>
-            <h2 id="trial-preview-heading" tabIndex={-1}>{previewTrial.briefTitle}</h2>
-            <code>{previewTrial.id}</code>
-            <div className="preview-status"><span><small>Registry study status</small><StatusChip tone="source">{previewTrial.statusLabel}</StatusChip></span><span><small>Independent site confirmation</small><StatusChip tone="attention">Unknown</StatusChip></span></div>
-            <p>{previewTrial.briefSummary}</p>
-            <dl><div><dt>Displayed condition</dt><dd>{displayConditions(previewTrial).slice(0, 3).join(", ")}</dd></div><div><dt>India sites</dt><dd>{previewTrial.indiaLocations.length} registry-listed</dd></div><div><dt>Source</dt><dd>{previewTrial.source} · updated {previewTrial.lastUpdatePostedDate}</dd></div></dl>
-            <div className="preview-actions">{reviewPatient ? <button className="button primary" type="button" onClick={() => startReview(previewTrial)}>Start human review for {reviewPatient.label}</button> : null}<button className={reviewPatient ? "button secondary" : "button primary"} type="button" onClick={() => openTrial(previewTrial)}>Open full Trial Detail</button><a className="button secondary" href={previewTrial.sourceUrl} target="_blank" rel="noreferrer">Open source <Icon name="external" /></a></div>
-          </aside> : null}
-        </div>
-
-        <nav className="pagination" aria-label="Trial result pages">
-          <button type="button" disabled={currentPage === 1} onClick={() => setParam("page", String(currentPage - 1), "1")}>Previous</button>
-          <span>Page {currentPage} of {pageCount} · showing {visibleTrials.length} of {filteredTrials.length} matching records · limit {pageSize}</span>
-          <button type="button" disabled={currentPage === pageCount} onClick={() => setParam("page", String(currentPage + 1), "1")}>Next</button>
-        </nav>
+          <nav className="pagination" aria-label="Trial result pages">
+            <button type="button" disabled={currentPage === 1} onClick={() => setParam("page", String(currentPage - 1), "1")}>Previous</button>
+            <span>Page {currentPage} of {pageCount} · showing {visibleTrials.length} of {filteredTrials.length} matching records · limit {pageSize}</span>
+            <button type="button" disabled={currentPage === pageCount} onClick={() => setParam("page", String(currentPage + 1), "1")}>Next</button>
+          </nav>
+        </>}
       </section>
     </div>
   );
