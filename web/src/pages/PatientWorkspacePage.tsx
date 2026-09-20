@@ -10,7 +10,7 @@ type PatientSection = (typeof sections)[number];
 export function PatientWorkspacePage() {
   const { patientId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { handoffs, patients, workItems } = useAppState();
+  const { advanceSimulatedHandoff, handoffs, patients, workItems } = useAppState();
   const { findTrial, status: trialDataStatus } = useTrialData();
   const patient = patients.find((candidate) => candidate.id === patientId);
   const requestedSection = searchParams.get("section") as PatientSection | null;
@@ -64,7 +64,7 @@ export function PatientWorkspacePage() {
       {section === "handoffs" ? <section className="workspace-section" aria-labelledby="handoffs-heading">
         <div className="section-heading"><div><p className="eyebrow">Demonstration state only</p><h2 id="handoffs-heading">Simulated handoffs</h2></div></div>
         <div className="handoff-warning"><Icon name="warning" /><p><strong>Nothing is sent from this prototype.</strong> These controls only simulate owner, approval, and acknowledgement states in browser memory. They do not contact a site, transmit records, or persist after reload.</p></div>
-        {patientHandoffs.map((handoff) => <article className="handoff-card" key={handoff.id}><span><code>{handoff.id}</code><strong>{handoff.state}</strong><small>Owner: {handoff.owner} · trial {handoff.trialId}</small></span><StatusChip tone="human">Simulated</StatusChip></article>)}
+        {patientHandoffs.map((handoff) => <article className="handoff-card" key={handoff.id}><span><code>{handoff.id}</code><strong>Simulation state: {handoff.state}</strong><small>Owner: {handoff.owner} · trial {handoff.trialId} · nothing transmitted</small></span><div className="handoff-actions"><StatusChip tone="human">Not sent · simulated</StatusChip>{handoff.state !== "Simulated acknowledgement" ? <button className="button secondary" type="button" onClick={() => advanceSimulatedHandoff(handoff.id)}>{handoff.state === "Draft" ? "Simulate ready state" : "Simulate acknowledgement"}</button> : null}</div></article>)}
       </section> : null}
     </div>
   );

@@ -239,10 +239,10 @@ Stop and rework before further sessions if the interface causes a participant to
 
 ## Current slice
 
-**Branch:** `feat/evidence-led-patient-workflow`
+**Branch:** `feat/evidence-led-attention-workflow`
 
-**Pull request outcome:** make Patients a reusable synthetic workspace system with search, ownership and sorting; controlled synthetic-only creation; several coherent fixtures; sectioned workspace pages; per-fact source badges; explicit manual selection from the unranked general library; and a dedicated, complete, criterion-level Patient–Trial Review with prominent completeness and human-created missing-information work.
+**Pull request outcome:** make Home operationally role-specific; constrain Inbox to unread, owned, or explicitly accepted work for the selected role; remove all automatic unverified-site tasks; preserve exact message, criterion, trial, workspace, and handoff return positions; and reduce the downstream handoff to an unmistakably unsent browser-memory simulation.
 
-**Acceptance scenario:** find and filter three existing synthetic workspaces, create a fourth controlled fixture without any free-text identity or upload field, open `SYN-2047`, identify the source type of every fact, manually select `NCT06345729` from the unchanged general library, observe the coherent NSCLC/Stage IV/PD-L1 context and explicit unknown KRAS G12C fact, identify that 3 of 23 retained criteria are reviewed and 20 remain Not reviewed, open exact `criterion-3`, and explicitly create or reuse its source-retrieval task.
+**Acceptance scenario:** switch among coordinator, oncologist, site, and auditor roles and observe different Home copy and attention counts; confirm the complete demo contains five deliberate starting work items rather than 285 automatic site gaps; open the oncologist message from Inbox and land on exact `ROOM-2`; advance the synthetic handoff from Draft to Ready for simulation to Simulated acknowledgement while every surface states nothing was sent; and observe the resolved handoff leave the coordinator attention view.
 
-**Explicit non-goals for this slice:** no real patient entry or upload, EMR integration, durable patient record, cohort matching/filtering, patient-specific ranking, strong/weak match label, aggregate score, eligibility conclusion, treatment recommendation, inferred fact, autonomous task, or external handoff.
+**Explicit non-goals for this slice:** no system-wide unknown-to-task conversion, notification-rule builder, external delivery channel, scheduler, production identity, durable queue, real referral, file transfer, site contact, acknowledgement claim, backend, persistence, or clinical decision.

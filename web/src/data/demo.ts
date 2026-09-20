@@ -155,8 +155,8 @@ export const initialWorkItems: WorkItem[] = [
   {
     id: "HANDOFF-SYN-2047",
     kind: "handoff",
-    title: "Simulated handoff draft needs approval",
-    summary: "Nothing has been transmitted. Review the synthetic manifest and owner before simulation.",
+    title: "Review a simulated handoff state",
+    summary: "Nothing was sent or transmitted. Inspect only the synthetic owner and browser-memory state.",
     sourceLabel: "Synthetic Cedar workspace",
     owner: "A. Rao",
     occurredAt: "2026-09-18T16:20:00Z",

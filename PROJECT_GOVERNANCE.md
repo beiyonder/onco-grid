@@ -181,6 +181,7 @@ On 2026-09-20 the owner supplied [`product/TRIAL_RELAY_EVIDENCE_LED_REVIEW.md`](
 | `C2` | `P5` | `.harness/reports/20260920T144329Z-P5-typed-routed-foundation.md` | Complete; typed routed foundation prepared for review |
 | `C2` | `P5` | `.harness/reports/20260920T150108Z-P5-evidence-led-trial-workflow.md` | Complete; evidence-led Trial workflow prepared for review |
 | `C2` | `P5` | `.harness/reports/20260920T151051Z-P5-evidence-led-patient-workflow.md` | Complete; evidence-led Patient workflow prepared for review |
+| `C2` | `P5` | `.harness/reports/20260920T151911Z-P5-evidence-led-attention-workflow.md` | Complete; evidence-led role and attention workflow prepared for review |
 
 ## References
 
@@ -230,3 +231,4 @@ On 2026-09-20 the owner supplied [`product/TRIAL_RELAY_EVIDENCE_LED_REVIEW.md`](
 - `.harness/reports/20260920T144329Z-P5-typed-routed-foundation.md`
 - `.harness/reports/20260920T150108Z-P5-evidence-led-trial-workflow.md`
 - `.harness/reports/20260920T151051Z-P5-evidence-led-patient-workflow.md`
+- `.harness/reports/20260920T151911Z-P5-evidence-led-attention-workflow.md`
