@@ -179,6 +179,7 @@ On 2026-09-20 the owner supplied [`product/TRIAL_RELAY_EVIDENCE_LED_REVIEW.md`](
 | `C2` | `P5` | `.harness/reports/20260919T142331Z-P5-responsive-presentation.md` | Complete; merged through pull request `#19` |
 | `C3` | `P5` | `.harness/reports/20260919T143549Z-P5-implementation-readiness.md` | Complete; Phase 0–5 integrated, Phase 6 oncology-user evidence remains open |
 | `C2` | `P5` | `.harness/reports/20260920T144329Z-P5-typed-routed-foundation.md` | Complete; typed routed foundation prepared for review |
+| `C2` | `P5` | `.harness/reports/20260920T150108Z-P5-evidence-led-trial-workflow.md` | Complete; evidence-led Trial workflow prepared for review |
 
 ## References
 
@@ -226,3 +227,4 @@ On 2026-09-20 the owner supplied [`product/TRIAL_RELAY_EVIDENCE_LED_REVIEW.md`](
 - `.harness/reports/20260919T142331Z-P5-responsive-presentation.md`
 - `.harness/reports/20260919T143549Z-P5-implementation-readiness.md`
 - `.harness/reports/20260920T144329Z-P5-typed-routed-foundation.md`
+- `.harness/reports/20260920T150108Z-P5-evidence-led-trial-workflow.md`
