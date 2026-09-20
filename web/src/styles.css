@@ -826,4 +826,5 @@ textarea { width: 100%; resize: vertical; }
   .spatial-canvas-shell { display: none !important; }
   .spatial-layout { display: block; }
   .cluster-list > div { max-height: none; overflow: visible; }
+  .cluster-list:not([open]) > div { display: grid !important; }
 }

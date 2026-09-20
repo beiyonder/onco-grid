@@ -133,6 +133,8 @@ The evidence-led remediation was delivered through pull requests `#21`–`#25`. 
 
 On 2026-09-20 the owner explicitly authorised the seven previously gated product hypotheses under a narrower pilot contract: deterministic unranked assisted discovery; explicit cohort-filter counts; official-source evidence; a server-side citation-bound OpenAI assistant that excludes all patient facts and can never author an official response; Supabase-authenticated staff communication and audited referral-state handoff with no PHI; and an approximate Three.js registry map with no route, travel, access, capacity, or availability claim. Patient/trial work is explicit human criterion/source coverage only—never a score, ranking, close-match label, recommendation, or eligibility conclusion. Approved de-identified research JSON may exist only in browser memory after strict identifier rejection. The owner selected the cheapest pinned OpenAI model. A credential exposed in conversation is treated as compromised and must be revoked; it is not authorised for use, storage, logging, commit, prompt, or memory.
 
+The owner-authorized expansion was delivered through pull requests `#28`–`#32`. Reachable browser, official-source, API-policy, security-contract, spatial, responsive, accessibility, dependency, and privacy evidence passes. This does not waive `GAP-PILOT-SERVICE-CONFIG`: live Supabase/Auth/RLS/realtime/two-user handoff and live OpenAI output remain unvalidated until approved service configuration and a rotated server-side credential exist. `P5`, direct workflow evidence, and product lock remain open.
+
 ## Gap register
 
 | Gap | Status | Evidence | Owner | Next action |
@@ -194,6 +196,7 @@ On 2026-09-20 the owner explicitly authorised the seven previously gated product
 | `C2` | `P5` | `.harness/reports/20260920T165548Z-P5-source-evidence-assistant.md` | Complete; merged through pull request `#29`; live AI acceptance blocked by service configuration |
 | `C2` | `P5` | `.harness/reports/20260920T171636Z-P5-authenticated-no-phi-pilot.md` | Complete; merged through pull request `#30`; live Supabase acceptance blocked by project configuration |
 | `C2` | `P5` | `.harness/reports/20260920T173557Z-P5-threejs-india-spatial-lens.md` | Complete; merged through pull request `#31` |
+| `C3` | `P5` | `.harness/reports/20260920T174136Z-P5-owner-expansion-qualification.md` | Complete; integrated through pull request `#32`; live pilot acceptance remains blocked |
 
 ## References
 
@@ -251,3 +254,4 @@ On 2026-09-20 the owner explicitly authorised the seven previously gated product
 - `.harness/reports/20260920T165548Z-P5-source-evidence-assistant.md`
 - `.harness/reports/20260920T171636Z-P5-authenticated-no-phi-pilot.md`
 - `.harness/reports/20260920T173557Z-P5-threejs-india-spatial-lens.md`
+- `.harness/reports/20260920T174136Z-P5-owner-expansion-qualification.md`
