@@ -267,6 +267,16 @@ All twenty implementation-authorized roadmap items in the 2026-09-20 evidence-le
 
 Missing Supabase project configuration and a rotated server-side OpenAI key block live external-service acceptance; they do not permit a mock or browser-exposed fallback.
 
+## Expansion delivery status
+
+| Slice | Merge evidence | State |
+|---|---|---|
+| Explicit coverage and discovery | Pull request `#28` | **FACT — implemented** |
+| Official evidence and source-only assistant | Pull request `#29` | **FACT — implemented; live assistant acceptance BLOCKED by service configuration** |
+| Authenticated communication and no-PHI handoff | Planned pull request `#30` | **CURRENT** |
+| Approximate Three.js spatial lens | Planned pull request `#31` | **READY** |
+| Integrated qualification | Planned pull request `#32` | **READY after dependencies** |
+
 ## Expansion authorization state
 
 | Review item | State | Authorised implementation boundary |

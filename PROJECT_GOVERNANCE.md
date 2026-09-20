@@ -191,6 +191,7 @@ On 2026-09-20 the owner explicitly authorised the seven previously gated product
 | `C2` | `P5` | `.harness/reports/20260920T155218Z-P5-trial-site-spacing.md` | Complete; merged through pull request `#26` |
 | `C2` | `P5` | `.harness/reports/20260920T160905Z-P5-registry-criteria-formatting.md` | Complete; merged through pull request `#27` |
 | `C2` | `P5` | `.harness/reports/20260920T164029Z-P5-explicit-coverage-discovery.md` | Complete; merged through pull request `#28` |
+| `C2` | `P5` | `.harness/reports/20260920T165548Z-P5-source-evidence-assistant.md` | Complete; merged through pull request `#29`; live AI acceptance blocked by service configuration |
 
 ## References
 
@@ -245,3 +246,4 @@ On 2026-09-20 the owner explicitly authorised the seven previously gated product
 - `.harness/reports/20260920T155218Z-P5-trial-site-spacing.md`
 - `.harness/reports/20260920T160905Z-P5-registry-criteria-formatting.md`
 - `.harness/reports/20260920T164029Z-P5-explicit-coverage-discovery.md`
+- `.harness/reports/20260920T165548Z-P5-source-evidence-assistant.md`

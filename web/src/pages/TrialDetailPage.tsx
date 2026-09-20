@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { EmptyState, PageHeader, SafetyNote, StatusChip } from "../components/Primitives";
+import { TrialEvidenceFeed } from "../components/TrialEvidenceFeed";
 import { TrialCoverageTools } from "../components/TrialCoverageTools";
 import { displayConditions, displayStates, formatDate, registryCriteriaSections } from "../data/trials";
 import { useAppState } from "../state/AppState";
@@ -47,9 +48,12 @@ export function TrialDetailPage() {
             <div className="section-heading"><div><p className="eyebrow">Authority layers</p><h2 id="status-heading">Current status</h2></div></div>
             <div className="status-grid">
               <div className="source-status"><span>Registry-declared study status</span><strong>{trial.statusLabel}</strong><small>ClinicalTrials.gov verified {trial.statusVerifiedDate || "date not reported"}</small><StatusChip tone="source">Public source assertion</StatusChip></div>
+
               <div className="site-status"><span>Independent India site confirmation</span><strong>Not confirmed</strong><small>No authorised site response is stored in this browser-only validation workspace.</small><StatusChip tone="attention">Unknown is not unavailable</StatusChip></div>
             </div>
           </section>
+
+          <TrialEvidenceFeed trial={trial} />
 
           <section className="reading-surface" aria-labelledby="summary-heading">
             <p className="eyebrow">Registry summary</p><h2 id="summary-heading">Study overview</h2><p>{trial.briefSummary}</p>
