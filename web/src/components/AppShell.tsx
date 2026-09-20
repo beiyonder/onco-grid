@@ -6,6 +6,7 @@ import { useAppState } from "../state/AppState";
 import { useTrialData } from "../state/TrialData";
 import type { RoleId } from "../types";
 import { Icon, type IconName } from "./Icon";
+import { PilotIdentity } from "./PilotIdentity";
 
 const navigation: Array<{ to: string; label: string; icon: IconName }> = [
   { to: "/", label: "Home", icon: "home" },
@@ -55,7 +56,7 @@ export function AppShell() {
         </nav>
         <div className="sidebar-boundary">
           <Icon name="shield" />
-          <p><strong>Validation workspace</strong>Real public trial records. All patient and workflow examples are synthetic and reset on reload.</p>
+          <p><strong>Validation workspace</strong>Public trial data, browser-only synthetic/approved research facts, and optional authenticated no-PHI pilot services.</p>
         </div>
       </aside>
 
@@ -66,6 +67,7 @@ export function AppShell() {
             <Icon name="source" />
             <span><strong>{snapshot ? `${snapshot.retainedCount} public records` : status === "error" ? "Source unavailable" : "Loading public records"}</strong><small>{sourceDate ? `Snapshot ${sourceDate}` : "ClinicalTrials.gov snapshot"}</small></span>
           </div>
+          <PilotIdentity />
           <label className="role-switcher">
             <span className="role-avatar" aria-hidden="true">{role.initials}</span>
             <span className="role-copy"><small>Prototype role</small>
@@ -77,7 +79,7 @@ export function AppShell() {
         </header>
         <details className="mobile-boundary">
           <summary>Validation boundaries and source date</summary>
-          <p>Trial records are real public ClinicalTrials.gov data{sourceDate ? ` dated ${sourceDate}` : ""}. Patient, role, message, task, and handoff content is synthetic. Browser-memory state resets on reload.</p>
+          <p>Trial records are public ClinicalTrials.gov data{sourceDate ? ` dated ${sourceDate}` : ""}. Patient facts stay synthetic or approved de-identified and browser-only. Authenticated pilot communication carries no PHI.</p>
         </details>
         <main id="main-content" tabIndex={-1}>
           <Outlet />

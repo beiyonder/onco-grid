@@ -1,6 +1,7 @@
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { EmptyState, PageHeader, SafetyNote, SourceBadge, StatusChip } from "../components/Primitives";
+import { PilotHandoffPanel } from "../components/PilotHandoffPanel";
 import { useAppState } from "../state/AppState";
 import { useTrialData } from "../state/TrialData";
 
@@ -63,7 +64,9 @@ export function PatientWorkspacePage() {
       </section> : null}
 
       {section === "handoffs" ? <section className="workspace-section" aria-labelledby="handoffs-heading">
-        <div className="section-heading"><div><p className="eyebrow">Demonstration state only</p><h2 id="handoffs-heading">Simulated handoffs</h2></div></div>
+        <div className="section-heading"><div><p className="eyebrow">Separated service boundaries</p><h2 id="handoffs-heading">Handoffs</h2><p>Authenticated no-PHI pilot state and browser-only simulation remain visibly separate.</p></div></div>
+        <PilotHandoffPanel trialIds={patient.reviewTrialIds} />
+        <div className="subsection-heading"><p className="eyebrow">Browser-only demonstration</p><h3>Simulated handoff</h3></div>
         <div className="handoff-warning"><Icon name="warning" /><p><strong>Nothing is sent from this prototype.</strong> These controls only simulate owner, approval, and acknowledgement states in browser memory. They do not contact a site, transmit records, or persist after reload.</p></div>
         {patientHandoffs.map((handoff) => <article className="handoff-card" key={handoff.id}><span><code>{handoff.id}</code><strong>Simulation state: {handoff.state}</strong><small>Owner: {handoff.owner} · trial {handoff.trialId} · nothing transmitted</small></span><div className="handoff-actions"><StatusChip tone="human">Not sent · simulated</StatusChip>{handoff.state !== "Simulated acknowledgement" ? <button className="button secondary" type="button" onClick={() => advanceSimulatedHandoff(handoff.id)}>{handoff.state === "Draft" ? "Simulate ready state" : "Simulate acknowledgement"}</button> : null}</div></article>)}
       </section> : null}
