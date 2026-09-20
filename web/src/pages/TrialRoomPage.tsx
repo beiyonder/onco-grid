@@ -2,6 +2,7 @@ import { type FormEvent, useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { EmptyState, PageHeader, SafetyNote, StatusChip } from "../components/Primitives";
+import { TrialSourceAssistant } from "../components/TrialSourceAssistant";
 import { useAppState } from "../state/AppState";
 import { useTrialData } from "../state/TrialData";
 
@@ -102,6 +103,8 @@ export function TrialRoomPage() {
             {correctionId ? <p className="success-note" role="status"><Icon name="check" /> {correctionId} created with source evidence.</p> : null}
             {trialCorrections.map((ticket) => <article className="correction-row" key={ticket.id}><span><code>{ticket.id}</code><strong>{ticket.title}</strong><small>{ticket.createdBy} · source linked</small></span><StatusChip tone="attention">{ticket.status}</StatusChip></article>)}
           </section>
+
+          <TrialSourceAssistant trial={trial} messages={messages} />
         </aside>
       </div>
     </div>
