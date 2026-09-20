@@ -22,6 +22,7 @@ export const initialPatients: PatientWorkspace[] = [
     context: "NSCLC · Stage IV · clinician-led review",
     owner: "Dr M. Shah",
     institution: "Western Oncology Unit",
+    dataBoundary: "Synthetic demo",
     lastActivity: "2026-09-19T13:42:00Z",
     reviewTrialIds: ["NCT06345729"],
     facts: [
@@ -65,6 +66,7 @@ export const initialPatients: PatientWorkspace[] = [
     context: "Breast cancer · source collation",
     owner: "A. Rao",
     institution: "Central Research Desk",
+    dataBoundary: "Synthetic demo",
     lastActivity: "2026-09-19T09:15:00Z",
     reviewTrialIds: [],
     facts: [
@@ -92,6 +94,7 @@ export const initialPatients: PatientWorkspace[] = [
     context: "Colorectal cancer · missing records",
     owner: "A. Rao",
     institution: "Eastern Oncology Unit",
+    dataBoundary: "Synthetic demo",
     lastActivity: "2026-09-18T15:30:00Z",
     reviewTrialIds: [],
     facts: [

@@ -558,3 +558,74 @@ textarea { width: 100%; resize: vertical; }
   .criteria-group, .criteria-list > li { break-inside: avoid; }
   .criteria-marker { border: 1px solid #777; background: #fff !important; color: #000 !important; }
 }
+
+.sr-only { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important; border: 0 !important; }
+
+.assisted-discovery { margin-bottom: 1rem; border: 1px solid #b7cbd8; border-radius: var(--radius); background: var(--blue-soft); }
+.assisted-discovery > summary { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.8rem 0.9rem; cursor: pointer; color: var(--blue); list-style: none; }
+.assisted-discovery > summary::-webkit-details-marker { display: none; }
+.assisted-discovery > summary > span, .assisted-discovery > summary strong, .assisted-discovery > summary small { display: block; }
+.assisted-discovery > summary small { margin-top: 0.1rem; color: var(--ink-muted); font-size: 0.8125rem; font-weight: 500; }
+.assisted-discovery-body { display: grid; gap: 0.8rem; padding: 0 0.9rem 0.9rem; }
+.assisted-filter-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.65rem; }
+.assisted-filter-grid label > span { display: block; margin-bottom: 0.3rem; color: var(--ink-secondary); font-size: 0.8125rem; font-weight: 750; }
+.assisted-filter-grid select { width: 100%; }
+.discovery-input-trace { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; }
+.discovery-input-trace strong { margin-right: 0.2rem; font-size: 0.8125rem; }
+.discovery-input-trace span { padding: 0.25rem 0.5rem; border-radius: 999px; background: var(--surface); color: var(--ink-secondary); font-size: 0.8125rem; }
+.assisted-discovery-body > p { display: flex; align-items: flex-start; gap: 0.5rem; margin: 0; color: var(--ink-secondary); font-size: 0.875rem; }
+.assisted-discovery-body > p svg { flex: none; color: var(--green); }
+
+.coverage-dialog-backdrop { position: fixed; z-index: 80; inset: 0; display: grid; place-items: center; padding: 1rem; background: rgba(24, 38, 48, 0.42); }
+.coverage-dialog { width: min(72rem, 100%); max-height: min(52rem, calc(100vh - 2rem)); overflow: auto; border: 1px solid var(--rule); border-radius: 1.3rem; background: var(--surface); box-shadow: 0 1.5rem 5rem rgba(24, 38, 48, 0.24); }
+.coverage-dialog > header { position: sticky; z-index: 2; top: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding: 1.2rem 3.8rem 1.1rem 1.3rem; border-bottom: 1px solid var(--rule); background: rgba(251, 252, 251, 0.98); }
+.coverage-dialog > header h2 { font-family: Charter, "Iowan Old Style", Georgia, serif; font-size: 1.65rem; }
+.coverage-dialog > header p:last-child { max-width: 48rem; margin: 0.35rem 0 0; color: var(--ink-secondary); }
+.coverage-dialog > header .preview-close { top: 1rem; right: 1rem; }
+.coverage-dialog-body { display: grid; gap: 1rem; padding: 1.2rem 1.3rem 1.4rem; }
+.coverage-boundary { display: flex; align-items: flex-start; gap: 0.65rem; padding: 0.85rem 0.95rem; border-left: 4px solid var(--green); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; background: var(--green-soft); color: var(--ink-secondary); }
+.coverage-boundary svg { flex: none; color: var(--green); }
+.coverage-boundary span, .coverage-boundary strong { display: block; }
+.coverage-patient-list { display: grid; gap: 0.6rem; }
+.coverage-patient-list article { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 1rem; padding: 0.9rem 1rem; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface-secondary); }
+.coverage-patient-list article code, .coverage-patient-list article h3, .coverage-patient-list article p, .coverage-patient-list article span { display: block; }
+.coverage-patient-list article h3 { margin-top: 0.2rem; }
+.coverage-patient-list article p { margin: 0.15rem 0; color: var(--ink-secondary); }
+.coverage-patient-list article span { color: var(--ink-muted); font-size: 0.8125rem; }
+.research-import { display: grid; gap: 0.8rem; padding: 1rem; border: 1px solid #b7cbd8; border-radius: var(--radius); background: var(--blue-soft); }
+.research-import h3 { font-size: 1.1rem; }
+.research-import p { margin: 0.25rem 0 0; color: var(--ink-secondary); font-size: 0.875rem; }
+.research-import-actions { display: flex; flex-wrap: wrap; gap: 0.55rem; }
+.button.disabled { cursor: not-allowed; opacity: 0.5; }
+.form-error { display: flex; align-items: flex-start; gap: 0.45rem; margin: 0 !important; padding: 0.65rem 0.75rem; border-radius: var(--radius-sm); background: var(--red-soft); color: var(--red) !important; }
+.form-error svg { flex: none; }
+.cohort-filter-builder { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) auto; align-items: end; gap: 0.65rem; }
+.cohort-filter-builder label > span { display: block; margin-bottom: 0.3rem; color: var(--ink-secondary); font-size: 0.8125rem; font-weight: 750; }
+.cohort-filter-builder select, .cohort-filter-builder input { width: 100%; }
+.active-cohort-filters { display: flex; flex-wrap: wrap; gap: 0.4rem; min-height: 2rem; align-items: center; color: var(--ink-muted); font-size: 0.8125rem; }
+.active-cohort-filters button { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.35rem 0.55rem; border: 1px solid #cabdd3; border-radius: 999px; background: var(--plum-soft); color: var(--plum); font-size: 0.8125rem; cursor: pointer; }
+.active-cohort-filters button svg { width: 0.9rem; height: 0.9rem; }
+.cohort-result-summary { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding: 0.8rem 0.9rem; border-radius: var(--radius); background: var(--surface-secondary); }
+.cohort-result-summary strong, .cohort-result-summary span { display: block; }
+.cohort-result-summary span { color: var(--ink-muted); font-size: 0.8125rem; text-align: right; }
+
+@media (prefers-reduced-transparency: reduce) {
+  .coverage-dialog-backdrop { background: #d7dedb; }
+  .coverage-dialog, .coverage-dialog > header { background: #fbfcfb; box-shadow: none; }
+}
+
+@media screen and (max-width: 48rem) {
+  .assisted-filter-grid, .cohort-filter-builder { grid-template-columns: 1fr; }
+  .coverage-dialog-backdrop { align-items: end; padding: 0; }
+  .coverage-dialog { max-height: 94vh; border-radius: 1.1rem 1.1rem 0 0; }
+  .coverage-dialog > header { padding-inline: 1rem 3.5rem; }
+  .coverage-dialog-body { padding-inline: 0.85rem; }
+  .coverage-patient-list article { grid-template-columns: 1fr; }
+  .coverage-patient-list article .button { justify-self: start; }
+  .cohort-result-summary { align-items: flex-start; flex-direction: column; }
+  .cohort-result-summary span { text-align: left; }
+}
+
+@media print {
+  .coverage-dialog-backdrop { display: none !important; }
+}

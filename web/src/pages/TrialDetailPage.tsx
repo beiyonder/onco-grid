@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { EmptyState, PageHeader, SafetyNote, StatusChip } from "../components/Primitives";
+import { TrialCoverageTools } from "../components/TrialCoverageTools";
 import { displayConditions, displayStates, formatDate, registryCriteriaSections } from "../data/trials";
 import { useAppState } from "../state/AppState";
 import { useTrialData } from "../state/TrialData";
@@ -36,7 +37,7 @@ export function TrialDetailPage() {
         eyebrow={`${trial.id} · ${trial.phases.join(", ") || "Phase not reported"}`}
         title={trial.briefTitle}
         description={displayConditions(trial).join(" · ")}
-        actions={<><button className="button secondary" type="button" onClick={() => toggleFollowTrial(trial.id)}>{isFollowed ? "Following" : "Follow trial"}</button><Link className="button primary" to={`/trials/${trial.id}/room`}>Open Trial Room</Link></>}
+        actions={<><TrialCoverageTools trial={trial} /><button className="button quiet" type="button" onClick={() => toggleFollowTrial(trial.id)}>{isFollowed ? "Following" : "Follow trial"}</button><Link className="button secondary" to={`/trials/${trial.id}/room`}>Open Trial Room</Link></>}
       />
       <SafetyNote><p><strong>Registry status and site availability are different authorities.</strong> The public record can say recruiting while every India site remains independently unconfirmed.</p></SafetyNote>
 

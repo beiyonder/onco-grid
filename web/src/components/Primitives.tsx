@@ -34,15 +34,16 @@ export function StatusChip({ tone = "neutral", children }: { tone?: "neutral" | 
   return <span className={`status-chip ${tone}`}>{children}</span>;
 }
 
+const sourceTone: Record<PatientFactSource, "neutral" | "source" | "good" | "human"> = {
+  "Clinician confirmed": "good",
+  "Synthetic document": "source",
+  "Manual synthetic entry": "neutral",
+  "Approved de-identified research data": "source",
+  "Conceptual future EMR": "human",
+};
+
 export function SourceBadge({ source }: { source: PatientFactSource }) {
-  const tone = source === "Clinician confirmed"
-    ? "good"
-    : source === "Synthetic document"
-      ? "source"
-      : source === "Conceptual future EMR"
-        ? "human"
-        : "neutral";
-  return <StatusChip tone={tone}>{source}</StatusChip>;
+  return <StatusChip tone={sourceTone[source]}>{source}</StatusChip>;
 }
 
 export function EmptyState({ icon, title, children, action }: { icon: IconName; title: string; children: ReactNode; action?: ReactNode }) {
