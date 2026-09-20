@@ -1,4 +1,4 @@
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { EmptyState, PageHeader, SafetyNote, StatusChip } from "../components/Primitives";
 import { displayConditions, displayStates, formatDate } from "../data/trials";
@@ -8,9 +8,11 @@ import { useTrialData } from "../state/TrialData";
 export function TrialDetailPage() {
   const { trialId } = useParams();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
   const { findTrial, status } = useTrialData();
   const trial = findTrial(trialId);
-  const { followedTrialIds, toggleFollowTrial } = useAppState();
+  const { corrections, followedTrialIds, roomMessages, toggleFollowTrial } = useAppState();
 
   if (status === "loading") {
     return <div className="page"><EmptyState icon="source" title="Loading trial source">Retrieving the dated registry record.</EmptyState></div>;
@@ -22,10 +24,12 @@ export function TrialDetailPage() {
   const from = searchParams.get("from");
   const libraryRoute = from ? `/trials?${from}` : "/trials";
   const isFollowed = followedTrialIds.includes(trial.id);
+  const trialMessages = roomMessages.filter((message) => message.trialId === trial.id);
+  const trialCorrections = corrections.filter((correction) => correction.trialId === trial.id);
 
   return (
     <div className="page detail-page">
-      <Link className="back-link" to={libraryRoute}>← Back to Trial Library</Link>
+      <button className="back-link button quiet" type="button" onClick={() => navigate(libraryRoute, { state: location.state })}>← Back to Trial Library</button>
       <PageHeader
         eyebrow={`${trial.id} · ${trial.phases.join(", ") || "Phase not reported"}`}
         title={trial.briefTitle}
@@ -53,6 +57,20 @@ export function TrialDetailPage() {
             <div className="site-list">
               {trial.indiaLocations.map((location, index) => <div className="site-row" key={`${location.facility}-${index}`}><span><strong>{location.facility || "Facility not reported"}</strong><small>{[location.city, location.state].filter(Boolean).join(", ")}</small></span><span><StatusChip tone="source">Registry: {location.status || "Unknown"}</StatusChip><StatusChip tone="attention">Site: not independently confirmed</StatusChip></span></div>)}
             </div>
+          </section>
+
+          <section className="surface protocol-source" aria-labelledby="criteria-source-heading">
+            <div className="section-heading"><div><p className="eyebrow">Complete retained source</p><h2 id="criteria-source-heading">Eligibility criteria</h2><p>Original registry text for human review; not interpreted by Trial Relay.</p></div><StatusChip tone="source">{trial.eligibilityCriteriaTruncated ? "Source excerpt" : "Complete retained text"}</StatusChip></div>
+            <details><summary>Read registry criteria</summary><p>{trial.eligibilityCriteria}</p></details>
+          </section>
+
+          <section className="surface trial-activity" aria-labelledby="trial-activity-heading">
+            <div className="section-heading"><div><p className="eyebrow">Human and source events</p><h2 id="trial-activity-heading">Activity</h2></div><Link className="button secondary" to={`/trials/${trial.id}/room`}>Open Trial Room</Link></div>
+            <ol>
+              <li><Icon name="update" /><span><strong>Registry source updated</strong><small>{formatDate(trial.lastUpdatePostedDate)} · {trial.source}</small></span></li>
+              {trialMessages.slice().reverse().slice(0, 3).map((message) => <li key={message.id}><Icon name="message" /><span><strong>{message.author} · {message.authority}</strong><small>{message.body}</small></span></li>)}
+              {trialCorrections.map((correction) => <li key={correction.id}><Icon name="task" /><span><strong>{correction.id} · {correction.title}</strong><small>Evidence linked by {correction.createdBy}</small></span></li>)}
+            </ol>
           </section>
         </div>
 

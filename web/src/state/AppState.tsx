@@ -48,7 +48,8 @@ interface AppStateValue {
   resolveWorkItem: (workItemId: string) => void;
   addMissingInformationTask: (patientId: string, trialId: string, criterionId: string) => string;
   roomMessages: RoomMessage[];
-  postRoomMessage: (trialId: string, body: string, sourceUrl?: string) => void;
+  postRoomMessage: (trialId: string, body: string, sourceUrl?: string, replyToId?: string) => void;
+  resolveRoomMessage: (messageId: string) => void;
   reviews: ReviewRecord[];
   updateCriterion: (update: CriterionUpdate) => void;
   corrections: CorrectionTicket[];
@@ -136,7 +137,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       return id;
     },
     roomMessages,
-    postRoomMessage(trialId, body, sourceUrl) {
+    postRoomMessage(trialId, body, sourceUrl, replyToId) {
       const message: RoomMessage = {
         id: `ROOM-${roomMessages.length + 1}`,
         trialId,
@@ -146,8 +147,13 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
         sentAt: new Date().toISOString(),
         authority: role.id === "site" ? "Authorised site response" : "General discussion",
         sourceUrl,
+        replyToId,
       };
       setRoomMessages((current) => [...current, message]);
+    },
+    resolveRoomMessage(messageId) {
+      setRoomMessages((current) => current.map((message) => message.id === messageId ? { ...message, resolved: true } : message));
+      setWorkItems((current) => current.map((item) => item.route.includes(`message=${messageId}`) ? { ...item, status: "resolved" } : item));
     },
     reviews,
     updateCriterion(update) {

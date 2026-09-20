@@ -22,12 +22,14 @@ export function AppShell() {
   const attentionCount = workItems.filter((item) => item.status !== "resolved" && item.roleIds.includes(roleId)).length;
 
   useEffect(() => {
+    const navigationState = location.state as { libraryFocusId?: string } | null;
+    if ((location.pathname === "/trials" && navigationState?.libraryFocusId) || location.search.includes("message=")) return;
     const frame = requestAnimationFrame(() => {
       document.querySelector<HTMLElement>("main h1")?.focus({ preventScroll: true });
       window.scrollTo({ top: 0, behavior: "auto" });
     });
     return () => cancelAnimationFrame(frame);
-  }, [location.pathname]);
+  }, [location.pathname, location.search, location.state]);
 
   return (
     <div className="app-shell">

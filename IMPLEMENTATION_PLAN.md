@@ -239,10 +239,10 @@ Stop and rework before further sessions if the interface causes a participant to
 
 ## Current slice
 
-**Branch:** `feat/evidence-led-foundation`
+**Branch:** `feat/evidence-led-trial-workflow`
 
-**Pull request outcome:** replace the browser-native global-render architecture with a typed, hash-routed React/Vite validation surface; establish readable Soft Spatial Systems tokens; preserve four global destinations and all source, clinical, privacy, and synthetic-data boundaries; emit the dated registry file as a separate static asset; and retain loading/error/retry behavior.
+**Pull request outcome:** make Trial Library a concise scan-and-compare surface with normalized display taxonomy, explicit result counts/page limits, non-hover preview, stable full-detail route, preserved search/focus/position, source-first detail hierarchy, chronological Trial Room replies, authorised-response styling, human resolution, and evidence-linked correction tickets.
 
-**Acceptance scenario:** build the static app, open Home at desktop and mobile widths, observe 285 public records and the dated source, navigate all four global routes plus a stable Trial Detail hash route, verify focus restoration and no horizontal overflow, and confirm that browser-memory role/work state remains synthetic.
+**Acceptance scenario:** filter to `NCT06345729`, open and close its accessible preview, move to the stable Trial Detail, inspect registry versus independently confirmed site status, all India sites, raw source taxonomy and complete retained criteria, return without losing query or focus, open the Trial Room at an exact message, reply with the public source attached, and create a correction that retains a source link without mutating registry or site status.
 
-**Explicit non-goals for this slice:** no claim of oncology-user validation, product lock, production readiness, backend, persistence, authentication, external messaging, patient matching/ranking, real patient data, new registry source, clinical capability, or deployment-topology change.
+**Explicit non-goals for this slice:** no map investment, patient-specific discovery, matching/ranking, eligibility conclusion, automated site verification, generated official response, real communication, external notification, backend, persistence, real patient data, or new source.

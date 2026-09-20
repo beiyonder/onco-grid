@@ -137,7 +137,7 @@ export const initialWorkItems: WorkItem[] = [
     owner: "Dr M. Shah",
     occurredAt: "2026-09-19T12:05:00Z",
     status: "unread",
-    route: "/trials/NCT06345729/room",
+    route: "/trials/NCT06345729/room?message=ROOM-2",
     roleIds: ["oncologist"],
   },
   {

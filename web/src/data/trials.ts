@@ -4,11 +4,16 @@ import type { TrialRecord } from "../types";
 export const trialSnapshotUrl = snapshotUrl;
 
 const conditionDisplayMap: Record<string, string> = {
+  "breast carcinoma": "Breast cancer",
+  "breast neoplasms": "Breast cancer",
+  breastcancer: "Breast cancer",
+  "carcinoma of the lung": "Lung cancer",
+  "carcinoma, non-small-cell lung": "Non-small cell lung cancer",
+  "carcinoma, non-small-cell lung (nsclc)": "Non-small cell lung cancer",
+  "colonic neoplasms": "Colon cancer",
+  "colorectal carcinoma": "Colorectal cancer",
   "non small cell lung cancer": "Non-small cell lung cancer",
   "non-small-cell lung cancer": "Non-small cell lung cancer",
-  "carcinoma of the lung": "Lung cancer",
-  "breast carcinoma": "Breast cancer",
-  "colorectal carcinoma": "Colorectal cancer",
   neoplasm: "Cancer",
 };
 
@@ -20,15 +25,37 @@ const stateDisplayMap: Record<string, string> = {
   "west bengal": "West Bengal",
 };
 
-function sentenceCase(value: string): string {
+const acronymDisplayMap: Record<string, string> = {
+  aml: "AML",
+  cll: "CLL",
+  cml: "CML",
+  dlbcl: "DLBCL",
+  ecog: "ECOG",
+  egfr: "EGFR",
+  er: "ER",
+  hcc: "HCC",
+  her2: "HER2",
+  hpv: "HPV",
+  kras: "KRAS",
+  mds: "MDS",
+  nsclc: "NSCLC",
+  "pd-1": "PD-1",
+  "pd-l1": "PD-L1",
+  sclc: "SCLC",
+  sll: "SLL",
+};
+
+function normalizedDisplayCase(value: string): string {
   if (!value) return value;
-  if (/^[A-Z0-9\-\s()/+]+$/.test(value) && value.length < 8) return value;
-  return value.charAt(0).toUpperCase() + value.slice(1);
+  const sentence = value.toLocaleLowerCase().replace(/^[a-z]/, (character) => character.toLocaleUpperCase());
+  return Object.entries(acronymDisplayMap).reduce((result, [raw, display]) => (
+    result.replace(new RegExp(`\\b${raw}\\b`, "gi"), display)
+  ), sentence).replace(/\bStage (i{1,3}|iv)\b/gi, (_match, numeral: string) => `Stage ${numeral.toLocaleUpperCase()}`);
 }
 
 export function normalizeCondition(raw: string): string {
   const compact = raw.trim().replace(/\s+/g, " ");
-  return conditionDisplayMap[compact.toLowerCase()] ?? sentenceCase(compact);
+  return conditionDisplayMap[compact.toLowerCase()] ?? normalizedDisplayCase(compact);
 }
 
 export function displayConditions(trial: TrialRecord): string[] {
@@ -46,7 +73,7 @@ export function displayConditions(trial: TrialRecord): string[] {
 
 export function normalizeState(raw: string): string {
   const compact = raw.trim().replace(/\s+/g, " ");
-  return stateDisplayMap[compact.toLowerCase()] ?? sentenceCase(compact);
+  return stateDisplayMap[compact.toLowerCase()] ?? normalizedDisplayCase(compact);
 }
 
 export function displayStates(trial: TrialRecord): string[] {
