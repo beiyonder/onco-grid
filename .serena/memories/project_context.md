@@ -132,10 +132,12 @@ Owner sign-off is required for changes to goal, scope, non-goals, acceptance thr
 - 2026-09-20 authenticated no-PHI pilot state: Supabase migration defines staff profiles, room membership, RLS/realtime messages, admin-granted official site-response authority, random-reference no-PHI handoffs, role-gated transitions, and immutable audit events. React client adds fail-closed magic-link identity, live Trial Room, member invite, handoff creation/transition, and separate synthetic fallbacks. No Supabase project is configured, so live auth/RLS/realtime/two-user acceptance remains blocked. Report: `.harness/reports/20260920T171636Z-P5-authenticated-no-phi-pilot.md`.
 - 2026-09-20 Three.js spatial state: Trial Library List/Spatial lens continuity now renders a Natural Earth India 2.5D diorama over the same filtered registry dataset, using curated city and labelled state centroids, visible placed/unplaced counts, floating labels, pointer/orbit interaction, accessible cluster list, responsive/reduced/print fallbacks, and explicit no-route/travel/access/capacity/availability boundaries. Report: `.harness/reports/20260920T173557Z-P5-threejs-india-spatial-lens.md`.
 - 2026-09-20 integrated owner-expansion state: pull requests `#28`–`#32` implement explicit patient/source coverage, strict ephemeral approved research import, unranked cohort filters, transparent assisted discovery, official evidence, pinned cheapest source-only AI policy, Supabase no-PHI communication/handoff contracts, and an approximate Three.js India spatial lens. Reachable build/browser/API-policy/map/privacy evidence passes. Live Supabase and OpenAI acceptance remains blocked by missing approved configuration and rotated server-side key; `P5`, direct workflow evidence, and product lock remain open. Report: `.harness/reports/20260920T174136Z-P5-owner-expansion-qualification.md`.
+- Production release, Supabase migration/configuration, rotated OpenAI secret injection, live qualification, open governance gates, and rollback instructions are maintained in `PILOT_ACTIVATION_RUNBOOK.md`. Never place secret values in chat or repository files.
 
 ## References
 
 - `mem:core`
+- `PILOT_ACTIVATION_RUNBOOK.md`
 - `PROJECT_GOVERNANCE.md`
 - `AGENTS.md`
 - `FOUNDATION.md`
