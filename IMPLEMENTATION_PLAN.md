@@ -12,10 +12,11 @@
 
 ## Current frontend architecture decision
 
-- **FACT:** the accepted Home slice left `web/index.html` at 2,265 lines, including 1,004 lines of CSS and 746 lines of JavaScript.
-- **DECISION:** complete Phase 0 by separating the document, stylesheet, and application script into `web/index.html`, `web/styles.css`, and `web/app.js`. Keep the existing browser-native runtime and zero-dependency local serve path for now.
-- **RATIONALE:** stable file boundaries remove the immediate edit-collision and review problem without introducing a build system, framework lifecycle, dependency maintenance, or migration risk before those costs solve a demonstrated user-facing need.
-- **REASSESSMENT TRIGGER:** adopt a component framework and typed build only when a named slice demonstrates repeated component/state duplication, routing or testability limits, or delivery friction that browser-native modules cannot address cleanly.
+- **FACT — 2026-09-20 review:** [`product/TRIAL_RELAY_EVIDENCE_LED_REVIEW.md`](product/TRIAL_RELAY_EVIDENCE_LED_REVIEW.md) found a 4,433-line browser-native frontend with duplicated global state and render logic, no stable routes, and poor testability. It also observed materially unreadable typography, composite views, and delivery friction across the core journeys.
+- **DECISION:** the documented typed-component-stack trigger is met. Migrate the validation surface to React, TypeScript, and Vite with static-host-safe hash routes. Retain the dated `web/data/india-oncology-trials.json` artifact, static hosting, browser-memory-only workflow state, four global destinations, source/site authority separation, and synthetic-only patient/workflow data.
+- **RATIONALE:** routing, typed domain models, component boundaries, explicit loading/error states, and independently reviewable pages now solve demonstrated product and maintenance failures. A backend, persistence layer, production identity, external messaging channel, or new data source would not solve those failures and remains outside authority.
+- **RUNTIME CONTRACT:** `npm run dev` serves the validation surface; `npm run build` performs strict TypeScript validation and produces static output. The registry snapshot is emitted as a separate static asset rather than copied into the application bundle.
+- **REASSESSMENT TRIGGER:** revisit this stack only if direct Phase 6 evidence or an approved production boundary introduces a requirement it cannot meet. Dependency novelty alone is not a reason to migrate again.
 
 ## Product boundary
 
@@ -37,7 +38,7 @@ Real registry trial data and synthetic patient, EMR, board, referral, and workfl
 ## Delivery principles
 
 1. **One coherent job per pull request.** A review should demonstrate one complete user-observable outcome, not a collection of unrelated components.
-2. **One active UI pull request while `web/index.html` remains monolithic.** This prevents overlapping edits and unclear ownership. Parallel UI work begins only after a reviewed source split creates stable file boundaries.
+2. **One dependent UI pull request at a time.** Branch every slice from newly updated `main`; do not stack routes, state, or shared-design work on an unmerged predecessor.
 3. **No speculative platform work.** Add a backend, authentication system, persistence layer, deployment change, or data source only with a named requirement and separate owner authority. Frontend structure, tooling, and dependencies may change under the owner's conditional authorisation when a review slice records the maintainability or delivery need and preserves the privacy, security, and no-build-or-equivalent local-run boundary.
 4. **Context before controls.** Each detailed view has one dominant trial, patient, thread, or handoff. Supporting operations remain attached to that entity.
 5. **Authority is visible.** Important state always names its source or human authority and date. Unknown and conflicting states remain explicit.
@@ -48,7 +49,7 @@ Real registry trial data and synthetic patient, EMR, board, referral, and workfl
 ## Pull-request cadence
 
 - Target **one merge candidate every one to two working days** during active implementation; this is a review-size guardrail, not a delivery quota.
-- Keep **one non-draft implementation PR open at a time** while changes share the monolithic static app.
+- Keep **one dependent implementation PR open at a time** and merge only after its observable scenario and repository checks pass.
 - Branch each slice from updated `main`; never push directly to `main`.
 - Use a focused `feat/...` branch, a concise outcome-based PR title, and a body containing scope, non-goals, screenshots or observed states, verification, privacy checks, and remaining risk.
 - Prefer one to three meaningful commits during review and squash feature PRs at merge. Preserve separate commits only when they are independently useful review checkpoints.
@@ -61,12 +62,26 @@ Real registry trial data and synthetic patient, EMR, board, referral, and workfl
 1. Enumerate the intended changed files.
 2. Confirm ignored sensitive inputs remain ignored and untracked.
 3. Run `python3 research/validate_ledger.py`.
-4. Run `python3 scripts/fetch_india_oncology_trials.py --validate-only` when trial data or its presentation contract changes.
-5. Serve and exercise the actual `web/` surface.
-6. Verify the changed journey at one desktop viewport and one narrow mobile viewport.
-7. Verify keyboard navigation, visible focus, no page-level horizontal overflow, and reduced-motion behavior for changed interactions.
-8. Observe the browser console for errors and warnings.
-9. Record the exact scenario, observed result, remaining risk, and evidence report when the slice forms a governance checkpoint.
+4. Run `npm run build` from `web/` for strict TypeScript validation and production output.
+5. Run `python3 scripts/fetch_india_oncology_trials.py --validate-only` when trial data or its presentation contract changes.
+6. Serve and exercise the actual `web/` surface.
+7. Verify the changed journey at one desktop viewport and one narrow mobile viewport.
+8. Verify keyboard navigation, visible focus, no page-level horizontal overflow, and reduced-motion behavior for changed interactions.
+9. Observe the browser console for errors and warnings.
+10. Record the exact scenario, observed result, remaining risk, and evidence report when the slice forms a governance checkpoint.
+11. For the evidence-led redesign, verify that no automated site task, patient ranking, eligibility conclusion, real-data input, external transmission, or production persistence is introduced.
+
+## Evidence-led remediation sequence
+
+The 2026-09-20 owner review authorises twenty reversible implementation items. Deliver them as five dependent merge candidates:
+
+1. **Typed routed foundation** — React/TypeScript/Vite shell, hash routes, readable tokens, collapsed mobile chrome, separate registry asset, and the review artifact.
+2. **Trial workflow** — concise/paginated library, normalized display taxonomy with raw provenance, accessible preview, dedicated Trial Detail, chronological Trial Room, and evidence-linked corrections.
+3. **Patient workflow** — several coherent synthetic workspaces, synthetic-only creation, fact-level source badges, dedicated sectioned workspace and Patient–Trial Review, complete retained criterion excerpts, explicit completeness, and human-created missing-information tasks.
+4. **Role and attention workflow** — role-specific Home activity, one attention-focused Inbox with no automatic unverified-site tasks, and minimal simulated handoff wording that cannot imply transmission.
+5. **Integrated evidence** — responsive, keyboard, focus, console, reduced-presentation, print, deterministic, privacy, plan, governance, and Phase 6 protocol reconciliation.
+
+The seven future product hypotheses and five direct oncology-user/product-lock tasks in the review remain explicitly governance-gated. They are not implementation backlog and cannot be silently promoted by completing this redesign.
 
 ## Phased delivery
 
@@ -224,10 +239,10 @@ Stop and rework before further sessions if the interface causes a participant to
 
 ## Current slice
 
-**Branch:** `chore/implementation-readiness`
+**Branch:** `feat/evidence-led-foundation`
 
-**Pull request outcome:** reconcile the completed Phase 0–5 implementation, freeze the safe synthetic Phase 6 observation scenarios and de-identified evidence fields, run one final integrated browser verification, and make the remaining evidence/product-lock boundary explicit.
+**Pull request outcome:** replace the browser-native global-render architecture with a typed, hash-routed React/Vite validation surface; establish readable Soft Spatial Systems tokens; preserve four global destinations and all source, clinical, privacy, and synthetic-data boundaries; emit the dated registry file as a separate static asset; and retain loading/error/retry behavior.
 
-**Acceptance scenario:** from a clean reload, complete Home → Trial library/List/Map → source-first profile/Trial room → synthetic Patient criterion review/missing task → versioned packet/lifecycle/trial-team outcome → treating-team review/closure, plus packet-bound tumour-board reference and synthetic EMR task; verify responsive, reduced-motion, reduced-transparency, and opaque print modes; retain clean deterministic checks, privacy scans, and `main` integration through a final pull request.
+**Acceptance scenario:** build the static app, open Home at desktop and mobile widths, observe 285 public records and the dated source, navigate all four global routes plus a stable Trial Detail hash route, verify focus restoration and no horizontal overflow, and confirm that browser-memory role/work state remains synthetic.
 
-**Explicit non-goals for this slice:** no claim of oncology-user validation, product lock, production readiness, deployment change, external outreach, participant recruitment, real patient data, backend, persistence, authentication, new data source, or clinical capability.
+**Explicit non-goals for this slice:** no claim of oncology-user validation, product lock, production readiness, backend, persistence, authentication, external messaging, patient matching/ranking, real patient data, new registry source, clinical capability, or deployment-topology change.

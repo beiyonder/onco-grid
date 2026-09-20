@@ -127,12 +127,14 @@ On 2026-09-19 the owner authorised implementation of the Trial Relay experience 
 
 On 2026-09-19 the owner authorised the agent to push and merge future implementation pull requests without separate owner review when the repository's observable acceptance, privacy, and safety checks pass. Every change must still use a review branch and pull request; direct pushes to `main` remain prohibited. The owner also authorised replacing the monolithic HTML architecture and selecting a more sustainable frontend stack when a named implementation slice demonstrates that the change is necessary for maintainability or delivery efficiency. This conditional authority does not approve a backend, new data source, production identity or persistence boundary, deployment-topology change, or any clinical capability.
 
+On 2026-09-20 the owner supplied [`product/TRIAL_RELAY_EVIDENCE_LED_REVIEW.md`](product/TRIAL_RELAY_EVIDENCE_LED_REVIEW.md) and directed end-to-end remediation. The review establishes twenty reversible implementation items and identifies routing, duplicated state/render logic, testability, and delivery friction that satisfy the typed-component-stack trigger. React, TypeScript, and Vite are authorised for the static validation surface under the existing 2026-09-19 conditional frontend authority. The seven future product hypotheses and five direct-validation/product-lock items in the review remain governance-gated; this instruction does not authorise outreach, real data, external communication, persistence, production identity, patient ranking/matching, clinical capability, or `P5` closure.
+
 ## Gap register
 
 | Gap | Status | Evidence | Owner | Next action |
 |---|---|---|---|---|
 | `GAP-SERENA-LANGUAGE` | Closed | `research/validate_ledger.py` became the first real source file; Python was configured, one file indexed, and Serena health-check passed | Agent | Re-index after future source-language changes. |
-| `GAP-SETUP` | Closed for research phase | `python3 research/validate_ledger.py` is the canonical deterministic research check; no application surface exists | Owner and agent | Define product setup, test, build, and smoke commands only after owner-approved stack selection. |
+| `GAP-SETUP` | Closed for the validation surface | `web/package.json` defines the React/TypeScript/Vite development, strict typecheck, static build, and preview commands; the research ledger remains the canonical research check | Agent | Keep runtime and validation commands current when the frontend stack changes. |
 | `GAP-MCP-ACTIVATION` | Open | `.omp/mcp.json` is present, but OMP loads project MCP at session startup | Owner or next session | Launch OMP from the repository root, then run `/mcp list` and `/mcp test serena`. |
 | `GAP-PUBLICATION-SANITIZATION` | Mitigated for the approved PR; open for raw-source publication | Root `.gitignore` excludes `chatroom_notes.md`, `Oncologist Pain Points_v2.docx`, private research inputs/recordings, local secrets, credentials, and key material; pre-push scanning is required | Repository owner | Publish only de-identified analysis by PR. Never publish the raw expanded DOCX or chat source without a separately approved sanitized replacement. |
 | `GAP-DIRECT-WORKFLOW-OBSERVATION` | Accepted research limitation | Direct oncologist access has proven difficult; current phase uses independent research and internal analyst clarification | Repository owner | Keep transfer limits visible and do not claim desk research or selected accounts prove local workflow prevalence. |
@@ -176,6 +178,7 @@ On 2026-09-19 the owner authorised the agent to push and merge future implementa
 | `C2` | `P5` | `.harness/reports/20260919T141239Z-P5-relationship-lenses.md` | Complete; merged through pull request `#18` |
 | `C2` | `P5` | `.harness/reports/20260919T142331Z-P5-responsive-presentation.md` | Complete; merged through pull request `#19` |
 | `C3` | `P5` | `.harness/reports/20260919T143549Z-P5-implementation-readiness.md` | Complete; Phase 0–5 integrated, Phase 6 oncology-user evidence remains open |
+| `C2` | `P5` | `.harness/reports/20260920T144329Z-P5-typed-routed-foundation.md` | Complete; typed routed foundation prepared for review |
 
 ## References
 
@@ -185,6 +188,7 @@ On 2026-09-19 the owner authorised the agent to push and merge future implementa
 - `HEALTHATHON_OFFICIAL.md`
 - `ONCOLOGIST_INTERVIEW_FIELD_GUIDE.md`
 - `Oncologist Pain Points.md`
+- `product/TRIAL_RELAY_EVIDENCE_LED_REVIEW.md`
 - `research/P5_TUMOUR_BOARD_VALIDATION.md`
 - `research/P5_OPERATOR_VALIDATION_KIT.md`
 - `research/PAIN_POINTS_V2_ANALYSIS.md`
@@ -221,3 +225,4 @@ On 2026-09-19 the owner authorised the agent to push and merge future implementa
 - `.harness/reports/20260919T141239Z-P5-relationship-lenses.md`
 - `.harness/reports/20260919T142331Z-P5-responsive-presentation.md`
 - `.harness/reports/20260919T143549Z-P5-implementation-readiness.md`
+- `.harness/reports/20260920T144329Z-P5-typed-routed-foundation.md`

@@ -33,11 +33,11 @@ Consultation readiness was the strongest starting hypothesis. The completed desk
 - Public GitHub repository: `https://github.com/beiyonder/onco-grid`. The owner authorised publication of the reviewed non-sensitive set by pull request; `chatroom_notes.md`, `Oncologist Pain Points_v2.docx`, and other private/local material remain ignored.
 - Current local environment: macOS arm64; OMP 18.0.4; Serena 1.5.3; Orca 1.4.194 observed at bootstrap.
 - Orca repository registration exists. Machine-local Orca IDs belong only in the bootstrap report, never committed configuration or memory.
-- Serena indexes the dependency-free Python ledger validator; project index and health-check pass.
+- Serena indexes the Python research checks and TypeScript validation frontend; project index and health-check pass after source-language changes.
 
 ## Explicit non-goals
 
-- Do not select a product architecture or implementation stack before the owner closes `P5`.
+- Do not treat the owner-authorised validation frontend stack as production architecture or product lock.
 - Do not assume a generic oncology dashboard, EMR, knowledge assistant, or peer network is novel.
 - Do not convert clinical needs into prohibited patient-specific advice.
 - Do not treat internet research as equivalent to direct local workflow observation.
@@ -46,14 +46,18 @@ Consultation readiness was the strongest starting hypothesis. The completed desk
 
 ## Canonical setup, check, test, build, and smoke commands
 
-This is a research repository with no runnable product surface.
+The repository contains a research surface and a static React/TypeScript/Vite validation frontend.
 
+- Frontend install: `cd web && npm install`
+- Frontend development: `cd web && npm run dev`
+- Frontend strict build: `cd web && npm run build`
+- Frontend typecheck only: `cd web && npm run typecheck`
 - Serena project health: `serena project health-check .`
 - Serena memory reference check: `serena memories check .`
 - Serena re-index after source-language changes: `serena project index .`
 - OMP MCP after restarting from repository root: `/mcp list`, then `/mcp test serena`
 - Canonical research check: `python3 research/validate_ledger.py`
-- Product setup/build/smoke: unavailable until owner-approved product and stack selection.
+- Trial snapshot validation: `python3 scripts/fetch_india_oncology_trials.py --validate-only`
 
 Never invent a passing command.
 
@@ -76,12 +80,12 @@ Never invent a passing command.
 
 Agents may inspect, research, plan, make reversible repository-local changes, run non-destructive checks, update research artifacts and memory, and write evidence reports within the current coordinate.
 
-Owner sign-off is required for changes to goal, scope, non-goals, acceptance thresholds, security/privacy posture, production dependencies, runtime/deployment topology, use of sensitive data, publication/push/release/deployment, or waiver of failed evidence. Repository artifacts and executable evidence outrank agent self-report.
+Owner sign-off is required for changes to goal, scope, non-goals, acceptance thresholds, security/privacy posture, production runtime/deployment topology, use of sensitive data, external recruitment/contact, product lock, or waiver of failed evidence. The 2026-09-19 owner decision permits agents to push and merge implementation pull requests after repository acceptance, privacy, and safety checks pass; direct pushes to `main` remain prohibited. Repository artifacts and executable evidence outrank agent self-report.
 
 ## Known risks, gaps, and open decisions
 
 - `GAP-SERENA-LANGUAGE` is closed: the research validator is indexed as Python and Serena health-check passes.
-- `GAP-SETUP` is closed for the research phase through `python3 research/validate_ledger.py`; product setup/build/smoke commands remain a later owner-approved decision.
+- `GAP-SETUP` is closed for both research and the validation frontend: the ledger validator remains the research check; `web/package.json` defines install, development, typecheck, static build, and preview commands.
 - `GAP-MCP-ACTIVATION`: project MCP must be tested after OMP starts from this repository.
 - `GAP-PUBLICATION-SANITIZATION` is mitigated for the approved PR by `.gitignore` and pre-push scanning; both raw source files remain private. All project changes must reach the default branch through pull requests. `.private/` (chatroom, NER PDF) is gitignored and never committed.
 - `GAP-DIRECT-WORKFLOW-OBSERVATION`: desk research and selected caregiver accounts cannot prove local workflow prevalence.
@@ -116,6 +120,8 @@ Owner sign-off is required for changes to goal, scope, non-goals, acceptance thr
 - 2026-09-19 implementation state: pull request `#17` merged approximate List/Map continuity into `main`. The relationship-lens slice adds only actual source→trial→site→room→patient/handoff nodes and labelled connectors, with each action opening an existing exact context and no inferred clinical graph.
 - 2026-09-19 implementation state: pull request `#18` merged contextual relationship lenses into `main`. The responsive-presentation slice flattens those paths on narrow screens, adds reduced-transparency alongside reduced-motion behavior, and makes print fall back from Map to an opaque source-first profile with identifiers, dates, authority labels, and disclosures preserved.
 - 2026-09-19 implementation state: pull request `#19` merged responsive, reduced-transparency, and opaque print modes into `main`. All planned Phase 0–5 implementation slices are integrated. Phase 6 remains open because no qualifying direct oncology-user observation or product-lock decision exists; implementation evidence alone does not close `P5`.
+- 2026-09-20 owner review: `product/TRIAL_RELAY_EVIDENCE_LED_REVIEW.md` authorises twenty reversible clarity, workflow, and demo-safe remediation items. Seven future product hypotheses plus five direct-validation/product-lock tasks remain governance-gated.
+- 2026-09-20 architecture decision: the review's routing, duplicated state/render logic, testability, and delivery-friction evidence met the typed-component-stack trigger. The static validation surface is migrating to React 19, TypeScript 7, React Router 7, and Vite 8 with hash routes, a separately emitted dated registry asset, browser-memory-only state, four global destinations, and unchanged clinical/privacy boundaries. Report: `.harness/reports/20260920T144329Z-P5-typed-routed-foundation.md`.
 
 ## References
 
@@ -144,3 +150,5 @@ Owner sign-off is required for changes to goal, scope, non-goals, acceptance thr
 - `research/REGROUP_SYNC_20260909.md`
 - `research/KNOCKOUT_SIM_20260909.md`
 - `research/SHALEEN_BRIEF_20260909.md`
+- `product/TRIAL_RELAY_EVIDENCE_LED_REVIEW.md`
+- `.harness/reports/20260920T144329Z-P5-typed-routed-foundation.md`

@@ -27,3 +27,7 @@ credentials/
 # Local browser verification artifacts
 .playwright-cli/
 output/playwright/
+
+# Frontend dependencies and generated output
+web/node_modules/
+web/dist/
