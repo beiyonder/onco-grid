@@ -186,6 +186,7 @@ The evidence-led remediation was delivered through pull requests `#21`–`#25`. 
 | `C2` | `P5` | `.harness/reports/20260920T151911Z-P5-evidence-led-attention-workflow.md` | Complete; merged through pull request `#24` |
 | `C3` | `P5` | `.harness/reports/20260920T152948Z-P5-evidence-led-integration.md` | Complete; integrated through pull request `#25`; Phase 6 remains open |
 | `C2` | `P5` | `.harness/reports/20260920T155218Z-P5-trial-site-spacing.md` | Complete; merged through pull request `#26` |
+| `C2` | `P5` | `.harness/reports/20260920T160905Z-P5-registry-criteria-formatting.md` | Complete; merged through pull request `#27` |
 
 ## References
 
@@ -238,3 +239,4 @@ The evidence-led remediation was delivered through pull requests `#21`–`#25`. 
 - `.harness/reports/20260920T151911Z-P5-evidence-led-attention-workflow.md`
 - `.harness/reports/20260920T152948Z-P5-evidence-led-integration.md`
 - `.harness/reports/20260920T155218Z-P5-trial-site-spacing.md`
+- `.harness/reports/20260920T160905Z-P5-registry-criteria-formatting.md`

@@ -418,9 +418,33 @@ textarea { width: 100%; resize: vertical; }
 .preview-actions { display: grid; gap: 0.5rem; margin-top: 1rem; }
 
 .protocol-source, .trial-activity { padding: 1.25rem; }
-.protocol-source details { border-top: 1px solid var(--rule); }
-.protocol-source summary { padding: 0.85rem 0; cursor: pointer; color: var(--blue); font-weight: 750; }
-.protocol-source details p { margin: 0; padding: 0 0 0.5rem; white-space: pre-line; font-family: Charter, "Iowan Old Style", Georgia, serif; line-height: 1.7; }
+.criteria-disclosure { border-top: 1px solid var(--rule); }
+.criteria-disclosure > summary { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 0.15rem; cursor: pointer; color: var(--blue); list-style: none; }
+.criteria-disclosure > summary::-webkit-details-marker { display: none; }
+.criteria-disclosure > summary > span:first-child { display: grid; }
+.criteria-disclosure > summary strong { font-size: 0.95rem; }
+.criteria-disclosure > summary small { margin-top: 0.15rem; color: var(--ink-muted); font-size: 0.8125rem; font-weight: 500; }
+.criteria-summary-count { flex: none; padding: 0.3rem 0.6rem; border-radius: 999px; background: var(--blue-soft); color: var(--blue); font-size: 0.8125rem; font-weight: 800; }
+.criteria-disclosure[open] > summary { border-bottom: 1px solid var(--rule); }
+.criteria-document { display: grid; gap: 1.1rem; padding: 1.1rem 0 0.2rem; }
+.criteria-document-note { display: flex; align-items: flex-start; gap: 0.65rem; padding: 0.85rem 0.95rem; border-radius: var(--radius); background: var(--blue-soft); color: var(--ink-secondary); }
+.criteria-document-note svg { flex: none; margin-top: 0.1rem; color: var(--blue); }
+.criteria-document-note p { margin: 0; font-size: 0.875rem; }
+.criteria-group { overflow: hidden; border: 1px solid var(--rule); border-left: 4px solid var(--blue); border-radius: var(--radius); background: var(--surface); }
+.criteria-group.exclusion { border-left-color: var(--plum); }
+.criteria-group.protocol { border-left-color: var(--ink-muted); }
+.criteria-group > header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.9rem 1rem; background: var(--surface-secondary); }
+.criteria-group > header .eyebrow { margin-bottom: 0.15rem; }
+.criteria-group > header h3 { font-size: 1.05rem; }
+.criteria-group > header > span { flex: none; color: var(--ink-muted); font-size: 0.8125rem; font-weight: 750; }
+.criteria-list { list-style: none; margin: 0; padding: 0 1rem; }
+.criteria-list > li { display: grid; grid-template-columns: 2.15rem minmax(0, 1fr); gap: 0.8rem; padding: 1rem 0.15rem; border-top: 1px solid var(--rule); }
+.criteria-list > li:first-child { border-top: 0; }
+.criteria-marker { display: grid; width: 2rem; height: 2rem; place-items: center; border-radius: 0.55rem; background: var(--blue-soft); color: var(--blue); font-family: SFMono-Regular, Consolas, "Liberation Mono", monospace; font-size: 0.8125rem; font-weight: 800; }
+.criteria-group.exclusion .criteria-marker { background: var(--plum-soft); color: var(--plum); }
+.criteria-list > li > div > p { margin: 0; font-family: Charter, "Iowan Old Style", Georgia, serif; font-size: 1rem; line-height: 1.65; }
+.criteria-list ul { margin: 0.7rem 0 0; padding-left: 1.15rem; color: var(--ink-secondary); }
+.criteria-list ul li { margin-top: 0.45rem; padding-left: 0.25rem; }
 .trial-activity ol { list-style: none; margin: 0; padding: 0; }
 .trial-activity li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.7rem; padding: 0.8rem 0; border-top: 1px solid var(--rule); }
 .trial-activity li > svg { color: var(--plum); }
@@ -520,4 +544,17 @@ textarea { width: 100%; resize: vertical; }
   .criterion-card, .message, .site-row, .source-fact-list article, .inbox-row { break-inside: avoid; }
   .completion-meter { border: 1px solid #777; background: #fff; }
   .completion-meter span { background: #333 !important; }
+}
+
+@media screen and (max-width: 48rem) {
+  .criteria-disclosure > summary { align-items: flex-start; }
+  .criteria-group > header { align-items: flex-start; }
+  .criteria-list { padding-inline: 0.75rem; }
+  .criteria-list > li { grid-template-columns: 1.8rem minmax(0, 1fr); gap: 0.65rem; }
+  .criteria-marker { width: 1.7rem; height: 1.7rem; }
+}
+
+@media print {
+  .criteria-group, .criteria-list > li { break-inside: avoid; }
+  .criteria-marker { border: 1px solid #777; background: #fff !important; color: #000 !important; }
 }
