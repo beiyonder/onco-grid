@@ -911,7 +911,7 @@ textarea { width: 100%; resize: vertical; }
 .evidence-table thead th { position: sticky; z-index: 1; top: 0; background: #e5ece9; color: var(--ink-secondary); font-weight: 800; white-space: nowrap; }
 .evidence-table tbody tr:last-child th, .evidence-table tbody tr:last-child td { border-bottom: 0; }
 .evidence-table tbody th { min-width: 13rem; color: var(--ink); }
-.evidence-table .text-action { border: 0; background: transparent; cursor: pointer; }
+.evidence-table .text-action { border: 0; background: transparent; cursor: pointer; white-space: nowrap; }
 .evidence-more { margin-top: 0.8rem; }
 .intervention-index { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.7rem; }
 .intervention-index article { display: grid; min-width: 0; align-content: start; gap: 0.62rem; padding: 1rem; border: 1px solid var(--rule); border-radius: 0.8rem 0.8rem 0.24rem; background: rgba(255, 255, 255, 0.66); }

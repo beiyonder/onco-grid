@@ -217,7 +217,7 @@ export function EvidenceCoveragePage() {
         <div className="table-scroll">
           <table className="evidence-table">
             <thead><tr><th scope="col">Displayed cancer</th><th scope="col">Raw source variants</th><th scope="col">Trials</th><th scope="col">Share</th><th scope="col">India site listings</th><th scope="col">Exact interventions</th><th scope="col">Inspect</th></tr></thead>
-            <tbody>{filteredCoverage.slice(0, conditionLimit).map((row) => <tr key={row.condition}><th scope="row">{row.condition}</th><td>{row.rawTerms.join(" · ")}</td><td>{row.trialCount}</td><td>{(row.share * 100).toFixed(1)}%</td><td>{row.indiaSiteCount}</td><td>{row.exactInterventionCount}</td><td><button className="text-action" type="button" onClick={() => { setSelectedTrialId(row.trialIds[0] ?? ""); document.getElementById("local-abstract-heading")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>Open source abstract</button></td></tr>)}</tbody>
+            <tbody>{filteredCoverage.slice(0, conditionLimit).map((row) => <tr key={row.condition}><th scope="row">{row.condition}</th><td>{row.rawTerms.join(" · ")}</td><td>{row.trialCount}</td><td>{(row.share * 100).toFixed(1)}%</td><td>{row.indiaSiteCount}</td><td>{row.exactInterventionCount}</td><td><button className="text-action" type="button" onClick={() => { setSelectedTrialId(row.trialIds[0] ?? ""); document.getElementById("local-abstract-heading")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>View abstract</button></td></tr>)}</tbody>
           </table>
         </div>
         {filteredCoverage.length === 0 ? <EmptyState icon="search" title="No displayed cancer matches">Try another source label. No synonym or semantic expansion runs automatically.</EmptyState> : null}
