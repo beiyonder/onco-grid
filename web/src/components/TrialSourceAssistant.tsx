@@ -1,3 +1,4 @@
+import { ThinkingOrb } from "thinking-orbs";
 import { type FormEvent, useState } from "react";
 import type { RoomMessage, TrialRecord } from "../types";
 import { Icon } from "./Icon";
@@ -74,6 +75,7 @@ export function TrialSourceAssistant({
       <textarea id="assistant-question" rows={3} maxLength={500} value={question} onChange={(event) => setQuestion(event.target.value)} placeholder="Example: When was the registry record last updated, and what remains unresolved in this room?" />
       <div className="assistant-actions"><span>{question.length}/500 · model fixed to lowest-cost approved snapshot</span><button className="button primary" type="submit" disabled={!question.trim() || loading}>{loading ? "Checking cited sources…" : "Ask source assistant"}</button></div>
     </form>
+    {loading ? <div className="assistant-thinking" role="status"><ThinkingOrb state="searching" size={64} theme="light" aria-hidden="true" /><span><strong>Tracing the source layer</strong><small>Checking cited public-trial material and permitted room context.</small></span></div> : null}
     {error ? <p className="form-error" role="alert"><Icon name="warning" />{error}</p> : null}
     {answer ? <article className="assistant-answer" aria-live="polite"><header><StatusChip tone="human">Generated · not official</StatusChip><time dateTime={answer.generatedAt}>{new Date(answer.generatedAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}</time></header><p>{answer.answer}</p><div><strong>Citations</strong>{answer.citations.map((citation) => <a href={citation} target="_blank" rel="noreferrer" key={citation}>{citation}<Icon name="external" /></a>)}</div><small>Model: {answer.model} · {answer.authority}</small></article> : null}
   </section>;

@@ -1,18 +1,22 @@
 import { useEffect } from "react";
+import { Glass } from "@samasante/liquid-glass";
+import { ThinkingOrb } from "thinking-orbs";
+import type { OrbState } from "thinking-orbs";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { formatSourceDate } from "../data/trials";
 import { roles } from "../data/demo";
 import { useAppState } from "../state/AppState";
 import { useTrialData } from "../state/TrialData";
 import type { RoleId } from "../types";
-import { Icon, type IconName } from "./Icon";
+import { ExperienceSound } from "./ExperienceSound";
+import { Icon } from "./Icon";
 import { PilotIdentity } from "./PilotIdentity";
 
-const navigation: Array<{ to: string; label: string; icon: IconName }> = [
-  { to: "/", label: "Home", icon: "home" },
-  { to: "/trials", label: "Trials", icon: "trials" },
-  { to: "/patients", label: "Patients", icon: "patients" },
-  { to: "/inbox", label: "Inbox", icon: "inbox" },
+const navigation: Array<{ to: string; label: string; orb: OrbState }> = [
+  { to: "/", label: "Home", orb: "breathing" },
+  { to: "/trials", label: "Trials", orb: "searching" },
+  { to: "/patients", label: "Patients", orb: "connecting" },
+  { to: "/inbox", label: "Inbox", orb: "weaving" },
 ];
 
 export function AppShell() {
@@ -40,20 +44,24 @@ export function AppShell() {
           <span className="brand-mark" aria-hidden="true">TR</span>
           <span><strong>Trial Relay</strong><small>OncoGrid validation</small></span>
         </Link>
-        <nav className="primary-nav">
-          {navigation.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === "/"}
-              className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}
-            >
-              <Icon name={item.icon} />
-              <span>{item.label}</span>
-              {item.label === "Inbox" && attentionCount > 0 ? <span className="nav-count">{attentionCount}</span> : null}
-            </NavLink>
-          ))}
-        </nav>
+        <Glass className="nav-glass" optics={{ strength: 0.22, depth: 0.82, curvature: 0.3, dispersion: 0.08, frost: 7, glow: 0.34 }}>
+          <nav className="primary-nav">
+            {navigation.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.to === "/"}
+                className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}
+              >
+                {({ isActive }) => <>
+                  <span className="nav-orb" aria-hidden="true"><ThinkingOrb state={item.orb} size={20} theme="light" paused={!isActive} /></span>
+                  <span>{item.label}</span>
+                  {item.label === "Inbox" && attentionCount > 0 ? <span className="nav-count">{attentionCount}</span> : null}
+                </>}
+              </NavLink>
+            ))}
+          </nav>
+        </Glass>
         <div className="sidebar-boundary">
           <Icon name="shield" />
           <p><strong>Validation workspace</strong>Public trial data, browser-only synthetic/approved research facts, and optional authenticated no-PHI pilot services.</p>
@@ -63,10 +71,13 @@ export function AppShell() {
       <div className="workspace-shell">
         <header className="topbar">
           <div className="mobile-brand"><span className="brand-mark">TR</span><strong>Trial Relay</strong></div>
-          <div className="source-stamp">
-            <Icon name="source" />
-            <span><strong>{snapshot ? `${snapshot.retainedCount} public records` : status === "error" ? "Source unavailable" : "Loading public records"}</strong><small>{sourceDate ? `Snapshot ${sourceDate}` : "ClinicalTrials.gov snapshot"}</small></span>
-          </div>
+          <Glass className="source-glass" optics={{ strength: 0.18, depth: 0.74, curvature: 0.22, dispersion: 0.06, frost: 6 }}>
+            <div className="source-stamp">
+              <Icon name="source" />
+              <span><strong>{snapshot ? `${snapshot.retainedCount} public records` : status === "error" ? "Source unavailable" : "Loading public records"}</strong><small>{sourceDate ? `Snapshot ${sourceDate}` : "ClinicalTrials.gov snapshot"}</small></span>
+            </div>
+          </Glass>
+          <ExperienceSound />
           <PilotIdentity />
           <label className="role-switcher">
             <span className="role-avatar" aria-hidden="true">{role.initials}</span>

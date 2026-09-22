@@ -1,3 +1,6 @@
+import { Glass } from "@samasante/liquid-glass";
+import { ThinkingOrb } from "thinking-orbs";
+import type { OrbState } from "thinking-orbs";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { EmptyState, PageHeader, SafetyNote, SourceBadge, StatusChip } from "../components/Primitives";
@@ -7,6 +10,13 @@ import { useTrialData } from "../state/TrialData";
 
 const sections = ["overview", "sources", "reviews", "tasks", "handoffs"] as const;
 type PatientSection = (typeof sections)[number];
+const sectionOrbStates: Record<PatientSection, OrbState> = {
+  overview: "breathing",
+  sources: "searching",
+  reviews: "solving",
+  tasks: "weaving",
+  handoffs: "connecting",
+};
 
 export function PatientWorkspacePage() {
   const { patientId } = useParams();
@@ -35,13 +45,15 @@ export function PatientWorkspacePage() {
         actions={<Link className="button secondary" to={`/trials?reviewFor=${patient.id}`}>Find trials to review manually</Link>}
       />
       <SafetyNote><p>{approvedResearch ? <><strong>Approved de-identified research workspace.</strong> This browser-only record carries no direct identifiers, is not a system of record, and is not sent to the AI assistant. Approval reference: {patient.approvalReference}.</> : <><strong>EMR remains the clinical system of record.</strong> These are source-labelled synthetic facts and browser-memory workflow states.</>} Trial Relay does not infer diagnosis, stage, biomarkers, response, risk, fit, or eligibility.</p></SafetyNote>
-      <nav className="section-tabs" aria-label="Patient workspace sections">
-        {sections.map((candidate) => <button className={section === candidate ? "active" : ""} type="button" key={candidate} onClick={() => {
-          const next = new URLSearchParams(searchParams);
-          if (candidate === "overview") next.delete("section"); else next.set("section", candidate);
-          setSearchParams(next);
-        }}>{candidate.charAt(0).toUpperCase() + candidate.slice(1)}</button>)}
-      </nav>
+      <Glass className="section-tabs-glass" optics={{ strength: 0.2, depth: 0.82, curvature: 0.28, dispersion: 0.06, frost: 7 }}>
+        <nav className="section-tabs" aria-label="Patient workspace sections">
+          {sections.map((candidate) => <button className={section === candidate ? "active" : ""} type="button" key={candidate} onClick={() => {
+            const next = new URLSearchParams(searchParams);
+            if (candidate === "overview") next.delete("section"); else next.set("section", candidate);
+            setSearchParams(next);
+          }}><ThinkingOrb state={sectionOrbStates[candidate]} size={20} theme="light" paused={section !== candidate} aria-hidden="true" />{candidate.charAt(0).toUpperCase() + candidate.slice(1)}</button>)}
+        </nav>
+      </Glass>
 
       {section === "overview" ? <section className="workspace-section" aria-labelledby="overview-heading">
         <div className="section-heading"><div><p className="eyebrow">At a glance</p><h2 id="overview-heading">Workspace overview</h2></div><StatusChip tone={approvedResearch ? "source" : "human"}>{patient.dataBoundary}</StatusChip></div>
