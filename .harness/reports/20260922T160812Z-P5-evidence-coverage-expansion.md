@@ -36,6 +36,9 @@ Represent TMH, ACTREC, and Cytecare only as `WIP · not connected` planning prox
 - `python3 research/validate_ledger.py` passed 79 retained records; the unchanged trial snapshot passed 285 records; `npm audit --omit=dev` found 0 vulnerabilities; `web/vercel.json` parsed successfully.
 - Serena re-indexed 56 source files (`python=4`, `typescript=52`); project health and memory-reference checks passed. `git diff --check` passed.
 - The intended publication set contained no secret-shaped values or email addresses; private raw notes, the expanded DOCX, and `.private/` remained ignored.
+- Pull request `#42` passed Vercel preview checks and merged the evidence workspace to `main` as `ed683a6`. Production deployment `dpl_2XUyvsp8tR6EbNXtA8Bipg3u34rN` reached `Ready` with both new serverless functions.
+- Live production at `https://onco-grid-trial-relay-validation.vercel.app/#/trials/evidence` rendered 285 India records, 322 normalized cancer labels, 351 exact Drug/Biological terms, 20/2,957 loaded pembrolizumab records, 20 population/time rows, five PubMed metadata records, and three WIP institution proxies with zero desktop overflow, console warnings/errors, or page errors. Loaded mobile state retained one-column cards, scroll-contained tables, a 64px navigation lens, and zero page-level overflow.
+- Pull request `#43` then rejected unsupported query parameters to prevent silent cache-key fragmentation. It merged as `c648281`; production deployment `dpl_qtmDZhmfMoXPyydWXcVoem36RhUH` reached `Ready`. Live valid queries return `200`, repeated bounded queries use the Vercel cache, and extra parameters on either evidence route return `400`.
 
 ## Risks and gaps
 
@@ -45,7 +48,7 @@ The institution cards are not integrations. No organisation has been contacted a
 
 ## Next
 
-Merge and deploy the bounded evidence workspace. Run the structured clinician follow-up with concrete failed searches and measure useful-result rate, source-opening rate, trust, and time. Test whether the deterministic abstract and exact intervention index reduce source-navigation burden. Seek separate point-of-risk authorisation before contacting any institution. Before adding full text or outcome comparison, define source rights, correction/retraction handling, curation authority, and a clinically reviewed non-interpretation contract.
+Run the structured clinician follow-up with concrete failed searches and measure useful-result rate, source-opening rate, trust, and time. Test whether the deterministic abstract and exact intervention index reduce source-navigation burden. Seek separate point-of-risk authorisation before contacting any institution. Before adding full text or outcome comparison, define source rights, correction/retraction handling, curation authority, and a clinically reviewed non-interpretation contract.
 
 ## Sign-off needed
 
