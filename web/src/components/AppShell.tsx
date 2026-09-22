@@ -3,6 +3,7 @@ import { Glass } from "@samasante/liquid-glass";
 import { ThinkingOrb } from "thinking-orbs";
 import type { OrbState } from "thinking-orbs";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
+import { compactGlassOptics, panelGlassOptics } from "../design/glass";
 import { formatSourceDate } from "../data/trials";
 import { roles } from "../data/demo";
 import { useAppState } from "../state/AppState";
@@ -44,7 +45,13 @@ export function AppShell() {
           <span className="brand-mark" aria-hidden="true">TR</span>
           <span><strong>Trial Relay</strong><small>OncoGrid validation</small></span>
         </Link>
-        <Glass className="nav-glass" optics={{ strength: 0.22, depth: 0.82, curvature: 0.3, dispersion: 0.08, frost: 7, glow: 0.34 }}>
+        <Glass
+          className="nav-glass"
+          optics={panelGlassOptics}
+          filterResolution={2}
+          refract={<div className="glass-refract-field glass-refract-field-nav" aria-hidden="true" />}
+          behind="#dfe9e5"
+        >
           <nav className="primary-nav">
             {navigation.map((item) => (
               <NavLink
@@ -71,7 +78,13 @@ export function AppShell() {
       <div className="workspace-shell">
         <header className="topbar">
           <div className="mobile-brand"><span className="brand-mark">TR</span><strong>Trial Relay</strong></div>
-          <Glass className="source-glass" optics={{ strength: 0.18, depth: 0.74, curvature: 0.22, dispersion: 0.06, frost: 6 }}>
+          <Glass
+            className="source-glass"
+            optics={compactGlassOptics}
+            filterResolution={2}
+            refract={<div className="glass-refract-field glass-refract-field-source" aria-hidden="true" />}
+            behind="#e8efec"
+          >
             <div className="source-stamp">
               <Icon name="source" />
               <span><strong>{snapshot ? `${snapshot.retainedCount} public records` : status === "error" ? "Source unavailable" : "Loading public records"}</strong><small>{sourceDate ? `Snapshot ${sourceDate}` : "ClinicalTrials.gov snapshot"}</small></span>
