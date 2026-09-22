@@ -5,6 +5,7 @@ import { Link, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { EmptyState, PageHeader, SafetyNote, SourceBadge, StatusChip } from "../components/Primitives";
 import { PilotHandoffPanel } from "../components/PilotHandoffPanel";
+import { compactGlassOptics } from "../design/glass";
 import { useAppState } from "../state/AppState";
 import { useTrialData } from "../state/TrialData";
 
@@ -45,7 +46,13 @@ export function PatientWorkspacePage() {
         actions={<Link className="button secondary" to={`/trials?reviewFor=${patient.id}`}>Find trials to review manually</Link>}
       />
       <SafetyNote><p>{approvedResearch ? <><strong>Approved de-identified research workspace.</strong> This browser-only record carries no direct identifiers, is not a system of record, and is not sent to the AI assistant. Approval reference: {patient.approvalReference}.</> : <><strong>EMR remains the clinical system of record.</strong> These are source-labelled synthetic facts and browser-memory workflow states.</>} Trial Relay does not infer diagnosis, stage, biomarkers, response, risk, fit, or eligibility.</p></SafetyNote>
-      <Glass className="section-tabs-glass" optics={{ strength: 0.2, depth: 0.82, curvature: 0.28, dispersion: 0.06, frost: 7 }}>
+      <Glass
+        className="section-tabs-glass"
+        optics={compactGlassOptics}
+        filterResolution={2}
+        refract={<div className="glass-refract-field glass-refract-field-tabs" aria-hidden="true" />}
+        behind="#e7efeb"
+      >
         <nav className="section-tabs" aria-label="Patient workspace sections">
           {sections.map((candidate) => <button className={section === candidate ? "active" : ""} type="button" key={candidate} onClick={() => {
             const next = new URLSearchParams(searchParams);

@@ -135,6 +135,7 @@ Owner sign-off is required for changes to goal, scope, non-goals, acceptance thr
 - Production release, Supabase migration/configuration, rotated OpenAI secret injection, live qualification, open governance gates, and rollback instructions are maintained in `PILOT_ACTIVATION_RUNBOOK.md`. Never place secret values in chat or repository files.
 - 2026-09-20 production state: the React/Vite build is live at `https://onco-grid-trial-relay-validation.vercel.app`. Prebuilt deployment `dpl_4hNh6qcJyarCzx8roVA2nW2EqaDy` established the release; Vercel settings now use repository root `web`, Framework Vite, `npm ci`, `npm run build`, and `dist`. The next merged main commit automatically produced `dpl_GaryB2hJHg2CvHAauca96KUPRKbQ`, built both serverless functions, retained the alias, and passed a fresh live spatial check, proving GitHub auto-deploy now uses the correct root. Core UI, spatial lens, official evidence/API, mobile states, security headers, and fail-closed pilot blockers pass. Supabase and OpenAI production variables remain absent. Report: `.harness/reports/20260920T180806Z-P5-production-deployment.md`.
 - 2026-09-22 visual state: the owner-reviewed spatial interface adds liquid-glass navigation, Thinking Orb state cues, optional trusted-interaction sound, darker Three.js materials, and glass section controls. Home journey cards now share identical desktop grid geometry and footer baselines with no asymmetric idle rotation/translation; responsive checks preserve zero overflow and 13px minimum visible text. Report: `.harness/reports/20260922T134644Z-P5-home-journey-alignment.md`.
+- 2026-09-22 liquid-glass refinement state: navigation, source context, Trial Library view controls, and patient section tabs use shared stronger optics with a copied ambient refraction field beneath crisp content; narrow navigation is clamped to 64px and reduced transparency remains opaque. Desktop, 390px mobile, interaction, browser health, build, API policy, dependency, ledger, and snapshot checks pass locally. Report: `.harness/reports/20260922T144344Z-P5-liquid-glass-material.md`.
 
 ## References
 
@@ -177,3 +178,4 @@ Owner sign-off is required for changes to goal, scope, non-goals, acceptance thr
 - `.harness/reports/20260920T174136Z-P5-owner-expansion-qualification.md`
 - `.harness/reports/20260920T180806Z-P5-production-deployment.md`
 - `.harness/reports/20260922T134644Z-P5-home-journey-alignment.md`
+- `.harness/reports/20260922T144344Z-P5-liquid-glass-material.md`

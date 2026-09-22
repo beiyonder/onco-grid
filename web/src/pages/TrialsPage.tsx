@@ -5,6 +5,7 @@ import { Link, useLocation, useNavigate, useSearchParams } from "react-router-do
 import { IndiaSpatialLens } from "../components/IndiaSpatialLens";
 import { Icon } from "../components/Icon";
 import { EmptyState, PageHeader, SafetyNote, StatusChip } from "../components/Primitives";
+import { compactGlassOptics } from "../design/glass";
 import { displayConditions, displayStates, formatSourceDate, normalizeState } from "../data/trials";
 import { useAppState } from "../state/AppState";
 import { useTrialData } from "../state/TrialData";
@@ -165,7 +166,7 @@ export function TrialsPage() {
 
   return (
     <div className="page">
-      <PageHeader eyebrow="Public registry discovery" title="Trial Library" description="Scan concise rows or explore the same filtered source set through an approximate 2.5D India lens. Registry and independent site status remain separate." actions={<Glass className="library-view-glass" optics={{ strength: 0.22, depth: 0.82, curvature: 0.32, dispersion: 0.07, frost: 7 }}><div className="library-view-switch" role="group" aria-label="Trial Library view"><button type="button" className={viewMode === "list" ? "active" : ""} aria-pressed={viewMode === "list"} onClick={() => setViewMode("list")}><ThinkingOrb state="weaving" size={20} theme="light" paused={viewMode !== "list"} aria-hidden="true" />List</button><button type="button" className={viewMode === "map" ? "active" : ""} aria-pressed={viewMode === "map"} onClick={() => setViewMode("map")}><ThinkingOrb state="shaping" size={20} theme="light" paused={viewMode !== "map"} aria-hidden="true" />Spatial lens</button></div></Glass>} />
+      <PageHeader eyebrow="Public registry discovery" title="Trial Library" description="Scan concise rows or explore the same filtered source set through an approximate 2.5D India lens. Registry and independent site status remain separate." actions={<Glass className="library-view-glass" optics={compactGlassOptics} filterResolution={2} refract={<div className="glass-refract-field glass-refract-field-switch" aria-hidden="true" />} behind="#e7efeb"><div className="library-view-switch" role="group" aria-label="Trial Library view"><button type="button" className={viewMode === "list" ? "active" : ""} aria-pressed={viewMode === "list"} onClick={() => setViewMode("list")}><ThinkingOrb state="weaving" size={20} theme="light" paused={viewMode !== "list"} aria-hidden="true" />List</button><button type="button" className={viewMode === "map" ? "active" : ""} aria-pressed={viewMode === "map"} onClick={() => setViewMode("map")}><ThinkingOrb state="shaping" size={20} theme="light" paused={viewMode !== "map"} aria-hidden="true" />Spatial lens</button></div></Glass>} />
       <SafetyNote><p><strong>General discovery only.</strong> No patient facts, eligibility score, patient ranking, or treatment recommendation influences this list.</p></SafetyNote>
       {reviewPatient ? <div className="manual-selection-note" role="note"><Icon name="patients" /><span><strong>Manual selection for {reviewPatient.label}</strong>The general library order is unchanged and contains no patient-specific ranking. Opening a review records only your explicit selection.</span><Link className="text-action" to={`/patients/${reviewPatient.id}?section=reviews`}>Return to workspace</Link></div> : null}
 
