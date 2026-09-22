@@ -141,6 +141,8 @@ On 2026-09-22 the owner relayed a de-identified oncologist review of the deploye
 
 On 2026-09-22 the owner explicitly authorised the next evidence-coverage implementation order: an India coverage matrix, exact Drug/Biological index, deterministic registry abstracts, a separately labelled global ClinicalTrials.gov search, PubMed metadata links, descriptive same-intervention population/time mapping, and institution connection proxies. Institution cards must remain `WIP · not connected` and explain their intended future owner, site-verification, referral/acknowledgement, freshness, audit, and correction roles. This authority does not permit external contact, institutional endorsement claims, publication full-text redistribution, patient matching, eligibility conclusions, outcome pooling, comparative clinical interpretation, or treatment recommendation.
 
+On 2026-09-22 the owner directed a retrospective rhetorical audit of `/trials/evidence`, correction of boundary spacing/alignment/overflow, and replacement of repeated explanatory copy with a tasteful progressive-disclosure pattern before production deployment. Critical source and WIP states must remain visible; supporting methodology may move behind accessible information controls.
+
 ## Gap register
 
 | Gap | Status | Evidence | Owner | Next action |
@@ -209,6 +211,7 @@ On 2026-09-22 the owner explicitly authorised the next evidence-coverage impleme
 | `C2` | `P5` | `.harness/reports/20260922T144344Z-P5-liquid-glass-material.md` | Complete; merged and deployed through pull request `#38` |
 | `C2` | `P5` | `.harness/reports/20260922T150041Z-P5-clinician-portal-feedback.md` | Complete; sound removed and de-identified clinician evidence merged and deployed through pull request `#40` |
 | `C2` | `P5` | `.harness/reports/20260922T160812Z-P5-evidence-coverage-expansion.md` | Complete; merged and deployed through pull requests `#42` and `#43` |
+| `C2` | `P5` | `.harness/reports/20260922T192230Z-P5-evidence-page-rhetorical-refinement.md` | Complete locally; refined information hierarchy and spacing await review merge and production verification |
 
 ## References
 
@@ -273,3 +276,4 @@ On 2026-09-22 the owner explicitly authorised the next evidence-coverage impleme
 - `.harness/reports/20260922T144344Z-P5-liquid-glass-material.md`
 - `.harness/reports/20260922T150041Z-P5-clinician-portal-feedback.md`
 - `.harness/reports/20260922T160812Z-P5-evidence-coverage-expansion.md`
+- `.harness/reports/20260922T192230Z-P5-evidence-page-rhetorical-refinement.md`

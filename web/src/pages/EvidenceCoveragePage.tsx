@@ -1,7 +1,7 @@
 import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Icon } from "../components/Icon";
-import { EmptyState, PageHeader, SafetyNote, StatusChip } from "../components/Primitives";
+import { EmptyState, InfoTip, PageHeader, SafetyNote, StatusChip } from "../components/Primitives";
 import { SourceAbstract } from "../components/SourceAbstract";
 import {
   buildConditionCoverage,
@@ -21,30 +21,30 @@ const institutionProxies = [
     name: "Tata Memorial Hospital",
     shortName: "TMH",
     intendedServices: [
-      "Name an authorised trial-information owner",
-      "Confirm current site and screening status",
-      "Receive controlled referral questions and acknowledge disposition",
-      "Publish freshness, audit, and correction events",
+      "Authorised trial owner",
+      "Current site verification",
+      "Referral acknowledgement",
+      "Freshness and correction audit",
     ],
   },
   {
     name: "Advanced Centre for Treatment, Research and Education in Cancer",
     shortName: "ACTREC",
     intendedServices: [
-      "Name an authorised research-office owner",
-      "Confirm study and site assertions from an institutional source",
-      "Route bounded trial-access questions to the correct human team",
-      "Publish freshness, audit, and correction events",
+      "Authorised research owner",
+      "Study and source verification",
+      "Operational query routing",
+      "Freshness and correction audit",
     ],
   },
   {
     name: "Cytecare Cancer Hospitals",
     shortName: "Cytecare",
     intendedServices: [
-      "Name an authorised trial-information owner",
-      "Confirm current site and screening status",
-      "Acknowledge controlled referral or information handoffs",
-      "Publish freshness, audit, and correction events",
+      "Authorised trial owner",
+      "Current site verification",
+      "Referral acknowledgement",
+      "Freshness and correction audit",
     ],
   },
 ] as const;
@@ -197,22 +197,22 @@ export function EvidenceCoveragePage() {
     <div className="page evidence-page">
       <Link className="back-link" to="/trials">← Back to Trial Library</Link>
       <PageHeader
-        eyebrow="Coverage, sources, and descriptive comparison"
+        eyebrow="Evidence workspace"
         title="Trial evidence workspace"
-        description="Inspect what the India snapshot covers, search a separate global source, link PubMed metadata, and build a source-bounded drug evidence map."
+        description="India coverage, global trials, publications, and drug-centred evidence."
         actions={<><button className="button secondary" type="button" onClick={exportEvidence}><Icon name="source" /> Export JSON</button><button className="button quiet" type="button" onClick={() => window.print()}>Print report</button></>}
       />
-      <SafetyNote><p><strong>Evidence retrieval, not clinical synthesis.</strong> Global records do not prove India access. Publication indexing does not prove peer review, primary-trial linkage, or current site status. No outcomes are pooled, no treatments are compared, and no patient facts influence this workspace.</p></SafetyNote>
+      <SafetyNote><div className="evidence-boundary-line"><span><strong>Public-source evidence only.</strong> No patient matching or treatment recommendations.</span><InfoTip label="Evidence boundary"><p>Global records do not establish India access. PubMed indexing does not prove peer review or primary-trial linkage. No outcomes are pooled or treatments compared.</p></InfoTip></div></SafetyNote>
 
       <section className="evidence-stat-grid" aria-label="India snapshot coverage summary">
-        <article><span>India-actionable source layer</span><strong>{snapshot.retainedCount}</strong><small>Dated, active-status interventional records with an India location</small></article>
-        <article><span>Displayed cancer terms</span><strong>{coverage.length}</strong><small>Normalized from {rawConditionCount} exact raw source terms; every raw value remains attached</small></article>
-        <article><span>Exact drug / biological terms</span><strong>{interventionIndex.length}</strong><small>From {rawInterventionCount} raw intervention terms; no invented aliases or equivalence</small></article>
-        <article><span>Snapshot date</span><strong>{formatSourceDate(snapshot.source.dataTimestamp)}</strong><small>Registry state is not independent site confirmation</small></article>
+        <article><span>India source layer</span><strong>{snapshot.retainedCount}</strong><small>India-located · active statuses</small></article>
+        <article><span>Cancer labels</span><strong>{coverage.length}</strong><small>{rawConditionCount} raw source terms</small></article>
+        <article><span>Drug / biological terms</span><strong>{interventionIndex.length}</strong><small>{rawInterventionCount} raw interventions</small></article>
+        <article><span>Snapshot date</span><strong>{formatSourceDate(snapshot.source.dataTimestamp)}</strong><small>Dated registry source</small></article>
       </section>
 
       <section className="surface evidence-section" aria-labelledby="coverage-heading">
-        <div className="section-heading"><div><p className="eyebrow">India source inventory</p><h2 id="coverage-heading">Cancer coverage matrix</h2><p>Counts show the exact bounded snapshot—not all oncology trials and not proof that an absent cancer has no India research.</p></div><StatusChip tone="source">{coverage.length} displayed labels</StatusChip></div>
+        <div className="section-heading"><div><p className="eyebrow">India source inventory</p><h2 id="coverage-heading">Cancer coverage matrix</h2></div><div className="section-heading-actions"><InfoTip label="How coverage is counted"><p>Counts use the bounded 285-record India snapshot. Display labels group known spelling variants while every raw source term remains visible. An absent label does not prove there is no India research.</p></InfoTip><StatusChip tone="source">{coverage.length} labels</StatusChip></div></div>
         <label className="evidence-filter"><span>Filter displayed cancer labels</span><input type="search" value={conditionQuery} onChange={(event) => { setConditionQuery(event.target.value); setConditionLimit(20); }} placeholder="e.g. breast, lung, lymphoma" /></label>
         <div className="table-scroll">
           <table className="evidence-table">
@@ -225,7 +225,7 @@ export function EvidenceCoveragePage() {
       </section>
 
       <section className="surface evidence-section" aria-labelledby="intervention-heading">
-        <div className="section-heading"><div><p className="eyebrow">Exact source terms</p><h2 id="intervention-heading">Drug and biological index</h2><p>Only exact registry terms labelled Drug or Biological are grouped. Codes, brands, combinations, and spellings stay separate.</p></div><StatusChip tone="source">{interventionIndex.length} exact terms</StatusChip></div>
+        <div className="section-heading"><div><p className="eyebrow">Exact source terms</p><h2 id="intervention-heading">Drug and biological index</h2></div><div className="section-heading-actions"><InfoTip label="How interventions are grouped"><p>Only exact registry terms typed Drug or Biological are grouped. Codes, brands, combinations, and spellings remain separate; no aliases or equivalence are inferred.</p></InfoTip><StatusChip tone="source">{interventionIndex.length} terms</StatusChip></div></div>
         <label className="evidence-filter"><span>Filter exact intervention terms</span><input type="search" value={interventionQuery} onChange={(event) => { setInterventionQuery(event.target.value); setInterventionLimit(24); }} placeholder="e.g. pembrolizumab" /></label>
         <div className="intervention-index">
           {filteredInterventions.slice(0, interventionLimit).map((entry) => <article key={entry.exactLabel}><header><StatusChip tone={entry.kind === "Drug" ? "source" : "human"}>{entry.kind}</StatusChip><strong>{entry.name}</strong></header><p>{entry.trialCount} India-snapshot {entry.trialCount === 1 ? "trial" : "trials"} · {entry.conditions.slice(0, 3).join(", ") || "Condition not reported"}</p><small>{entry.phases.join(", ") || "Phase not reported"} · {entry.statuses.join(", ")}</small><button className="button secondary" type="button" onClick={() => useIntervention(entry)}>Use source term in global search <Icon name="arrow" /></button></article>)}
@@ -235,41 +235,41 @@ export function EvidenceCoveragePage() {
       </section>
 
       <section className="reading-surface evidence-section" aria-labelledby="local-abstract-heading">
-        <div className="section-heading"><div><p className="eyebrow">Current India snapshot</p><h2 id="local-abstract-heading">Deterministic trial abstract</h2><p>One source record reformatted into a repeatable reading order. The source remains authoritative.</p></div>{selectedTrial ? <Link className="button secondary" to={`/trials/${selectedTrial.id}`}>Open Trial Detail</Link> : null}</div>
+        <div className="section-heading"><div><p className="eyebrow">Current India snapshot</p><h2 id="local-abstract-heading">Trial abstract</h2></div><div className="section-heading-actions"><InfoTip label="About this abstract"><p>One registry record is placed in a fixed reading order. Missing or truncated source fields stay visible; the original source remains authoritative.</p></InfoTip>{selectedTrial ? <Link className="button secondary" to={`/trials/${selectedTrial.id}`}>Open Trial Detail</Link> : null}</div></div>
         <label className="evidence-filter"><span>Select an India-snapshot trial</span><select value={selectedTrial?.id ?? ""} onChange={(event) => setSelectedTrialId(event.target.value)}>{trials.map((trial) => <option value={trial.id} key={trial.id}>{trial.id} · {trial.briefTitle}</option>)}</select></label>
         {selectedTrial && selectedAbstract ? <><div className="abstract-title"><code>{selectedTrial.id}</code><h3>{selectedTrial.briefTitle}</h3></div><SourceAbstract value={selectedAbstract} /></> : null}
       </section>
 
       <section className="surface evidence-section global-evidence" id="global-evidence-search" aria-labelledby="global-heading">
-        <div className="section-heading"><div><p className="eyebrow">Separate evidence layer</p><h2 id="global-heading">Global ClinicalTrials.gov search</h2><p>Broader registry evidence remains separate from India site actionability. Results are explicit-query ordered by the upstream registry, never patient-ranked.</p></div><StatusChip tone="attention">Not an India availability list</StatusChip></div>
+        <div className="section-heading"><div><p className="eyebrow">Global source</p><h2 id="global-heading">ClinicalTrials.gov search</h2></div><div className="section-heading-actions"><InfoTip label="Global search boundary"><p>Results follow the explicit upstream query and registry order. They are not patient-ranked and do not establish India site access or current capacity.</p></InfoTip><StatusChip tone="attention">Not India availability</StatusChip></div></div>
         <form className="global-search-form" onSubmit={submitGlobalSearch}>
           <label><span>Search field</span><select value={globalMode} onChange={(event) => { setGlobalMode(event.target.value as "condition" | "intervention"); setGlobalResult(null); setPublicationResult(null); }}><option value="intervention">Intervention field</option><option value="condition">Condition field</option></select></label>
           <label className="global-query"><span>Public registry query</span><input type="search" value={globalQuery} onChange={(event) => setGlobalQuery(event.target.value)} placeholder={globalMode === "intervention" ? "e.g. pembrolizumab" : "e.g. non-small cell lung cancer"} minLength={2} maxLength={120} required /></label>
           <button className="button primary" type="submit" disabled={globalLoading}>{globalLoading ? "Searching official source…" : "Search global source"}</button>
         </form>
-        <div className="discovery-input-trace"><strong>Inputs used</strong><span>Source: ClinicalTrials.gov API v2</span><span>Mode: {globalMode}</span><span>Term: {globalQuery.trim() || "Not submitted"}</span><span>No patient facts</span></div>
+        <div className="discovery-input-trace"><strong>Query</strong><span>ClinicalTrials.gov API v2</span><span>{globalMode}</span><span>{globalQuery.trim() || "Not submitted"}</span></div>
         {globalError ? <div className="source-error" role="alert"><Icon name="warning" /><span><strong>Global source unavailable</strong><small>{globalError}</small></span><button className="button secondary" type="button" onClick={() => void loadGlobalEvidence()}>Retry</button></div> : null}
         {globalResult ? <>
           <div className="global-result-summary"><span><strong>{globalResult.trials.length.toLocaleString("en-IN")} loaded</strong><small>{globalResult.totalCount === null ? "Upstream total not reported" : `${globalResult.totalCount.toLocaleString("en-IN")} upstream matches`} · fetched {new Date(globalResult.source.fetchedAt).toLocaleString("en-IN")}</small></span><a className="text-action" href={globalResult.source.queryUrl} target="_blank" rel="noreferrer">Open exact API query <Icon name="external" /></a></div>
-          <div className="global-trial-list">{globalResult.trials.map((trial) => <article key={trial.id}><header><code>{trial.id}</code><StatusChip tone="source">{trial.statusLabel}</StatusChip><span>{trial.phases.join(", ") || "Phase not reported"}</span></header><h3>{trial.briefTitle}</h3><p className="global-condition-line">{trial.conditions.join(" · ") || "Conditions not reported"}</p><p className="global-summary-excerpt">{trial.briefSummary}</p><details className="global-abstract-disclosure"><summary>Read deterministic source abstract</summary><SourceAbstract value={deterministicGlobalTrialAbstract(trial)} /></details><a className="button secondary" href={trial.sourceUrl} target="_blank" rel="noreferrer">Open ClinicalTrials.gov <Icon name="external" /></a></article>)}</div>
+          <div className="global-trial-list">{globalResult.trials.map((trial) => <article key={trial.id}><header><code>{trial.id}</code><StatusChip tone="source">{trial.statusLabel}</StatusChip><span>{trial.phases.join(", ") || "Phase not reported"}</span></header><h3>{trial.briefTitle}</h3><p className="global-condition-line">{trial.conditions.join(" · ") || "Conditions not reported"}</p><p className="global-summary-excerpt">{trial.briefSummary}</p><details className="global-abstract-disclosure"><summary>Read source abstract</summary><SourceAbstract value={deterministicGlobalTrialAbstract(trial)} /></details><a className="button secondary" href={trial.sourceUrl} target="_blank" rel="noreferrer">Open ClinicalTrials.gov <Icon name="external" /></a></article>)}</div>
           {globalResult.nextPageToken ? <button className="button secondary evidence-more" type="button" disabled={globalLoading} onClick={() => void loadGlobalEvidence(globalResult.nextPageToken)}>{globalLoading ? "Loading…" : `Load next ${globalResult.query.pageSize} registry records`}</button> : null}
-        </> : <EmptyState icon="search" title="Run an explicit global search">Choose condition or intervention and submit a public registry term. Nothing is searched or broadened automatically.</EmptyState>}
+        </> : <EmptyState icon="search" title="Search global trials">Choose a field and enter a registry term.</EmptyState>}
       </section>
 
       <section className="surface evidence-section cross-trial-map" aria-labelledby="cross-trial-heading">
-        <div className="section-heading"><div><p className="eyebrow">Descriptive evidence map</p><h2 id="cross-trial-heading">Same-term population and time map</h2><p>Loaded registry facts shown side by side. No endpoint harmonisation, pooled effect, comparison, ranking, or conclusion is calculated.</p></div><StatusChip tone={globalMode === "intervention" && globalRows.length ? "good" : "neutral"}>{globalRows.length} loaded rows</StatusChip></div>
-        {globalMode === "intervention" && globalRows.length ? <div className="table-scroll"><table className="evidence-table cross-trial-table"><thead><tr><th scope="col">Trial</th><th scope="col">Registry population</th><th scope="col">Study period</th><th scope="col">Phase / status</th><th scope="col">Countries</th></tr></thead><tbody>{globalRows.map((row) => <tr key={row.trialId}><th scope="row"><a href={row.sourceUrl} target="_blank" rel="noreferrer"><code>{row.trialId}</code><span>{row.title}</span></a></th><td>{row.population}</td><td>{row.studyPeriod}</td><td>{row.phaseAndStatus}</td><td>{row.geography}</td></tr>)}</tbody></table></div> : <EmptyState icon="source" title="Search by intervention to build the map">A condition search can retrieve evidence, but a same-drug map requires an explicit intervention term.</EmptyState>}
+        <div className="section-heading"><div><p className="eyebrow">Descriptive map</p><h2 id="cross-trial-heading">Population and time</h2></div><div className="section-heading-actions"><InfoTip label="What this map compares"><p>Loaded registry facts are aligned by population, study dates, phase/status, and geography. Endpoints and outcomes are not harmonised, pooled, ranked, or interpreted.</p></InfoTip><StatusChip tone={globalMode === "intervention" && globalRows.length ? "good" : "neutral"}>{globalRows.length} rows</StatusChip></div></div>
+        {globalMode === "intervention" && globalRows.length ? <div className="table-scroll"><table className="evidence-table cross-trial-table"><thead><tr><th scope="col">Trial</th><th scope="col">Registry population</th><th scope="col">Study period</th><th scope="col">Phase / status</th><th scope="col">Countries</th></tr></thead><tbody>{globalRows.map((row) => <tr key={row.trialId}><th scope="row"><a href={row.sourceUrl} target="_blank" rel="noreferrer"><code>{row.trialId}</code><span>{row.title}</span></a></th><td>{row.population}</td><td>{row.studyPeriod}</td><td>{row.phaseAndStatus}</td><td>{row.geography}</td></tr>)}</tbody></table></div> : <EmptyState icon="source" title="Search by intervention">Use an intervention search to compare loaded study facts.</EmptyState>}
       </section>
 
       <section className="surface evidence-section publications-section" aria-labelledby="publications-heading">
-        <div className="section-heading"><div><p className="eyebrow">Bibliographic metadata</p><h2 id="publications-heading">PubMed records mentioning selected trial IDs</h2><p>The first ten loaded NCT identifiers form one explicit PubMed query. Results are metadata links—not proof of peer review, primary-publication linkage, correctness, or applicability.</p></div><button className="button secondary" type="button" disabled={!globalResult?.trials.length || publicationLoading} onClick={() => void loadPublications()}>{publicationLoading ? "Checking PubMed…" : "Find PubMed records"}</button></div>
+        <div className="section-heading"><div><p className="eyebrow">Bibliographic metadata</p><h2 id="publications-heading">PubMed records</h2></div><div className="section-heading-actions"><InfoTip label="How publication matches work"><p>The first ten loaded NCT IDs form one combined PubMed query. Results may be primary reports, secondary analyses, or reviews; each trial-publication relationship needs human verification.</p></InfoTip><button className="button secondary" type="button" disabled={!globalResult?.trials.length || publicationLoading} onClick={() => void loadPublications()}>{publicationLoading ? "Checking PubMed…" : "Find PubMed records"}</button></div></div>
         {publicationError ? <div className="source-error" role="alert"><Icon name="warning" /><span><strong>Publication source unavailable</strong><small>{publicationError}</small></span><button className="button secondary" type="button" onClick={() => void loadPublications()}>Retry</button></div> : null}
-        {publicationResult ? <><div className="global-result-summary"><span><strong>{publicationResult.loadedCount} metadata records loaded</strong><small>{publicationResult.totalCount} upstream matches · query over {publicationResult.queryTrialIds.length} selected NCT identifiers</small></span><a className="text-action" href={publicationResult.source.searchUrl} target="_blank" rel="noreferrer">Open exact PubMed query <Icon name="external" /></a></div><div className="publication-list">{publicationResult.publications.map((publication) => <article key={publication.pmid}><header><code>PMID {publication.pmid}</code><StatusChip tone="source">PubMed metadata</StatusChip></header><h3>{publication.title}</h3><p>{publication.authors.join(", ") || "Authors not reported"}</p><small>{publication.journal} · {publication.publicationDate} · {publication.publicationTypes.join(", ") || "Type not reported"}</small><p className="publication-basis">{publication.matchBasis}; the specific NCT-to-publication relationship still requires human source review.</p><a className="button secondary" href={publication.sourceUrl} target="_blank" rel="noreferrer">Open PubMed <Icon name="external" /></a></article>)}</div>{publicationResult.publications.length === 0 ? <EmptyState icon="source" title="No PubMed metadata matched">The combined selected-NCT query returned no records. This does not prove no publication exists.</EmptyState> : null}</> : <EmptyState icon="source" title="Publication lookup has not run">Load global trials, then explicitly query PubMed metadata for up to ten visible NCT identifiers.</EmptyState>}
+        {publicationResult ? <><div className="global-result-summary"><span><strong>{publicationResult.loadedCount} metadata records</strong><small>{publicationResult.totalCount} upstream matches · {publicationResult.queryTrialIds.length} selected NCT IDs</small></span><a className="text-action" href={publicationResult.source.searchUrl} target="_blank" rel="noreferrer">Open PubMed query <Icon name="external" /></a></div><div className="publication-list">{publicationResult.publications.map((publication) => <article key={publication.pmid}><header><code>PMID {publication.pmid}</code><StatusChip tone="source">PubMed</StatusChip></header><h3>{publication.title}</h3><p>{publication.authors.join(", ") || "Authors not reported"}</p><small>{publication.journal} · {publication.publicationDate} · {publication.publicationTypes.join(", ") || "Type not reported"}</small><a className="button secondary" href={publication.sourceUrl} target="_blank" rel="noreferrer">Open PubMed <Icon name="external" /></a></article>)}</div>{publicationResult.publications.length === 0 ? <EmptyState icon="source" title="No PubMed metadata matched">No records matched the selected NCT query.</EmptyState> : null}</> : <EmptyState icon="source" title="Publication lookup ready">Load global trials, then query up to ten visible NCT IDs.</EmptyState>}
       </section>
 
       <section className="surface evidence-section institution-proxies" aria-labelledby="institution-heading">
-        <div className="section-heading"><div><p className="eyebrow">Institution connection proxy</p><h2 id="institution-heading">Suggested specialist centres</h2><p>Named in clinician feedback as centres worth exploring. These are planning proxies only: no organisation has been contacted, connected, or represented as participating.</p></div><StatusChip tone="attention">WIP · not connected</StatusChip></div>
-        <div className="institution-grid">{institutionProxies.map((institution) => <article key={institution.shortName}><header><span className="institution-mark" aria-hidden="true">{institution.shortName.slice(0, 3)}</span><span><strong>{institution.shortName}</strong><small>{institution.name}</small></span></header><StatusChip tone="attention">Proxy only</StatusChip><p>This future connection is intended to serve:</p><ul>{institution.intendedServices.map((service) => <li key={service}><Icon name="check" />{service}</li>)}</ul><p className="proxy-boundary"><Icon name="lock" /><span>No live site state, capacity, referral acceptance, or institutional endorsement is claimed.</span></p></article>)}</div>
+        <div className="section-heading"><div><p className="eyebrow">Institution proxies</p><h2 id="institution-heading">Suggested specialist centres</h2></div><div className="section-heading-actions"><InfoTip label="What these proxies are for"><p>These placeholders define the future job: name an authorised owner, verify current site state, acknowledge referrals, and maintain freshness and correction history. No centre has been contacted or connected.</p></InfoTip><StatusChip tone="attention">WIP · not connected</StatusChip></div></div>
+        <div className="institution-grid">{institutionProxies.map((institution) => <article key={institution.shortName}><header><span className="institution-mark" aria-hidden="true">{institution.shortName.slice(0, 3)}</span><span><strong>{institution.shortName}</strong><small>{institution.name}</small></span></header><StatusChip tone="attention">WIP proxy</StatusChip><ul>{institution.intendedServices.map((service) => <li key={service}><Icon name="check" />{service}</li>)}</ul></article>)}</div>
       </section>
     </div>
   );
