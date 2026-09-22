@@ -139,6 +139,8 @@ On 2026-09-20 the owner authorised production deployment. The merged React/Vite 
 
 On 2026-09-22 the owner relayed a de-identified oncologist review of the deployed portal and explicitly directed removal of interface sound. The review identifies perceived coverage, summary, drug-navigation, publication, specialist-centre, and cross-trial evidence needs. It authorises sound removal and evidence capture only; it does not by itself approve a new publication source, external institutional contact, geographic/product-scope expansion, data/reuse terms, or clinical comparison output.
 
+On 2026-09-22 the owner explicitly authorised the next evidence-coverage implementation order: an India coverage matrix, exact Drug/Biological index, deterministic registry abstracts, a separately labelled global ClinicalTrials.gov search, PubMed metadata links, descriptive same-intervention population/time mapping, and institution connection proxies. Institution cards must remain `WIP · not connected` and explain their intended future owner, site-verification, referral/acknowledgement, freshness, audit, and correction roles. This authority does not permit external contact, institutional endorsement claims, publication full-text redistribution, patient matching, eligibility conclusions, outcome pooling, comparative clinical interpretation, or treatment recommendation.
+
 ## Gap register
 
 | Gap | Status | Evidence | Owner | Next action |
@@ -153,7 +155,7 @@ On 2026-09-22 the owner relayed a de-identified oncologist review of the deploye
 | `GAP-OUTREACH-AUTHORITY` | Paused by owner | An external email was prepared but not sent; the owner redirected validation to the internal analyst after providing the expanded source | Repository owner | Do not send externally. Require fresh point-of-risk confirmation for the exact recipient, channel, and message if external outreach later resumes. |
 | `GAP-V2-PROVENANCE` | Open | The expanded source mixes duplicate synthesis, proposed questionnaires, author assumptions, three sensitive caregiver accounts, and an uncited primer | Internal analyst and repository owner | Clarify authorship, sample, method, whether questionnaires were administered, and whether de-identified answer notes exist. |
 | `GAP-CTRI-BULK-ACCESS` | Open; research mirror measured | Direct CTRI search is CAPTCHA/CSRF gated with no documented bulk API or open/commercial reuse terms found; the permitted WHO mirror was 4,611 primary records behind the CTRI homepage count and prohibits commercial/marketing/promotional use | Repository owner and source authority | Obtain written CTRI access/reuse terms and a supported current bulk/API path before any product or demo dependency; preserve the private WHO snapshot only for approved non-commercial research. |
-| `GAP-TRIAL-COVERAGE-AND-EVIDENCE-SCOPE` | Open; one clinician source claim | The reviewer judged 285 India-located records too small and requested global trials, specialist-centre connections, concise abstracts, drug-centred discovery, publications, and a multi-trial drug report | Repository owner and agent | Test coverage framing, intervention indexing, and deterministic abstracts on the approved source first; separately decide global registry scope, bibliographic source/licence, institutional authority, and the non-clinical boundary for any cross-trial evidence map. |
+| `GAP-TRIAL-COVERAGE-AND-EVIDENCE-SCOPE` | Prototype implemented; clinician task validation remains open | The evidence workspace now separates the 285-record India-actionable layer from bounded global ClinicalTrials.gov search, exposes cancer and exact Drug/Biological coverage, reformats deterministic abstracts, links PubMed metadata under `EV-0079`, renders a descriptive population/time map, and labels all institution cards WIP/not connected | Repository owner and agent | Run structured clinician search tasks; measure useful-result rate, source-opening, trust, time, and missing-result reasons. Keep institution outreach, full-text rights, and outcome interpretation separately gated. |
 
 ## Report index
 
@@ -206,6 +208,7 @@ On 2026-09-22 the owner relayed a de-identified oncologist review of the deploye
 | `C2` | `P5` | `.harness/reports/20260922T134644Z-P5-home-journey-alignment.md` | Complete; merged and deployed through pull request `#37` |
 | `C2` | `P5` | `.harness/reports/20260922T144344Z-P5-liquid-glass-material.md` | Complete; merged and deployed through pull request `#38` |
 | `C2` | `P5` | `.harness/reports/20260922T150041Z-P5-clinician-portal-feedback.md` | Complete; sound removed and de-identified clinician evidence merged and deployed through pull request `#40` |
+| `C2` | `P5` | `.harness/reports/20260922T160812Z-P5-evidence-coverage-expansion.md` | Complete locally; bounded evidence expansion awaits review merge and production verification |
 
 ## References
 
@@ -269,3 +272,4 @@ On 2026-09-22 the owner relayed a de-identified oncologist review of the deploye
 - `.harness/reports/20260922T134644Z-P5-home-journey-alignment.md`
 - `.harness/reports/20260922T144344Z-P5-liquid-glass-material.md`
 - `.harness/reports/20260922T150041Z-P5-clinician-portal-feedback.md`
+- `.harness/reports/20260922T160812Z-P5-evidence-coverage-expansion.md`

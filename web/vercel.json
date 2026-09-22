@@ -10,6 +10,12 @@
     },
     "api/trial-evidence.ts": {
       "maxDuration": 15
+    },
+    "api/global-trials.ts": {
+      "maxDuration": 15
+    },
+    "api/publications.ts": {
+      "maxDuration": 15
     }
   },
   "cleanUrls": true,
