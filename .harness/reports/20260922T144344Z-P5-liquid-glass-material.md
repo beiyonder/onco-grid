@@ -21,6 +21,11 @@ This is a presentation-only change. Trial data, source authority, clinical bound
 - **OBSERVED:** `cd web && npm run build` passed TypeScript checks and the Vite production build across 105 modules.
 - **OBSERVED:** `cd web && npm run test:api` passed 8/8 server policy tests; `npm audit --omit=dev` found 0 vulnerabilities.
 - **OBSERVED:** `python3 research/validate_ledger.py` passed 70 records, and `python3 scripts/fetch_india_oncology_trials.py --validate-only` passed 285 normalized trials.
+- **OBSERVED:** Serena health and memory-reference checks passed; `git diff --check` passed; the intended publication set contained no secret-shaped values or email addresses; `chatroom_notes.md`, `Oncologist Pain Points_v2.docx`, and `.private/` remained ignored.
+- **OBSERVED:** Pull request `#38` passed its Vercel preview checks and merged the refinement to `main` as `fffa00b`.
+- **OBSERVED:** Automatic production deployment `dpl_DMgm7mYCATLcBCcY4c5aCnCEaPu5` reached `Ready` and retained the alias `https://onco-grid-trial-relay-validation.vercel.app`.
+- **OBSERVED:** Live desktop Home loaded 285 public records with two liquid-glass surfaces, crisp navigation, zero horizontal overflow, zero console warnings/errors, and zero page errors. Live 390×844 Home retained the exact 64px bottom lens and `scrollWidth = clientWidth = 390`.
+- **OBSERVED:** Live Trial Library retained List/Spatial lens in a third glass surface; live Patient Workspace retained all five section tabs in a third glass surface. Both routes loaded with zero console warnings/errors and zero page errors.
 
 ## Risks and gaps
 
@@ -28,7 +33,7 @@ The material uses SVG displacement and a custom copied ambient field; this exact
 
 ## Next
 
-Merge through a review pull request, allow the configured Vercel main-branch deployment to complete, and repeat live desktop/mobile checks on the production alias. Continue direct visual review with oncology users; reduce optical strength only if the stronger material competes with task comprehension.
+Production merge and deployment are complete. Continue direct visual review with oncology users; reduce optical strength only if the stronger material competes with task comprehension.
 
 ## Sign-off needed
 

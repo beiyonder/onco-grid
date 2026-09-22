@@ -201,7 +201,7 @@ On 2026-09-20 the owner authorised production deployment. The merged React/Vite 
 | `C3` | `P5` | `.harness/reports/20260920T174136Z-P5-owner-expansion-qualification.md` | Complete; integrated through pull request `#32`; live pilot acceptance remains blocked |
 | `C3` | `P5` | `.harness/reports/20260920T180806Z-P5-production-deployment.md` | Complete; deployed to production and verified through pull request `#35`; live pilot services remain blocked |
 | `C2` | `P5` | `.harness/reports/20260922T134644Z-P5-home-journey-alignment.md` | Complete; merged and deployed through pull request `#37` |
-| `C2` | `P5` | `.harness/reports/20260922T144344Z-P5-liquid-glass-material.md` | Complete; stronger responsive glass material verified, review merge and deployment pending |
+| `C2` | `P5` | `.harness/reports/20260922T144344Z-P5-liquid-glass-material.md` | Complete; merged and deployed through pull request `#38` |
 
 ## References
 
