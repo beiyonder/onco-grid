@@ -38,6 +38,9 @@ A multi-trial drug output is promotable only as a descriptive, citation-backed e
 - `python3 research/validate_ledger.py` passed 78 retained records, and `python3 scripts/fetch_india_oncology_trials.py --validate-only` passed the unchanged 285-record snapshot.
 - Serena re-indexed 48 source files (`python=4`, `typescript=44`); project health and memory-reference checks passed. `git diff --check` passed.
 - The intended change set contained no secret-shaped values or email addresses; the raw private notes, expanded DOCX, and `.private/` remained ignored. Only de-identified aggregate themes were retained.
+- Pull request `#40` passed its Vercel preview checks and merged the sound removal and de-identified evidence to `main` as `691aefa`.
+- Automatic production deployment `dpl_BSiAGRmD68x5rzR6V3qx43EtVo3a` reached `Ready` and retained `https://onco-grid-trial-relay-validation.vercel.app`.
+- Live desktop Home loaded 285 public records with zero sound controls, zero audio elements, zero horizontal overflow, zero console warnings/errors, and zero page errors. Live 390×844 Home also had zero sound controls/audio elements, zero overflow, a 60.7969px topbar, and the unchanged 64px bottom navigation.
 
 ## Risks and gaps
 
@@ -47,12 +50,11 @@ The feedback identifies a credible product-fit problem but does not establish th
 
 ## Next
 
-1. Merge and deploy the verified sound removal and de-identified evidence update.
-2. Run a structured follow-up using concrete failed searches: expected cancer, drug, geography, source, and what would count as a useful result.
-3. Prototype a coverage matrix, exact intervention index, and deterministic trial abstract over the existing source before adding data.
-4. Present a separate source/permission decision for global registry coverage and bibliographic metadata.
-5. Seek exact owner authorisation before contacting any named institution; capture role, authority, update ownership, and referral/site-verification workflow rather than requesting generic partnership.
-6. Test one source-bounded drug evidence map with a clinician and verify that it improves retrieval without inviting treatment comparison or recommendation.
+1. Run a structured follow-up using concrete failed searches: expected cancer, drug, geography, source, and what would count as a useful result.
+2. Prototype a coverage matrix, exact intervention index, and deterministic trial abstract over the existing source before adding data.
+3. Present a separate source/permission decision for global registry coverage and bibliographic metadata.
+4. Seek exact owner authorisation before contacting any named institution; capture role, authority, update ownership, and referral/site-verification workflow rather than requesting generic partnership.
+5. Test one source-bounded drug evidence map with a clinician and verify that it improves retrieval without inviting treatment comparison or recommendation.
 
 ## Sign-off needed
 
