@@ -5,6 +5,7 @@ import {
   validateAssistantRequest,
   validateGlobalEvidenceQuery,
   validatePublicationTrialIds,
+  validateQueryKeys,
   validateTrialId,
 } from "./policy.js";
 
@@ -91,5 +92,10 @@ test("rejects unbounded or clinical evidence queries", () => {
   assert.throws(
     () => validatePublicationTrialIds(Array.from({ length: 11 }, (_, index) => `NCT${String(index).padStart(8, "0")}`)),
     /1–10/,
+  );
+  assert.doesNotThrow(() => validateQueryKeys({ mode: "condition", q: "melanoma" }, ["mode", "q", "pageToken"]));
+  assert.throws(
+    () => validateQueryKeys({ mode: "condition", q: "melanoma", cacheProbe: "bypass" }, ["mode", "q", "pageToken"]),
+    /Unsupported query parameter/,
   );
 });

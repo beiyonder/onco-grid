@@ -1,6 +1,6 @@
 import type { ApiRequest, ApiResponse } from "./_shared/http.js";
 import { fetchGlobalTrialEvidence } from "./_shared/evidenceSources.js";
-import { validateGlobalEvidenceQuery } from "./_shared/policy.js";
+import { validateGlobalEvidenceQuery, validateQueryKeys } from "./_shared/policy.js";
 
 function first(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
@@ -16,6 +16,7 @@ export default async function handler(request: ApiRequest, response: ApiResponse
   }
 
   try {
+    validateQueryKeys(request.query, ["mode", "q", "pageToken"]);
     const query = validateGlobalEvidenceQuery(
       first(request.query.mode),
       first(request.query.q),
@@ -26,7 +27,7 @@ export default async function handler(request: ApiRequest, response: ApiResponse
     response.status(200).json(result);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Global trial evidence could not be loaded.";
-    const status = /mode|q must|q is|required|pageToken|not accepted/i.test(message) ? 400 : 502;
+    const status = /unsupported query|mode|q must|q is|required|pageToken|not accepted/i.test(message) ? 400 : 502;
     response.status(status).json({ error: "global_evidence_error", message });
   }
 }
