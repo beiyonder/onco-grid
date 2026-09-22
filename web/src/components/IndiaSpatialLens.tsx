@@ -55,10 +55,13 @@ function labelSprite(label: string): THREE.Sprite {
   canvas.width = 320;
   canvas.height = 72;
   if (context) {
-    context.fillStyle = "rgba(251,252,251,0.92)";
+    context.fillStyle = "rgba(31,34,38,0.92)";
     context.roundRect(2, 2, 316, 68, 18);
     context.fill();
-    context.fillStyle = "#173d5b";
+    context.strokeStyle = "rgba(218,222,222,0.48)";
+    context.lineWidth = 2;
+    context.stroke();
+    context.fillStyle = "#f3f1eb";
     context.font = "700 25px Avenir Next, Arial, sans-serif";
     context.textAlign = "center";
     context.textBaseline = "middle";
@@ -121,15 +124,15 @@ export function IndiaSpatialLens({ trials, onOpenTrial }: { trials: TrialRecord[
     renderer.domElement.setAttribute("role", "img");
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color("#edf1ef");
-    scene.fog = new THREE.Fog("#edf1ef", 12, 22);
+    scene.background = new THREE.Color("#1f2226");
+    scene.fog = new THREE.Fog("#1f2226", 12, 22);
     const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
     camera.position.set(0, -0.7, 15.5);
     camera.lookAt(0, 0.35, 0);
 
-    const ambient = new THREE.HemisphereLight("#ffffff", "#9db5aa", 2.3);
+    const ambient = new THREE.HemisphereLight("#f5f3ed", "#566069", 2.45);
     scene.add(ambient);
-    const sun = new THREE.DirectionalLight("#fff2d8", 3.2);
+    const sun = new THREE.DirectionalLight("#fff8e8", 3.45);
     sun.position.set(-4, 7, 10);
     sun.castShadow = true;
     sun.shadow.mapSize.set(1024, 1024);
@@ -148,14 +151,14 @@ export function IndiaSpatialLens({ trials, onOpenTrial }: { trials: TrialRecord[
       bevelThickness: 0.045,
       curveSegments: 2,
     });
-    const land = new THREE.Mesh(shapeGeometry, new THREE.MeshStandardMaterial({ color: "#dbe9df", roughness: 0.76, metalness: 0.02 }));
+    const land = new THREE.Mesh(shapeGeometry, new THREE.MeshStandardMaterial({ color: "#aeb8bb", roughness: 0.5, metalness: 0.16 }));
     land.receiveShadow = true;
     land.castShadow = true;
     group.add(land);
 
     const base = new THREE.Mesh(
       new THREE.CylinderGeometry(4.6, 4.9, 0.28, 64),
-      new THREE.MeshStandardMaterial({ color: "#e4e9e6", roughness: 0.85 }),
+      new THREE.MeshStandardMaterial({ color: "#30343a", roughness: 0.64, metalness: 0.12 }),
     );
     base.rotation.x = Math.PI / 2;
     base.position.set(0, 0, -0.32);
@@ -168,7 +171,7 @@ export function IndiaSpatialLens({ trials, onOpenTrial }: { trials: TrialRecord[
       const height = 0.2 + Math.min(0.68, Math.sqrt(cluster.siteCount) * 0.095);
       const marker = new THREE.Mesh(
         new THREE.CylinderGeometry(0.07 + Math.min(0.08, cluster.siteCount * 0.004), 0.11, height, 12),
-        new THREE.MeshStandardMaterial({ color: cluster.precision === "city centroid" ? "#245d86" : "#9b5b13", roughness: 0.42 }),
+        new THREE.MeshStandardMaterial({ color: cluster.precision === "city centroid" ? "#c9ad7b" : "#91a6b5", roughness: 0.28, metalness: 0.18, emissive: cluster.precision === "city centroid" ? "#3f3422" : "#293841", emissiveIntensity: 0.24 }),
       );
       marker.rotation.x = Math.PI / 2;
       marker.position.set(x, y, 0.26 + height / 2);

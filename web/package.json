@@ -12,12 +12,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@samasante/liquid-glass": "0.1.1",
     "@supabase/supabase-js": "2.116.0",
     "openai": "7.20.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "react-router-dom": "7.18.4",
-    "three": "0.186.0"
+    "thinking-orbs": "0.3.2",
+    "three": "0.186.0",
+    "uisfx": "0.4.0"
   },
   "devDependencies": {
     "@types/node": "26.6.2",

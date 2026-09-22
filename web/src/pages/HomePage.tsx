@@ -1,3 +1,4 @@
+import { ThinkingOrb } from "thinking-orbs";
 import { Link } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { PageHeader, SafetyNote, StatusChip } from "../components/Primitives";
@@ -42,15 +43,22 @@ export function HomePage() {
       {status === "error" ? <div className="source-error" role="alert"><Icon name="warning" /><span><strong>Public trial records could not be loaded.</strong><small>{error}</small></span><button className="button secondary" type="button" onClick={retry}>Retry source</button></div> : null}
 
       <section className="journey-grid" aria-label="Primary Trial Relay journeys">
+        <div className="relay-field" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </div>
         <Link className="journey-card source-layer" to="/trials">
-          <span className="journey-icon"><Icon name="trials" /></span>
+          <span className="journey-plane-label">Registry plane</span>
+          <span className="journey-icon" aria-hidden="true"><ThinkingOrb state="searching" size={64} theme="light" /><Icon name="trials" /></span>
           <span className="eyebrow">Trial-first</span>
           <h2>Find or follow a trial</h2>
           <p>Scan {snapshot ? snapshot.retainedCount : "the dated"} India-located registry records, inspect source and site uncertainty, then ask an operational question.</p>
           <span className="journey-foot"><span>{sourceDate ? `Snapshot ${sourceDate}` : "Registry source loading"}</span><strong>Open Trials <Icon name="arrow" /></strong></span>
         </Link>
         <Link className="journey-card human-layer" to="/patients">
-          <span className="journey-icon"><Icon name="patients" /></span>
+          <span className="journey-plane-label">Workspace plane</span>
+          <span className="journey-icon" aria-hidden="true"><ThinkingOrb state="connecting" size={64} theme="light" /><Icon name="patients" /></span>
           <span className="eyebrow">Patient-first</span>
           <h2>Work with a synthetic patient</h2>
           <p>Open one of {patients.length} source-labelled workspaces, choose a trial manually, and record a criterion-level human review.</p>
@@ -59,7 +67,7 @@ export function HomePage() {
       </section>
 
       <div className="home-grid">
-        <section className="surface activity-preview" aria-labelledby="attention-heading">
+        <section className="surface activity-preview iso-panel" aria-labelledby="attention-heading">
           <div className="section-heading">
             <div><p className="eyebrow">Current role</p><h2 id="attention-heading">Attention for {role.name}</h2></div>
             <StatusChip tone={ownedAttention.length > 0 ? "attention" : "good"}>{ownedAttention.length} open</StatusChip>
@@ -75,7 +83,7 @@ export function HomePage() {
           <Link className="text-action" to="/inbox">Open the attention queue <Icon name="arrow" /></Link>
         </section>
 
-        <aside className="surface source-summary" aria-labelledby="source-summary-heading">
+        <aside className="surface source-summary iso-panel" aria-labelledby="source-summary-heading">
           <p className="eyebrow">Source boundary</p>
           <h2 id="source-summary-heading">What is real here?</h2>
           <dl>

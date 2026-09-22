@@ -1,3 +1,5 @@
+import { Glass } from "@samasante/liquid-glass";
+import { ThinkingOrb } from "thinking-orbs";
 import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { IndiaSpatialLens } from "../components/IndiaSpatialLens";
@@ -163,7 +165,7 @@ export function TrialsPage() {
 
   return (
     <div className="page">
-      <PageHeader eyebrow="Public registry discovery" title="Trial Library" description="Scan concise rows or explore the same filtered source set through an approximate 2.5D India lens. Registry and independent site status remain separate." actions={<div className="library-view-switch" role="group" aria-label="Trial Library view"><button type="button" className={viewMode === "list" ? "active" : ""} aria-pressed={viewMode === "list"} onClick={() => setViewMode("list")}>List</button><button type="button" className={viewMode === "map" ? "active" : ""} aria-pressed={viewMode === "map"} onClick={() => setViewMode("map")}>Spatial lens</button></div>} />
+      <PageHeader eyebrow="Public registry discovery" title="Trial Library" description="Scan concise rows or explore the same filtered source set through an approximate 2.5D India lens. Registry and independent site status remain separate." actions={<Glass className="library-view-glass" optics={{ strength: 0.22, depth: 0.82, curvature: 0.32, dispersion: 0.07, frost: 7 }}><div className="library-view-switch" role="group" aria-label="Trial Library view"><button type="button" className={viewMode === "list" ? "active" : ""} aria-pressed={viewMode === "list"} onClick={() => setViewMode("list")}><ThinkingOrb state="weaving" size={20} theme="light" paused={viewMode !== "list"} aria-hidden="true" />List</button><button type="button" className={viewMode === "map" ? "active" : ""} aria-pressed={viewMode === "map"} onClick={() => setViewMode("map")}><ThinkingOrb state="shaping" size={20} theme="light" paused={viewMode !== "map"} aria-hidden="true" />Spatial lens</button></div></Glass>} />
       <SafetyNote><p><strong>General discovery only.</strong> No patient facts, eligibility score, patient ranking, or treatment recommendation influences this list.</p></SafetyNote>
       {reviewPatient ? <div className="manual-selection-note" role="note"><Icon name="patients" /><span><strong>Manual selection for {reviewPatient.label}</strong>The general library order is unchanged and contains no patient-specific ranking. Opening a review records only your explicit selection.</span><Link className="text-action" to={`/patients/${reviewPatient.id}?section=reviews`}>Return to workspace</Link></div> : null}
 
