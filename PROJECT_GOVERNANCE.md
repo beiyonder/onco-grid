@@ -205,7 +205,7 @@ On 2026-09-22 the owner relayed a de-identified oncologist review of the deploye
 | `C3` | `P5` | `.harness/reports/20260920T180806Z-P5-production-deployment.md` | Complete; deployed to production and verified through pull request `#35`; live pilot services remain blocked |
 | `C2` | `P5` | `.harness/reports/20260922T134644Z-P5-home-journey-alignment.md` | Complete; merged and deployed through pull request `#37` |
 | `C2` | `P5` | `.harness/reports/20260922T144344Z-P5-liquid-glass-material.md` | Complete; merged and deployed through pull request `#38` |
-| `C2` | `P5` | `.harness/reports/20260922T150041Z-P5-clinician-portal-feedback.md` | Complete locally; sound removal and de-identified clinician evidence await review merge |
+| `C2` | `P5` | `.harness/reports/20260922T150041Z-P5-clinician-portal-feedback.md` | Complete; sound removed and de-identified clinician evidence merged and deployed through pull request `#40` |
 
 ## References
 
