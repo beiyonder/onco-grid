@@ -211,7 +211,7 @@ On 2026-09-22 the owner directed a retrospective rhetorical audit of `/trials/ev
 | `C2` | `P5` | `.harness/reports/20260922T144344Z-P5-liquid-glass-material.md` | Complete; merged and deployed through pull request `#38` |
 | `C2` | `P5` | `.harness/reports/20260922T150041Z-P5-clinician-portal-feedback.md` | Complete; sound removed and de-identified clinician evidence merged and deployed through pull request `#40` |
 | `C2` | `P5` | `.harness/reports/20260922T160812Z-P5-evidence-coverage-expansion.md` | Complete; merged and deployed through pull requests `#42` and `#43` |
-| `C2` | `P5` | `.harness/reports/20260922T192230Z-P5-evidence-page-rhetorical-refinement.md` | Complete locally; refined information hierarchy and spacing await review merge and production verification |
+| `C2` | `P5` | `.harness/reports/20260922T192230Z-P5-evidence-page-rhetorical-refinement.md` | Complete; merged and deployed through pull requests `#45` and `#46` |
 
 ## References
 

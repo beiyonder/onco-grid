@@ -39,6 +39,9 @@ Use one information tip per section rather than repeating caveats per result. Re
 - `python3 research/validate_ledger.py` passed 79 retained records; the trial snapshot passed 285 records; `npm audit --omit=dev` found 0 vulnerabilities.
 - Serena re-indexed 56 source files (`python=4`, `typescript=52`); project health and memory-reference checks passed. `git diff --check` passed.
 - The intended publication set contained no secret-shaped values or email addresses; private raw notes, the expanded DOCX, and `.private/` remained ignored.
+- Pull request `#45` passed Vercel preview checks and merged the rhetorical/spacing refinement to `main` as `04cba84`; production deployment `dpl_FiuLA1GDRNjef9KKTAMnx6QqwX24` reached `Ready`.
+- Final live review found the coverage-table action still wrapped awkwardly at the viewport edge. Pull request `#46` shortened it to `View abstract`, enforced one-line rendering, and merged as `087fbca`; production deployment `dpl_CxS8Qz3pTkcFNMhw6FA2ZPX7g2hj` reached `Ready`.
+- Final production verification retained 25px insets across all seven desktop sections, nine initial information controls, a one-line table action, zero overflowing text, and zero page-level overflow.
 
 ## Risks and gaps
 
@@ -48,7 +51,7 @@ This refinement improves readability and information flow but does not validate 
 
 ## Next
 
-Merge and deploy the refined evidence workspace. In the next clinician session, observe whether users discover the information controls when needed, whether the persistent safety line is sufficient, and whether users reach coverage, drug, global-search, and publication actions without reading methods first.
+In the next clinician session, observe whether users discover the information controls when needed, whether the persistent safety line is sufficient, and whether users reach coverage, drug, global-search, and publication actions without reading methods first.
 
 ## Sign-off needed
 
