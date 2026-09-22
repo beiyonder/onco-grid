@@ -37,6 +37,16 @@ function hasOnlyKeys(value: Record<string, unknown>, allowed: string[]): boolean
   return Object.keys(value).every((key) => allowed.includes(key));
 }
 
+export function validateQueryKeys(
+  query: Record<string, unknown>,
+  allowed: string[],
+): void {
+  const unsupported = Object.keys(query).filter((key) => !allowed.includes(key));
+  if (unsupported.length) {
+    throw new Error(`Unsupported query parameter: ${unsupported.join(", ")}.`);
+  }
+}
+
 function rejectSensitiveText(value: string): void {
   if (
     forbiddenClinicalPattern.test(value)
