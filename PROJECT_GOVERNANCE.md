@@ -208,7 +208,7 @@ On 2026-09-22 the owner explicitly authorised the next evidence-coverage impleme
 | `C2` | `P5` | `.harness/reports/20260922T134644Z-P5-home-journey-alignment.md` | Complete; merged and deployed through pull request `#37` |
 | `C2` | `P5` | `.harness/reports/20260922T144344Z-P5-liquid-glass-material.md` | Complete; merged and deployed through pull request `#38` |
 | `C2` | `P5` | `.harness/reports/20260922T150041Z-P5-clinician-portal-feedback.md` | Complete; sound removed and de-identified clinician evidence merged and deployed through pull request `#40` |
-| `C2` | `P5` | `.harness/reports/20260922T160812Z-P5-evidence-coverage-expansion.md` | Complete locally; bounded evidence expansion awaits review merge and production verification |
+| `C2` | `P5` | `.harness/reports/20260922T160812Z-P5-evidence-coverage-expansion.md` | Complete; merged and deployed through pull requests `#42` and `#43` |
 
 ## References
 
