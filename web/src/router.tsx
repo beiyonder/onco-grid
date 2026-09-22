@@ -2,6 +2,7 @@ import { createHashRouter, Link, useRouteError } from "react-router-dom";
 import { AppShell } from "./components/AppShell";
 import { EmptyState } from "./components/Primitives";
 import { HomePage } from "./pages/HomePage";
+import { EvidenceCoveragePage } from "./pages/EvidenceCoveragePage";
 import { InboxPage } from "./pages/InboxPage";
 import { PatientTrialReviewPage } from "./pages/PatientTrialReviewPage";
 import { PatientWorkspacePage } from "./pages/PatientWorkspacePage";
@@ -24,6 +25,7 @@ export const router = createHashRouter([
     children: [
       { index: true, element: <HomePage /> },
       { path: "trials", element: <TrialsPage /> },
+      { path: "trials/evidence", element: <EvidenceCoveragePage /> },
       { path: "trials/:trialId", element: <TrialDetailPage /> },
       { path: "trials/:trialId/room", element: <TrialRoomPage /> },
       { path: "patients", element: <PatientsPage /> },

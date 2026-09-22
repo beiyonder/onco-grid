@@ -12,6 +12,15 @@ export interface AssistantRequest {
   roomContext: AssistantRoomContext[];
 }
 
+
+export type GlobalSearchMode = "condition" | "intervention";
+
+export interface GlobalEvidenceQuery {
+  mode: GlobalSearchMode;
+  term: string;
+  pageToken?: string;
+}
+
 const trialIdPattern = /^NCT\d{8}$/;
 const forbiddenClinicalPattern = /\b(?:patient|mrn|medical record|date of birth|dob|eligible|eligibility|qualif(?:y|ies|ied)|match(?:es|ing)?|recommend(?:ation|ed)?|treatment advice)\b/i;
 const emailPattern = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i;
@@ -44,6 +53,46 @@ export function validateTrialId(value: unknown): string {
     throw new Error("trialId must be a valid NCT identifier.");
   }
   return value;
+}
+
+export function validateGlobalEvidenceQuery(
+  modeInput: unknown,
+  termInput: unknown,
+  pageTokenInput: unknown,
+): GlobalEvidenceQuery {
+  if (modeInput !== "condition" && modeInput !== "intervention") {
+    throw new Error("mode must be condition or intervention.");
+  }
+  if (typeof termInput !== "string") throw new Error("q is required.");
+  const term = termInput.trim().replace(/\s+/g, " ");
+  if (term.length < 2 || term.length > 120 || /[\u0000-\u001f<>]/u.test(term)) {
+    throw new Error("q must contain 2–120 safe characters.");
+  }
+  rejectSensitiveText(term);
+
+  let pageToken: string | undefined;
+  if (pageTokenInput !== undefined && pageTokenInput !== "") {
+    if (
+      typeof pageTokenInput !== "string"
+      || pageTokenInput.length > 1_024
+      || !/^[A-Za-z0-9._~+/=-]+$/.test(pageTokenInput)
+    ) {
+      throw new Error("pageToken is invalid.");
+    }
+    pageToken = pageTokenInput;
+  }
+
+  return pageToken ? { mode: modeInput, term, pageToken } : { mode: modeInput, term };
+}
+
+export function validatePublicationTrialIds(value: unknown): string[] {
+  const raw = Array.isArray(value) ? value.join(",") : value;
+  if (typeof raw !== "string") throw new Error("ids is required.");
+  const ids = Array.from(new Set(raw.split(",").map((item) => item.trim()).filter(Boolean)));
+  if (ids.length < 1 || ids.length > 10) {
+    throw new Error("ids must contain 1–10 NCT identifiers.");
+  }
+  return ids.map(validateTrialId);
 }
 
 export function validateAssistantRequest(payload: unknown): AssistantRequest {

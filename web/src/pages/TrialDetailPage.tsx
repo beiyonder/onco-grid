@@ -1,8 +1,10 @@
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { EmptyState, PageHeader, SafetyNote, StatusChip } from "../components/Primitives";
+import { SourceAbstract } from "../components/SourceAbstract";
 import { TrialEvidenceFeed } from "../components/TrialEvidenceFeed";
 import { TrialCoverageTools } from "../components/TrialCoverageTools";
+import { deterministicTrialAbstract } from "../data/evidence";
 import { displayConditions, displayStates, formatDate, registryCriteriaSections } from "../data/trials";
 import { useAppState } from "../state/AppState";
 import { useTrialData } from "../state/TrialData";
@@ -56,7 +58,7 @@ export function TrialDetailPage() {
           <TrialEvidenceFeed trial={trial} />
 
           <section className="reading-surface" aria-labelledby="summary-heading">
-            <p className="eyebrow">Registry summary</p><h2 id="summary-heading">Study overview</h2><p>{trial.briefSummary}</p>
+            <p className="eyebrow">Registry abstract</p><h2 id="summary-heading">Source-grounded study overview</h2><SourceAbstract value={deterministicTrialAbstract(trial)} />
           </section>
 
           <section className="surface site-section" aria-labelledby="sites-heading">
