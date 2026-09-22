@@ -30,6 +30,18 @@ export function SafetyNote({ children }: { children: ReactNode }) {
   return <div className="safety-note" role="note"><Icon name="shield" />{children}</div>;
 }
 
+export function InfoTip({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <details className="info-tip">
+      <summary aria-label={label} title={label}><span aria-hidden="true">i</span></summary>
+      <div className="info-tip-panel" role="note">
+        <strong>{label}</strong>
+        <div>{children}</div>
+      </div>
+    </details>
+  );
+}
+
 export function StatusChip({ tone = "neutral", children }: { tone?: "neutral" | "source" | "good" | "attention" | "danger" | "human"; children: ReactNode }) {
   return <span className={`status-chip ${tone}`}>{children}</span>;
 }
