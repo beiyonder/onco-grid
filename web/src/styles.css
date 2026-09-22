@@ -82,8 +82,6 @@ code { font-family: SFMono-Regular, Consolas, "Liberation Mono", monospace; font
 .source-stamp span, .source-stamp strong, .source-stamp small { display: block; }
 .source-stamp strong { font-size: 0.8125rem; }
 .source-stamp small { color: var(--ink-muted); font-size: 0.8125rem; }
-.sound-toggle { display: inline-flex; min-height: 2.35rem; align-items: center; gap: 0.4rem; padding: 0.35rem 0.58rem; border: 1px solid rgba(113, 123, 128, 0.28); border-radius: 0.72rem 0.72rem 0.22rem; background: rgba(255, 255, 255, 0.48); color: var(--ink-secondary); font-size: 0.8125rem; font-weight: 750; cursor: pointer; box-shadow: 0 0.18rem 0 rgba(70, 78, 82, 0.18); }
-.sound-toggle[aria-pressed="false"] { opacity: 0.62; box-shadow: none; }
 .role-switcher { display: flex; align-items: center; gap: 0.6rem; }
 .role-avatar { display: grid; width: 2.45rem; height: 2.45rem; place-items: center; border-radius: 50%; background: #e0e2e1; color: #545d62; font-size: 0.8125rem; font-weight: 800; }
 .role-copy small { display: block; color: var(--ink-muted); font-size: 0.8125rem; }
@@ -351,8 +349,6 @@ textarea { width: 100%; resize: vertical; }
   .mobile-brand .brand-mark { width: 2rem; height: 2rem; border-radius: 0.6rem 0.6rem 0.18rem; font-size: 0.8125rem; }
   .mobile-brand strong { display: none; }
   .source-glass { display: none !important; }
-  .sound-toggle { min-height: 2rem; padding: 0.28rem; }
-  .sound-toggle > span { display: none; }
   .role-avatar { width: 2rem; height: 2rem; }
   .role-copy small { display: none; }
   .role-copy select { width: 7.8rem; max-width: 38vw; font-size: 0.8125rem; }
@@ -410,7 +406,7 @@ textarea { width: 100%; resize: vertical; }
   :root { --canvas: #fff; --surface: #fff; --surface-secondary: #fff; }
   * { box-shadow: none !important; text-shadow: none !important; }
   body { background: #fff; color: #000; font-size: 11pt; }
-  .sidebar, .topbar, .mobile-boundary, .page-actions, .section-tabs-glass, .composer, .inbox-actions, .pagination, .button, .back-link, .sound-toggle { display: none !important; }
+  .sidebar, .topbar, .mobile-boundary, .page-actions, .section-tabs-glass, .composer, .inbox-actions, .pagination, .button, .back-link { display: none !important; }
   .workspace-shell { margin: 0; }
   .page { width: 100%; padding: 0; }
   .page-header, .detail-layout, .room-layout, .review-layout { display: block; }

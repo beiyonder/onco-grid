@@ -9,7 +9,6 @@ import { roles } from "../data/demo";
 import { useAppState } from "../state/AppState";
 import { useTrialData } from "../state/TrialData";
 import type { RoleId } from "../types";
-import { ExperienceSound } from "./ExperienceSound";
 import { Icon } from "./Icon";
 import { PilotIdentity } from "./PilotIdentity";
 
@@ -90,7 +89,6 @@ export function AppShell() {
               <span><strong>{snapshot ? `${snapshot.retainedCount} public records` : status === "error" ? "Source unavailable" : "Loading public records"}</strong><small>{sourceDate ? `Snapshot ${sourceDate}` : "ClinicalTrials.gov snapshot"}</small></span>
             </div>
           </Glass>
-          <ExperienceSound />
           <PilotIdentity />
           <label className="role-switcher">
             <span className="role-avatar" aria-hidden="true">{role.initials}</span>

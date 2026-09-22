@@ -137,6 +137,8 @@ The owner-authorized expansion was delivered through pull requests `#28`–`#32`
 
 On 2026-09-20 the owner authorised production deployment. The merged React/Vite build was first deployed to `https://onco-grid-trial-relay-validation.vercel.app` through prebuilt production deployment `dpl_4hNh6qcJyarCzx8roVA2nW2EqaDy`; live Home, List/Spatial lens, Trial Detail, official evidence, patient review entry, Trial Room fail-closed state, Handoff fail-closed state, mobile layout, APIs, headers, and browser health passed. The Vercel project now uses Root Directory `web`, Framework Vite, `npm ci`, `npm run build`, and `dist`. The next merged main commit automatically produced `dpl_GaryB2hJHg2CvHAauca96KUPRKbQ`, built both serverless functions, retained the production alias, and passed a fresh live spatial-lens check, confirming GitHub auto-deploy now uses the correct root. Deployment does not close `GAP-PILOT-SERVICE-CONFIG`, `P5`, or product lock.
 
+On 2026-09-22 the owner relayed a de-identified oncologist review of the deployed portal and explicitly directed removal of interface sound. The review identifies perceived coverage, summary, drug-navigation, publication, specialist-centre, and cross-trial evidence needs. It authorises sound removal and evidence capture only; it does not by itself approve a new publication source, external institutional contact, geographic/product-scope expansion, data/reuse terms, or clinical comparison output.
+
 ## Gap register
 
 | Gap | Status | Evidence | Owner | Next action |
@@ -146,11 +148,12 @@ On 2026-09-20 the owner authorised production deployment. The merged React/Vite 
 | `GAP-PILOT-SERVICE-CONFIG` | Open | Supabase pilot was authorised but no project URL/publishable key is configured; the exposed OpenAI credential is rejected and a rotated server-side secret is not configured | Repository owner | Configure an approved Supabase project and rotated `OPENAI_API_KEY` through deployment/local secret stores; never send values in chat or commit them. Live auth/realtime/AI acceptance remains blocked until then. |
 | `GAP-MCP-ACTIVATION` | Open | `.omp/mcp.json` is present, but OMP loads project MCP at session startup | Owner or next session | Launch OMP from the repository root, then run `/mcp list` and `/mcp test serena`. |
 | `GAP-PUBLICATION-SANITIZATION` | Mitigated for the approved PR; open for raw-source publication | Root `.gitignore` excludes `chatroom_notes.md`, `Oncologist Pain Points_v2.docx`, private research inputs/recordings, local secrets, credentials, and key material; pre-push scanning is required | Repository owner | Publish only de-identified analysis by PR. Never publish the raw expanded DOCX or chat source without a separately approved sanitized replacement. |
-| `GAP-DIRECT-WORKFLOW-OBSERVATION` | Accepted research limitation | Direct oncologist access has proven difficult; current phase uses independent research and internal analyst clarification | Repository owner | Keep transfer limits visible and do not claim desk research or selected accounts prove local workflow prevalence. |
+| `GAP-DIRECT-WORKFLOW-OBSERVATION` | Partially narrowed; product review received, workflow observation remains open | One de-identified oncologist reviewed the deployed portal and raised eight product/source preferences, recorded as one independent source group in `EV-0071`–`EV-0078`; no task observation, failed-query trace, timing, or burden baseline was supplied | Repository owner | Run a structured search session using expected cancer, drug, geography, and source examples; record task success, source opening, trust, time, and missing-result reasons without retaining identity. |
 | `GAP-TUMOUR-BOARD-LOCAL-WORKFLOW` | Narrowed, internally routed | V2 contains no answered tumour-board workflow; existing Indian examples still do not establish a current general target-site owner, acknowledgement, person-time, or baseline | Agent and repository owner | Ask the internal analyst first. Resume a separately approved external operator request only if internal evidence remains insufficient. |
 | `GAP-OUTREACH-AUTHORITY` | Paused by owner | An external email was prepared but not sent; the owner redirected validation to the internal analyst after providing the expanded source | Repository owner | Do not send externally. Require fresh point-of-risk confirmation for the exact recipient, channel, and message if external outreach later resumes. |
 | `GAP-V2-PROVENANCE` | Open | The expanded source mixes duplicate synthesis, proposed questionnaires, author assumptions, three sensitive caregiver accounts, and an uncited primer | Internal analyst and repository owner | Clarify authorship, sample, method, whether questionnaires were administered, and whether de-identified answer notes exist. |
 | `GAP-CTRI-BULK-ACCESS` | Open; research mirror measured | Direct CTRI search is CAPTCHA/CSRF gated with no documented bulk API or open/commercial reuse terms found; the permitted WHO mirror was 4,611 primary records behind the CTRI homepage count and prohibits commercial/marketing/promotional use | Repository owner and source authority | Obtain written CTRI access/reuse terms and a supported current bulk/API path before any product or demo dependency; preserve the private WHO snapshot only for approved non-commercial research. |
+| `GAP-TRIAL-COVERAGE-AND-EVIDENCE-SCOPE` | Open; one clinician source claim | The reviewer judged 285 India-located records too small and requested global trials, specialist-centre connections, concise abstracts, drug-centred discovery, publications, and a multi-trial drug report | Repository owner and agent | Test coverage framing, intervention indexing, and deterministic abstracts on the approved source first; separately decide global registry scope, bibliographic source/licence, institutional authority, and the non-clinical boundary for any cross-trial evidence map. |
 
 ## Report index
 
@@ -202,6 +205,7 @@ On 2026-09-20 the owner authorised production deployment. The merged React/Vite 
 | `C3` | `P5` | `.harness/reports/20260920T180806Z-P5-production-deployment.md` | Complete; deployed to production and verified through pull request `#35`; live pilot services remain blocked |
 | `C2` | `P5` | `.harness/reports/20260922T134644Z-P5-home-journey-alignment.md` | Complete; merged and deployed through pull request `#37` |
 | `C2` | `P5` | `.harness/reports/20260922T144344Z-P5-liquid-glass-material.md` | Complete; merged and deployed through pull request `#38` |
+| `C2` | `P5` | `.harness/reports/20260922T150041Z-P5-clinician-portal-feedback.md` | Complete locally; sound removal and de-identified clinician evidence await review merge |
 
 ## References
 
@@ -264,3 +268,4 @@ On 2026-09-20 the owner authorised production deployment. The merged React/Vite 
 - `.harness/reports/20260920T180806Z-P5-production-deployment.md`
 - `.harness/reports/20260922T134644Z-P5-home-journey-alignment.md`
 - `.harness/reports/20260922T144344Z-P5-liquid-glass-material.md`
+- `.harness/reports/20260922T150041Z-P5-clinician-portal-feedback.md`
