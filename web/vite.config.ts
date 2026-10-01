@@ -1,9 +1,10 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import { publicApiDevelopment } from "./scripts/public-api-dev.ts";
 
 export default defineConfig({
   base: "./",
-  plugins: [react()],
+  plugins: [react(), publicApiDevelopment()],
   build: {
     outDir: "dist",
     emptyOutDir: true,

@@ -1,94 +1,258 @@
-import { Glass } from "@samasante/liquid-glass";
-import { ThinkingOrb } from "thinking-orbs";
-import type { OrbState } from "thinking-orbs";
-import { Link, useParams, useSearchParams } from "react-router-dom";
-import { Icon } from "../components/Icon";
-import { EmptyState, PageHeader, SafetyNote, SourceBadge, StatusChip } from "../components/Primitives";
 import { PilotHandoffPanel } from "../components/PilotHandoffPanel";
-import { compactGlassOptics } from "../design/glass";
+import { Link, useParams, useSearchParams } from "react-router-dom";
+import { PageHeader, SafetyNote, EmptyState } from "../components/Primitives";
+import { SourceInventory } from "../components/PatientEvidence";
+import { MatchingResults } from "../components/MatchingResults";
+import { GapTasks } from "../components/GapTasks";
+import { useWorkflow } from "../state/WorkflowState";
 import { useAppState } from "../state/AppState";
-import { useTrialData } from "../state/TrialData";
-
-const sections = ["overview", "sources", "reviews", "tasks", "handoffs"] as const;
-type PatientSection = (typeof sections)[number];
-const sectionOrbStates: Record<PatientSection, OrbState> = {
-  overview: "breathing",
-  sources: "searching",
-  reviews: "solving",
-  tasks: "weaving",
-  handoffs: "connecting",
-};
-
+import { demoFields } from "../domain/patients";
+import { isAssessmentCurrent } from "../domain/workflow";
+const sections = ["Overview", "Sources", "Trial matches", "Tasks", "Handoffs"];
+const sectionIds = ["overview", "sources", "matches", "tasks", "handoffs"];
 export function PatientWorkspacePage() {
   const { patientId } = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const { advanceSimulatedHandoff, handoffs, patients, workItems } = useAppState();
-  const { findTrial, status: trialDataStatus } = useTrialData();
-  const patient = patients.find((candidate) => candidate.id === patientId);
-  const requestedSection = searchParams.get("section") as PatientSection | null;
-  const section: PatientSection = requestedSection && sections.includes(requestedSection) ? requestedSection : "overview";
-
-  if (!patient) {
-    return <div className="page"><EmptyState icon="warning" title="Workspace not found">This browser session does not contain the requested synthetic or approved de-identified research workspace.</EmptyState></div>;
-  }
-
-  const patientTasks = workItems.filter((item) => item.route.includes(patient.id) && item.kind === "task");
-  const patientHandoffs = handoffs.filter((handoff) => handoff.patientId === patient.id);
-  const approvedResearch = patient.dataBoundary === "Approved de-identified research";
-
+  const [params, setParams] = useSearchParams();
+  const { state, command, error } = useWorkflow();
+  const { patients: researchPatients, roleId } = useAppState();
+  const patient = state.patients.find((p) => p.id === patientId);
+  const research = researchPatients.find(
+    (p) =>
+      p.id === patientId &&
+      p.dataBoundary === "Approved de-identified research",
+  );
+  const section = params.get("section") ?? "overview";
+  if (research)
+    return (
+      <div className="page">
+        <Link to="/patients">Back to patients</Link>
+        <PageHeader
+          title={research.label}
+          eyebrow="Approved research · not eligible for synthetic matching"
+          description={`Approval reference: ${research.approvalReference}`}
+        />
+        <div className="fact-grid">
+          {research.facts.map((f) => (
+            <article className="fact-card" key={f.id}>
+              <strong>{f.label}</strong>
+              <span>{f.value}</span>
+              <small>{f.sourceLabel}</small>
+            </article>
+          ))}
+        </div>
+        <p>
+          Original source artifacts were not supplied with this approved
+          structured import.
+        </p>
+        <Link to={`/trials?reviewFor=${research.id}`}>
+          Open general library for manual source review
+        </Link>
+      </div>
+    );
+  if (!patient)
+    return (
+      <div className="page">
+        <EmptyState icon="warning" title="Patient not in this session">
+          Created demo records reset on reload.{" "}
+          <Link to="/patients">Open patients</Link>
+        </EmptyState>
+      </div>
+    );
+  const assessments = state.runs
+    .flatMap((r) => r.assessments)
+    .filter((a) => a.patientId === patient.id);
   return (
     <div className="page patient-page">
-      <Link className="back-link" to="/patients">← Back to Patient Workspaces</Link>
+      <Link className="back-link" to="/patients">
+        Back to Patients
+      </Link>
       <PageHeader
-        eyebrow={`${patient.id} · ${patient.dataBoundary}`}
+        eyebrow={`${patient.id} · Synthetic demo · record v${patient.version}`}
         title={patient.label}
-        description={`${patient.context} · owned by ${patient.owner} at ${patient.institution}`}
-        actions={<Link className="button secondary" to={`/trials?reviewFor=${patient.id}`}>Find trials to review manually</Link>}
+        description={`${patient.context} · ${patient.scenario} · ${patient.owner}`}
+        actions={
+          <Link
+            className="button primary"
+            to={`/patients/${patient.id}?section=matches`}
+          >
+            Find matching trials
+          </Link>
+        }
       />
-      <SafetyNote><p>{approvedResearch ? <><strong>Approved de-identified research workspace.</strong> This browser-only record carries no direct identifiers, is not a system of record, and is not sent to the AI assistant. Approval reference: {patient.approvalReference}.</> : <><strong>EMR remains the clinical system of record.</strong> These are source-labelled synthetic facts and browser-memory workflow states.</>} Trial Relay does not infer diagnosis, stage, biomarkers, response, risk, fit, or eligibility.</p></SafetyNote>
-      <Glass
-        className="section-tabs-glass"
-        optics={compactGlassOptics}
-        filterResolution={2}
-        refract={<div className="glass-refract-field glass-refract-field-tabs" aria-hidden="true" />}
-        behind="#e7efeb"
-      >
+      <SafetyNote>
+        <p>
+          <strong>Synthetic demonstration.</strong> Facts, machine findings,
+          human review and trial-side disposition remain separate. No autonomous
+          eligibility or treatment recommendation. Changes reset on reload.
+        </p>
+      </SafetyNote>
+      {error && <p role="alert">{error}</p>}
+      <div className="section-tabs-glass">
         <nav className="section-tabs" aria-label="Patient workspace sections">
-          {sections.map((candidate) => <button className={section === candidate ? "active" : ""} type="button" key={candidate} onClick={() => {
-            const next = new URLSearchParams(searchParams);
-            if (candidate === "overview") next.delete("section"); else next.set("section", candidate);
-            setSearchParams(next);
-          }}><ThinkingOrb state={sectionOrbStates[candidate]} size={20} theme="light" paused={section !== candidate} aria-hidden="true" />{candidate.charAt(0).toUpperCase() + candidate.slice(1)}</button>)}
+          {sections.map((label, i) => (
+            <button
+              className={section === sectionIds[i] ? "active" : ""}
+              key={label}
+              onClick={() => setParams({ section: sectionIds[i]! })}
+            >
+              {label}
+            </button>
+          ))}
         </nav>
-      </Glass>
-
-      {section === "overview" ? <section className="workspace-section" aria-labelledby="overview-heading">
-        <div className="section-heading"><div><p className="eyebrow">At a glance</p><h2 id="overview-heading">Workspace overview</h2></div><StatusChip tone={approvedResearch ? "source" : "human"}>{patient.dataBoundary}</StatusChip></div>
-        <div className="fact-grid">{patient.facts.slice(0, 4).map((fact) => <article className="fact-card" key={fact.id}><span>{fact.label}</span><strong>{fact.value}</strong><SourceBadge source={fact.sourceType} /><small>{fact.sourceLabel}</small></article>)}</div>
-      </section> : null}
-
-      {section === "sources" ? <section className="workspace-section" aria-labelledby="sources-heading">
-        <div className="section-heading"><div><p className="eyebrow">Fact-level provenance</p><h2 id="sources-heading">Sources</h2></div><StatusChip tone="source">{patient.facts.length} facts</StatusChip></div>
-        <div className="source-fact-list">{patient.facts.map((fact) => <article key={fact.id}><div><span>{fact.label}</span><strong>{fact.value}</strong></div><div><SourceBadge source={fact.sourceType} /><span>{fact.sourceLabel}</span><time>{fact.recordedAt}</time></div></article>)}</div>
-      </section> : null}
-
-      {section === "reviews" ? <section className="workspace-section" aria-labelledby="reviews-heading">
-        <div className="section-heading"><div><p className="eyebrow">Clinician-selected only</p><h2 id="reviews-heading">Patient–Trial Reviews</h2></div><Link className="button secondary" to={`/trials?reviewFor=${patient.id}`}>Select from general library</Link></div>
-        {trialDataStatus === "loading" ? <EmptyState icon="source" title="Loading public trial source">Review links appear after the dated registry snapshot loads.</EmptyState> : patient.reviewTrialIds.length ? <div className="review-card-list">{patient.reviewTrialIds.map((trialId) => { const trial = findTrial(trialId); return trial ? <Link className="review-card" key={trialId} to={`/patients/${patient.id}/reviews/${trial.id}`}><span><code>{trial.id}</code><strong>{trial.briefTitle}</strong><small>Selected manually by the treating team · no recommendation</small></span><Icon name="arrow" /></Link> : null; })}</div> : <EmptyState icon="trials" title="No trial selected for review">Open the general Trial Library and choose a record manually. The product does not rank or recommend trials for this workspace.</EmptyState>}
-      </section> : null}
-
-      {section === "tasks" ? <section className="workspace-section" aria-labelledby="tasks-heading">
-        <div className="section-heading"><div><p className="eyebrow">Human-created work</p><h2 id="tasks-heading">Tasks</h2></div><StatusChip tone="attention">{patientTasks.filter((item) => item.status !== "resolved").length} open</StatusChip></div>
-        {patientTasks.length ? <div className="work-list">{patientTasks.map((item) => <article key={item.id}><Icon name="task" /><span><strong>{item.title}</strong><small>{item.summary}</small><span>{item.owner} · {item.id}</span></span><StatusChip tone={item.status === "resolved" ? "good" : "attention"}>{item.status}</StatusChip></article>)}</div> : <EmptyState icon="task" title="No owned tasks">Unknown source states remain unknown until a person explicitly creates or accepts work.</EmptyState>}
-      </section> : null}
-
-      {section === "handoffs" ? <section className="workspace-section" aria-labelledby="handoffs-heading">
-        <div className="section-heading"><div><p className="eyebrow">Separated service boundaries</p><h2 id="handoffs-heading">Handoffs</h2><p>Authenticated no-PHI pilot state and browser-only simulation remain visibly separate.</p></div></div>
-        <PilotHandoffPanel trialIds={patient.reviewTrialIds} />
-        <div className="subsection-heading"><p className="eyebrow">Browser-only demonstration</p><h3>Simulated handoff</h3></div>
-        <div className="handoff-warning"><Icon name="warning" /><p><strong>Nothing is sent from this prototype.</strong> These controls only simulate owner, approval, and acknowledgement states in browser memory. They do not contact a site, transmit records, or persist after reload.</p></div>
-        {patientHandoffs.map((handoff) => <article className="handoff-card" key={handoff.id}><span><code>{handoff.id}</code><strong>Simulation state: {handoff.state}</strong><small>Owner: {handoff.owner} · trial {handoff.trialId} · nothing transmitted</small></span><div className="handoff-actions"><StatusChip tone="human">Not sent · simulated</StatusChip>{handoff.state !== "Simulated acknowledgement" ? <button className="button secondary" type="button" onClick={() => advanceSimulatedHandoff(handoff.id)}>{handoff.state === "Draft" ? "Simulate ready state" : "Simulate acknowledgement"}</button> : null}</div></article>)}
-      </section> : null}
+      </div>
+      <section className="workspace-section">
+        {section === "overview" && (
+          <>
+            <h2>Recorded patient context</h2>
+            <p>
+              Full record grouped by source domain. Missing, conflicting and
+              unreviewed inputs stay explicit.
+            </p>
+            {[
+              "Clinic",
+              "Pathology",
+              "Molecular",
+              "Laboratory",
+              "Treatment",
+            ].map((group) => (
+              <section key={group}>
+                <h3>{group}</h3>
+                <div className="fact-grid">
+                  {demoFields
+                    .filter((f) => f.group === group)
+                    .map((field) => {
+                      const assertions = patient.assertions.filter(
+                        (a) =>
+                          a.concept === field.concept &&
+                          a.authority !== "rejected",
+                      );
+                      const conflict =
+                        new Set(
+                          assertions.map((a) =>
+                            JSON.stringify([a.value, a.unit]),
+                          ),
+                        ).size > 1;
+                      return (
+                        <article className="fact-card" key={field.concept}>
+                          <span>{field.label}</span>
+                          {!assertions.length ? (
+                            <strong>Not recorded</strong>
+                          ) : (
+                            assertions.map((a) => {
+                              const source = patient.artifacts.find(
+                                (s) => s.id === a.artifactId,
+                              );
+                              return (
+                                <div key={a.id}>
+                                  <strong>
+                                    {String(a.value)} {a.unit}
+                                  </strong>
+                                  <small className="block">
+                                    {conflict ? "Conflicting evidence · " : ""}
+                                    {a.authority} · observed {a.observedAt}
+                                  </small>
+                                  <small className="block">
+                                    {source?.origin ?? "Original unavailable"} ·{" "}
+                                    {source?.title} ·{" "}
+                                    {a.reviewer ?? "Not yet checked"}
+                                  </small>
+                                  <Link
+                                    to={`/patients/${patient.id}?section=sources&source=${encodeURIComponent(a.artifactId)}&locator=${encodeURIComponent(a.locator)}`}
+                                  >
+                                    View original at {a.locator}
+                                  </Link>
+                                </div>
+                              );
+                            })
+                          )}
+                        </article>
+                      );
+                    })}
+                </div>
+              </section>
+            ))}
+          </>
+        )}
+        {section === "sources" && <SourceInventory patient={patient} />}
+        {section === "matches" && (
+          <MatchingResults direction="patient-first" id={patient.id} />
+        )}
+        {section === "tasks" && <GapTasks patientId={patient.id} />}
+        {section === "handoffs" && (
+          <>
+            <PilotHandoffPanel trialIds={[...new Set(assessments.filter(a=>state.shortlist.includes(a.id)&&isAssessmentCurrent(state,a)).map(a=>a.trialId))]}/>
+            <h2>Reviewed packets and simulated handoffs</h2>
+            <p>
+              Browser-only state. Nothing is sent, no site is contacted, and
+              acknowledgement is simulated.
+            </p>
+            {state.packets
+              .filter((p) => assessments.some((a) => a.id === p.assessmentId))
+              .map((packet) => {
+                const assessment = assessments.find(
+                  (a) => a.id === packet.assessmentId,
+                )!;
+                const current = isAssessmentCurrent(state, assessment);
+                return (
+                  <article className="handoff-card" key={packet.id}>
+                    <h3>
+                      {assessment.trialId} · {packet.state}
+                    </h3>
+                    <p>
+                      {packet.author} · {packet.createdAt} ·{" "}
+                      {current
+                        ? "Current input versions"
+                        : "Stale — prepare a new reviewed packet"}
+                    </p>
+                    <details>
+                      <summary>Preview version-bound packet</summary>
+                      <pre>
+                        {JSON.stringify(
+                          {
+                            patient: patient.id,
+                            assessment,
+                            review: state.reviews.filter(
+                              (r) => r.assessmentId === assessment.id,
+                            ),
+                            disposition: state.dispositions.filter(
+                              (d) => d.assessmentId === assessment.id,
+                            ),
+                          },
+                          null,
+                          2,
+                        )}
+                      </pre>
+                    </details>
+                    <button
+                      className="button secondary"
+                      disabled={
+                        !current ||
+                        roleId === "auditor" ||
+                        packet.state === "Simulated acknowledgement"
+                      }
+                      onClick={() =>
+                        command({ type: "advance-packet", id: packet.id })
+                      }
+                    >
+                      {packet.state === "Draft"
+                        ? "Simulate ready state"
+                        : "Simulate acknowledgement"}
+                    </button>
+                  </article>
+                );
+              })}
+            {!state.packets.some((p) =>
+              assessments.some((a) => a.id === p.assessmentId),
+            ) && (
+              <p>
+                No packet yet. Shortlist an assessment, record every criterion
+                review and a trial-side disposition, then prepare the packet
+                from the review screen.
+              </p>
+            )}
+          </>
+        )}
+      </section>
     </div>
   );
 }

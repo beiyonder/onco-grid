@@ -1,11 +1,12 @@
 import { type ChangeEvent, type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   approvedResearchFactLabels,
   parseApprovedResearchRecord,
 } from "../data/researchImport";
 import { useAppState } from "../state/AppState";
+import { useWorkflow } from "../state/WorkflowState";
 import type { PatientWorkspace, TrialRecord } from "../types";
 import { Icon } from "./Icon";
 import { StatusChip } from "./Primitives";
@@ -62,6 +63,8 @@ function workspaceMeetsFilters(workspace: PatientWorkspace, filters: CohortFilte
 
 export function TrialCoverageTools({ trial }: { trial: TrialRecord }) {
   const navigate = useNavigate();
+  const {state:workflow}=useWorkflow();
+  const syntheticPatients=workflow.patients;
   const {
     importApprovedResearchWorkspace,
     patients,
@@ -114,7 +117,7 @@ export function TrialCoverageTools({ trial }: { trial: TrialRecord }) {
   const openReview = (patientId: string) => {
     startPatientTrialReview(patientId, trial.id);
     setPanel(null);
-    navigate(`/patients/${patientId}/reviews/${trial.id}`);
+    navigate(`/research/${patientId}/reviews/${trial.id}`);
   };
 
   const importResearchRecord = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -136,7 +139,7 @@ export function TrialCoverageTools({ trial }: { trial: TrialRecord }) {
       const patientId = importApprovedResearchWorkspace(record);
       startPatientTrialReview(patientId, trial.id);
       setPanel(null);
-      navigate(`/patients/${patientId}/reviews/${trial.id}`);
+      navigate(`/research/${patientId}/reviews/${trial.id}`);
     } catch (error) {
       setImportError(error instanceof Error ? error.message : "The research record could not be imported.");
     }
@@ -161,19 +164,21 @@ export function TrialCoverageTools({ trial }: { trial: TrialRecord }) {
 
   return <>
     <button className="button primary" type="button" onClick={() => setPanel("patient")}><Icon name="patients" /> Review with patient</button>
-    <button className="button secondary" type="button" onClick={() => setPanel("cohort")}><Icon name="filter" /> Review cohort coverage</button>
+    <button className="button secondary" type="button" onClick={() => setPanel("cohort")}><Icon name="filter" /> Approved research cohort filters</button>
+    <Link className="button secondary" to={`/studies?trial=${trial.id}`}>Open synthetic PI candidate queue</Link>
     {panel ? createPortal(
       <div className="coverage-dialog-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) close(); }}>
         <section className="coverage-dialog" role="dialog" aria-modal="true" aria-labelledby="coverage-dialog-heading">
           <header>
-            <div><p className="eyebrow">{trial.id} · clinician initiated</p><h2 id="coverage-dialog-heading" tabIndex={-1}>{panel === "patient" ? "Review this trial with a patient" : "Review explicit cohort coverage"}</h2><p>No match score, ranking, “best trial,” close-match label, or eligibility conclusion is produced.</p></div>
+            <div><p className="eyebrow">{trial.id} · clinician initiated</p><h2 id="coverage-dialog-heading" tabIndex={-1}>{panel === "patient" ? "Review this trial with a patient" : "Review explicit approved-research cohort coverage"}</h2><p>Synthetic pre-screening is separate from approved research, which remains manual and unscored. Neither establishes eligibility.</p></div>
             <button className="preview-close" type="button" onClick={close} aria-label="Close review tools"><Icon name="close" /></button>
           </header>
 
           {panel === "patient" ? <div className="coverage-dialog-body">
-            <div className="coverage-boundary" role="note"><Icon name="shield" /><span><strong>Manual criterion review only.</strong>Select an existing workspace or import an institutionally approved de-identified research record. Patient facts never change trial ordering and are never sent to the AI assistant.</span></div>
+            <div className="coverage-boundary" role="note"><Icon name="shield" /><span><strong>Choose the record boundary.</strong>Synthetic examples open contextual pre-screening for this trial. Institutionally approved research opens manual source review only. Facts remain in browser memory and are never sent to the AI assistant.</span></div>
             <label className="search-field" htmlFor="coverage-patient-search"><span>Find a patient workspace</span><span className="input-with-icon"><Icon name="search" /><input id="coverage-patient-search" type="search" value={patientQuery} onChange={(event) => setPatientQuery(event.target.value)} placeholder="Synthetic ID, workspace, context, or owner" /></span></label>
             <div className="coverage-patient-list">
+              {syntheticPatients.filter(p=>`${p.id} ${p.label} ${p.context} ${p.scenario}`.toLowerCase().includes(patientQuery.toLowerCase())).map(patient=><article key={patient.id}><div><code>{patient.id}</code><h3>{patient.label}</h3><p>{patient.context} · {patient.scenario}</p><StatusChip tone="human">Synthetic only</StatusChip></div><button className="button secondary" type="button" onClick={()=>{setPanel(null);navigate(`/patients/${patient.id}?section=matches&trial=${trial.id}&scope=selected`);}}>Review selected trial</button></article>)}
               {filteredPatients.map((patient) => <article key={patient.id}>
                 <div><code>{patient.id}</code><h3>{patient.label}</h3><p>{patient.context}</p><span><StatusChip tone={patient.dataBoundary === "Synthetic demo" ? "human" : "source"}>{patient.dataBoundary}</StatusChip> · {patient.facts.length} sourced facts · owner {patient.owner}</span></div>
                 <button className="button secondary" type="button" onClick={() => openReview(patient.id)}>Open criterion review</button>

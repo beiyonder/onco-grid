@@ -1,5 +1,6 @@
-import { type FormEvent, useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import type { FormEvent } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { EmptyState, InfoTip, PageHeader, SafetyNote, StatusChip } from "../components/Primitives";
 import { SourceAbstract } from "../components/SourceAbstract";
@@ -15,6 +16,7 @@ import {
 } from "../data/evidence";
 import { formatSourceDate } from "../data/trials";
 import { useTrialData } from "../state/TrialData";
+const WorldSpatialLens=lazy(()=>import("../components/WorldSpatialLens").then(module=>({default:module.WorldSpatialLens})));
 
 const institutionProxies = [
   {
@@ -60,21 +62,33 @@ function responseError(payload: unknown, fallback: string): string {
     : fallback;
 }
 
+// Only public registry search data is retained between in-app detail navigation.
+let lastGlobalSearch: {mode:"condition"|"intervention";query:string;result:GlobalTrialSearchResult}|null=null;
+
 export function EvidenceCoveragePage() {
   const { error, retry, snapshot, status, trials } = useTrialData();
+  const [searchParams,setSearchParams]=useSearchParams();
   const [conditionQuery, setConditionQuery] = useState("");
   const [conditionLimit, setConditionLimit] = useState(20);
   const [interventionQuery, setInterventionQuery] = useState("");
   const [interventionLimit, setInterventionLimit] = useState(24);
   const [selectedTrialId, setSelectedTrialId] = useState("");
-  const [globalMode, setGlobalMode] = useState<"condition" | "intervention">("intervention");
-  const [globalQuery, setGlobalQuery] = useState("");
+  const [globalMode, setGlobalMode] = useState<"condition" | "intervention">(searchParams.has("mode")?(searchParams.get("mode")==="condition"?"condition":"intervention"):lastGlobalSearch?.mode??"intervention");
+  const [globalQuery, setGlobalQuery] = useState(searchParams.get("q")??lastGlobalSearch?.query??"");
   const [globalResult, setGlobalResult] = useState<GlobalTrialSearchResult | null>(null);
   const [globalLoading, setGlobalLoading] = useState(false);
   const [globalError, setGlobalError] = useState("");
+  const [showWorld,setShowWorld]=useState(false);
   const [publicationResult, setPublicationResult] = useState<PublicationSearchResult | null>(null);
   const [publicationLoading, setPublicationLoading] = useState(false);
   const [publicationError, setPublicationError] = useState("");
+  const globalRequest = useRef<AbortController | null>(null);
+  useEffect(() => {
+    globalRequest.current?.abort();
+    setGlobalLoading(false);
+    setGlobalResult(lastGlobalSearch?.mode===globalMode&&lastGlobalSearch.query===globalQuery?lastGlobalSearch.result:null);
+    return () => globalRequest.current?.abort();
+  }, [globalMode, globalQuery]);
 
   useEffect(() => {
     if (!selectedTrialId && trials[0]) setSelectedTrialId(trials[0].id);
@@ -103,7 +117,11 @@ export function EvidenceCoveragePage() {
     const term = globalQuery.trim();
     if (!term || globalLoading) return;
     const append = Boolean(pageToken);
+    globalRequest.current?.abort();
+    const controller = new AbortController();
+    globalRequest.current = controller;
     setGlobalLoading(true);
+    setSearchParams({mode:globalMode,q:term},{replace:true});
     setGlobalError("");
     if (!append) {
       setGlobalResult(null);
@@ -113,19 +131,20 @@ export function EvidenceCoveragePage() {
     try {
       const params = new URLSearchParams({ mode: globalMode, q: term });
       if (pageToken) params.set("pageToken", pageToken);
-      const response = await fetch(`/api/global-trials?${params.toString()}`, { headers: { accept: "application/json" } });
+      const response = await fetch(`/api/global-trials?${params.toString()}`, { headers: { accept: "application/json" }, signal: controller.signal });
       const payload = await response.json() as GlobalTrialSearchResult | ApiErrorPayload;
+      if (controller.signal.aborted) return;
       if (!response.ok) throw new Error(responseError(payload, "Global evidence could not be loaded."));
       const result = payload as GlobalTrialSearchResult;
       setGlobalResult((current) => {
-        if (!append || !current) return result;
-        const trialsById = new Map([...current.trials, ...result.trials].map((trial) => [trial.id, trial]));
-        return { ...result, trials: Array.from(trialsById.values()) };
+        const combined=!append||!current?result:{...result,totalCount:result.totalCount??current.totalCount,trials:Array.from(new Map([...current.trials,...result.trials].map(trial=>[trial.id,trial])).values())};
+        lastGlobalSearch={mode:globalMode,query:term,result:combined};
+        return combined;
       });
     } catch (requestError) {
-      setGlobalError(requestError instanceof Error ? requestError.message : "Global evidence could not be loaded.");
+      if (!controller.signal.aborted) setGlobalError(requestError instanceof Error ? requestError.message : "Global evidence could not be loaded.");
     } finally {
-      setGlobalLoading(false);
+      if (!controller.signal.aborted) setGlobalLoading(false);
     }
   };
 
@@ -251,7 +270,8 @@ export function EvidenceCoveragePage() {
         {globalError ? <div className="source-error" role="alert"><Icon name="warning" /><span><strong>Global source unavailable</strong><small>{globalError}</small></span><button className="button secondary" type="button" onClick={() => void loadGlobalEvidence()}>Retry</button></div> : null}
         {globalResult ? <>
           <div className="global-result-summary"><span><strong>{globalResult.trials.length.toLocaleString("en-IN")} loaded</strong><small>{globalResult.totalCount === null ? "Upstream total not reported" : `${globalResult.totalCount.toLocaleString("en-IN")} upstream matches`} · fetched {new Date(globalResult.source.fetchedAt).toLocaleString("en-IN")}</small></span><a className="text-action" href={globalResult.source.queryUrl} target="_blank" rel="noreferrer">Open exact API query <Icon name="external" /></a></div>
-          <div className="global-trial-list">{globalResult.trials.map((trial) => <article key={trial.id}><header><code>{trial.id}</code><StatusChip tone="source">{trial.statusLabel}</StatusChip><span>{trial.phases.join(", ") || "Phase not reported"}</span></header><h3>{trial.briefTitle}</h3><p className="global-condition-line">{trial.conditions.join(" · ") || "Conditions not reported"}</p><p className="global-summary-excerpt">{trial.briefSummary}</p><details className="global-abstract-disclosure"><summary>Read source abstract</summary><SourceAbstract value={deterministicGlobalTrialAbstract(trial)} /></details><a className="button secondary" href={trial.sourceUrl} target="_blank" rel="noreferrer">Open ClinicalTrials.gov <Icon name="external" /></a></article>)}</div>
+          <details onToggle={event=>setShowWorld(event.currentTarget.open)}><summary>Switch to global spatial lens</summary>{showWorld&&<Suspense fallback={<p role="status">Loading country geometry. The complete loaded-results list remains available below.</p>}><WorldSpatialLens trials={globalResult.trials} total={globalResult.totalCount} /></Suspense>}</details>
+          <div className="global-trial-list">{globalResult.trials.map((trial) => <article key={trial.id}><header><code>{trial.id}</code><StatusChip tone="source">{trial.statusLabel}</StatusChip><span>{trial.phases.join(", ") || "Phase not reported"}</span></header><h3>{trial.briefTitle}</h3><p className="global-condition-line">{trial.conditions.join(" · ") || "Conditions not reported"}</p><p className="global-summary-excerpt">{trial.briefSummary}</p><details className="global-abstract-disclosure"><summary>Read source abstract</summary><SourceAbstract value={deterministicGlobalTrialAbstract(trial)} /></details><Link className="button primary" to={`/trials/global/${trial.id}`}>Open complete global detail</Link><a className="button secondary" href={trial.sourceUrl} target="_blank" rel="noreferrer">Open ClinicalTrials.gov <Icon name="external" /></a></article>)}</div>
           {globalResult.nextPageToken ? <button className="button secondary evidence-more" type="button" disabled={globalLoading} onClick={() => void loadGlobalEvidence(globalResult.nextPageToken)}>{globalLoading ? "Loading…" : `Load next ${globalResult.query.pageSize} registry records`}</button> : null}
         </> : <EmptyState icon="search" title="Search global trials">Choose a field and enter a registry term.</EmptyState>}
       </section>

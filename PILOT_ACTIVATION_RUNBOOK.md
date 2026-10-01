@@ -188,3 +188,23 @@ Do not treat deployment, a successful API call, or synthetic demonstrations as e
 - Revoke/rotate `OPENAI_API_KEY` to disable generated output immediately.
 - Disable affected Supabase users and official-response grants during an access incident.
 - Do not drop pilot tables or audit events as an emergency shortcut. Use a separately reviewed migration and retention decision.
+
+## 2026-10-01 synthetic renovation pickup
+
+**FACT:** The local renovation adds twelve numbered synthetic cases, exact original-source viewing, six source-linked demonstration criterion models, deterministic bidirectional pre-screening, human review overlays, accepted evidence tasks, PI dispositions, and simulated packets. Approved research stays manual and unscored. The existing remote deployment is not updated merely by running these local checks.
+
+### Local execution and checks
+
+From `web/`, run `npm run dev` for the app and its narrow public-source development API bridge. Run `npm run build` and `npm test` for strict compilation and the behavioral suite. `npm run preview` serves the built static artifact; it is not a substitute for the Vercel Functions runtime. `npm run generate:world` regenerates the bundled Natural Earth geometry from the existing `world-atlas` dependency.
+
+1. Open Patients: confirm Patient 1–12, original artifacts, missing/conflicting assertions, and the synthetic/reload boundary. Create a thin-intake example only from the supplied controls.
+2. Open My studies as the demo PI or oncologist. Inspect exact source spans and predicate JSON, enter a publication reason, and explicitly publish the demonstration revision. Other studies remain unmodeled; publication is not clinical approval.
+3. Run patient-first or trial-first pre-screening. Inspect support denominator, violations, unresolved requirements, source/model versions and exact predicate traces.
+4. Accept an unresolved information task. Attach a supplied value as coordinator; observe evidence-received, not confirmation. Confirm/reconcile as demo oncologist with a reason, then rerun affected studies. Unable-to-obtain closes effort, not the fact gap.
+5. Record individual reviews or explicitly select supported findings only. Add the version-bound assessment to the shortlist, record a separate PI site/owner disposition, prepare the packet, and use only the labelled simulation transitions.
+6. Revise an input or publish a new model version. Old assessments/packets must become stale and reject new decisions/release. Reload must reset the browser-only demonstration.
+7. Search a public intervention/topic in the evidence workspace. Inspect complete global detail, append results, switch to the country map, select countries/unplaced studies, and return to the same query. Counts describe the loaded set, not exhaustive site coverage or access.
+
+**OBSERVED:** The implementation report and synthetic-only screenshots are in [the C5 acceptance report](.harness/reports/20261001T151302Z-P5-workflow-renovation-implementation.md). It records 28 passing tests, zero dependency-audit vulnerabilities, a zero-finding scoped native security scan, source/privacy checks and exercised browser journeys.
+
+**OPEN:** Do not represent this as clinically qualified matching, real-patient support, or live referral delivery. The existing live-service configuration/rotation requirements above remain in force. Production publication still requires the repository review-branch/PR and privacy process.

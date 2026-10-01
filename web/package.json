@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "generate:map": "node scripts/generate-india-boundary.mjs",
+    "generate:world": "node scripts/generate-world-boundary.mjs",
     "build": "npm run typecheck && vite build",
     "typecheck": "tsc --noEmit && tsc -p tsconfig.api.json --noEmit",
     "test": "tsx --test api/_shared/*.test.ts src/data/*.test.ts",

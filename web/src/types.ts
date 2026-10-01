@@ -160,12 +160,3 @@ export interface CorrectionTicket {
   createdAt: string;
   status: "Open" | "Resolved";
 }
-
-export interface HandoffRecord {
-  id: string;
-  patientId: string;
-  trialId: string;
-  owner: string;
-  state: "Draft" | "Ready for simulation" | "Simulated acknowledgement";
-  updatedAt: string;
-}

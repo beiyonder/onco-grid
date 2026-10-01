@@ -1,5 +1,6 @@
 import type { ApiRequest, ApiResponse } from "./_shared/http.js";
 import { fetchOfficialTrialEvidence } from "./_shared/clinicalTrials.js";
+import { validateQueryKeys } from "./_shared/policy.js";
 
 export default async function handler(request: ApiRequest, response: ApiResponse): Promise<void> {
   response.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -11,13 +12,14 @@ export default async function handler(request: ApiRequest, response: ApiResponse
   }
 
   try {
+    validateQueryKeys(request.query, ["id"]);
     const trialId = Array.isArray(request.query.id) ? request.query.id[0] : request.query.id;
     const evidence = await fetchOfficialTrialEvidence(trialId);
     response.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=3600");
     response.status(200).json({ evidence });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Official evidence could not be loaded.";
-    const status = message.includes("valid NCT") ? 400 : message.includes("not found") ? 404 : 502;
+    const status = /valid NCT|Unsupported query/.test(message) ? 400 : message.includes("not found") ? 404 : 502;
     response.status(status).json({ error: "official_source_error", message });
   }
 }

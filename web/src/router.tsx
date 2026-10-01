@@ -10,6 +10,9 @@ import { PatientsPage } from "./pages/PatientsPage";
 import { TrialDetailPage } from "./pages/TrialDetailPage";
 import { TrialRoomPage } from "./pages/TrialRoomPage";
 import { TrialsPage } from "./pages/TrialsPage";
+import { StudiesPage } from "./pages/StudiesPage";
+import { GlobalTrialPage } from "./pages/GlobalTrialPage";
+import { ResearchReviewPage } from "./pages/ResearchReviewPage";
 
 function RouteErrorPage() {
   const error = useRouteError();
@@ -26,9 +29,12 @@ export const router = createHashRouter([
       { index: true, element: <HomePage /> },
       { path: "trials", element: <TrialsPage /> },
       { path: "trials/evidence", element: <EvidenceCoveragePage /> },
+      { path: "trials/global/:trialId", element: <GlobalTrialPage /> },
+      { path: "studies", element: <StudiesPage /> },
       { path: "trials/:trialId", element: <TrialDetailPage /> },
       { path: "trials/:trialId/room", element: <TrialRoomPage /> },
       { path: "patients", element: <PatientsPage /> },
+      { path: "research/:patientId/reviews/:trialId", element: <ResearchReviewPage /> },
       { path: "patients/:patientId", element: <PatientWorkspacePage /> },
       { path: "patients/:patientId/reviews/:trialId", element: <PatientTrialReviewPage /> },
       { path: "inbox", element: <InboxPage /> },

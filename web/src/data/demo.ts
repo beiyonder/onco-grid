@@ -1,6 +1,5 @@
 import type {
   CorrectionTicket,
-  HandoffRecord,
   PatientWorkspace,
   ReviewRecord,
   Role,
@@ -11,126 +10,13 @@ import type {
 export const roles: Role[] = [
   { id: "coordinator", name: "A. Rao", title: "Research coordinator", initials: "AR" },
   { id: "oncologist", name: "Dr M. Shah", title: "Treating oncologist", initials: "MS" },
-  { id: "site", name: "Site steward", title: "Authorised trial-side role", initials: "SS" },
+  { id: "site", name: "Demo PI", title: "Principal investigator / trial-side reviewer", initials: "PI" },
   { id: "auditor", name: "Auditor", title: "Read-only reviewer", initials: "AU" },
 ];
 
-export const initialPatients: PatientWorkspace[] = [
-  {
-    id: "SYN-2047",
-    label: "Synthetic Cedar workspace",
-    context: "NSCLC · Stage IV · clinician-led review",
-    owner: "Dr M. Shah",
-    institution: "Western Oncology Unit",
-    dataBoundary: "Synthetic demo",
-    lastActivity: "2026-09-19T13:42:00Z",
-    reviewTrialIds: ["NCT06345729"],
-    facts: [
-      {
-        id: "fact-diagnosis",
-        label: "Diagnosis",
-        value: "Non-small cell lung cancer",
-        sourceType: "Clinician confirmed",
-        sourceLabel: "Synthetic pathology summary PATH-SYN-2047",
-        recordedAt: "2026-09-18",
-      },
-      {
-        id: "fact-stage",
-        label: "Stage",
-        value: "Stage IV",
-        sourceType: "Clinician confirmed",
-        sourceLabel: "Synthetic treating-team note NOTE-SYN-2047",
-        recordedAt: "2026-09-18",
-      },
-      {
-        id: "fact-pdl1",
-        label: "PD-L1 TPS",
-        value: "60%",
-        sourceType: "Synthetic document",
-        sourceLabel: "Synthetic biomarker report BIO-SYN-2047",
-        recordedAt: "2026-09-17",
-      },
-      {
-        id: "fact-kras",
-        label: "KRAS G12C",
-        value: "Unknown — source retrieval required",
-        sourceType: "Clinician confirmed",
-        sourceLabel: "Explicitly marked unknown by Dr M. Shah",
-        recordedAt: "2026-09-19",
-      },
-    ],
-  },
-  {
-    id: "SYN-3112",
-    label: "Synthetic Lotus workspace",
-    context: "Breast cancer · source collation",
-    owner: "A. Rao",
-    institution: "Central Research Desk",
-    dataBoundary: "Synthetic demo",
-    lastActivity: "2026-09-19T09:15:00Z",
-    reviewTrialIds: [],
-    facts: [
-      {
-        id: "fact-diagnosis",
-        label: "Diagnosis context",
-        value: "Breast cancer",
-        sourceType: "Synthetic document",
-        sourceLabel: "Synthetic referral brief REF-SYN-3112",
-        recordedAt: "2026-09-16",
-      },
-      {
-        id: "fact-receptor",
-        label: "Receptor details",
-        value: "Not supplied",
-        sourceType: "Manual synthetic entry",
-        sourceLabel: "Synthetic intake demonstration",
-        recordedAt: "2026-09-19",
-      },
-    ],
-  },
-  {
-    id: "SYN-4820",
-    label: "Synthetic Monsoon workspace",
-    context: "Colorectal cancer · missing records",
-    owner: "A. Rao",
-    institution: "Eastern Oncology Unit",
-    dataBoundary: "Synthetic demo",
-    lastActivity: "2026-09-18T15:30:00Z",
-    reviewTrialIds: [],
-    facts: [
-      {
-        id: "fact-diagnosis",
-        label: "Diagnosis context",
-        value: "Colorectal cancer",
-        sourceType: "Clinician confirmed",
-        sourceLabel: "Synthetic clinician note NOTE-SYN-4820",
-        recordedAt: "2026-09-18",
-      },
-      {
-        id: "fact-molecular",
-        label: "Molecular report",
-        value: "Not available",
-        sourceType: "Manual synthetic entry",
-        sourceLabel: "Synthetic coordinator intake",
-        recordedAt: "2026-09-18",
-      },
-    ],
-  },
-];
+export const initialPatients: PatientWorkspace[] = [];
 
 export const initialWorkItems: WorkItem[] = [
-  {
-    id: "TASK-SYN-2047-criterion-3",
-    kind: "task",
-    title: "Retrieve KRAS G12C source result",
-    summary: "Human-created missing-information task for Synthetic Cedar workspace.",
-    sourceLabel: "Patient–Trial Review · NCT06345729",
-    owner: "A. Rao",
-    occurredAt: "2026-09-19T13:42:00Z",
-    status: "open",
-    route: "/patients/SYN-2047/reviews/NCT06345729?criterion=criterion-3",
-    roleIds: ["coordinator", "oncologist"],
-  },
   {
     id: "MSG-NCT06345729-2",
     kind: "message",
@@ -154,30 +40,6 @@ export const initialWorkItems: WorkItem[] = [
     status: "unread",
     route: "/trials/NCT06345729",
     roleIds: ["coordinator", "oncologist", "auditor"],
-  },
-  {
-    id: "HANDOFF-SYN-2047",
-    kind: "handoff",
-    title: "Review a simulated handoff state",
-    summary: "Nothing was sent or transmitted. Inspect only the synthetic owner and browser-memory state.",
-    sourceLabel: "Synthetic Cedar workspace",
-    owner: "A. Rao",
-    occurredAt: "2026-09-18T16:20:00Z",
-    status: "waiting",
-    route: "/patients/SYN-2047?section=handoffs",
-    roleIds: ["coordinator"],
-  },
-  {
-    id: "TASK-SYN-4820",
-    kind: "task",
-    title: "Confirm synthetic molecular-report availability",
-    summary: "Created by A. Rao during the synthetic intake demonstration.",
-    sourceLabel: "Synthetic Monsoon workspace",
-    owner: "A. Rao",
-    occurredAt: "2026-09-18T15:30:00Z",
-    status: "open",
-    route: "/patients/SYN-4820?section=tasks",
-    roleIds: ["coordinator"],
   },
 ];
 
@@ -215,45 +77,6 @@ export const initialRoomMessages: RoomMessage[] = [
   },
 ];
 
-export const initialReviews: ReviewRecord[] = [
-  {
-    patientId: "SYN-2047",
-    trialId: "NCT06345729",
-    criteria: {
-      "criterion-1": {
-        state: "Confirmed from source",
-        reviewer: "Dr M. Shah",
-        reviewedAt: "2026-09-19",
-        evidence: "Synthetic pathology summary PATH-SYN-2047: Non-small cell lung cancer",
-        note: "Diagnosis text confirmed in the synthetic source.",
-      },
-      "criterion-2": {
-        state: "Confirmed from source",
-        reviewer: "Dr M. Shah",
-        reviewedAt: "2026-09-19",
-        evidence: "Synthetic treating-team note NOTE-SYN-2047: Stage IV",
-        note: "Stage IV text confirmed in the synthetic source.",
-      },
-      "criterion-3": {
-        state: "Needs clarification",
-        reviewer: "Dr M. Shah",
-        reviewedAt: "2026-09-19",
-        evidence: "No source available in current synthetic workspace",
-        note: "Human-created retrieval task TASK-SYN-2047-criterion-3.",
-      },
-    },
-  },
-];
+export const initialReviews: ReviewRecord[] = [];
 
 export const initialCorrections: CorrectionTicket[] = [];
-
-export const initialHandoffs: HandoffRecord[] = [
-  {
-    id: "HANDOFF-SYN-2047",
-    patientId: "SYN-2047",
-    trialId: "NCT06345729",
-    owner: "A. Rao",
-    state: "Draft",
-    updatedAt: "2026-09-18T16:20:00Z",
-  },
-];

@@ -4,6 +4,7 @@ import { Icon } from "../components/Icon";
 import { EmptyState, PageHeader, SafetyNote, StatusChip } from "../components/Primitives";
 import { useAppState } from "../state/AppState";
 import type { WorkItemKind } from "../types";
+import { GapTasks } from "../components/GapTasks";
 
 const typeFilters: Array<{ id: "all" | WorkItemKind; label: string }> = [
   { id: "all", label: "All types" },
@@ -29,7 +30,8 @@ export function InboxPage() {
   return (
     <div className="page inbox-page">
       <PageHeader eyebrow={`${role.title} queue`} title="Inbox" description="Only unread, owned, or explicitly accepted work for the selected prototype role appears here. Unknown registry and site states stay source states until a person creates work." />
-      <SafetyNote><p><strong>No system-wide unknowns masquerade as tasks.</strong> The entire browser-memory demonstration contains five deliberate starting items—not 285 site gaps—with a source, owner, state, and exact return position.</p></SafetyNote>
+      <SafetyNote><p><strong>Only accepted information work becomes a task.</strong> Evidence-bearing gaps use explicit evidence and review transitions, never a generic resolution checkbox.</p></SafetyNote>
+      <section className="surface reading-surface"><GapTasks /></section>
       <section className="surface inbox-surface" aria-labelledby="inbox-heading">
         <div className="inbox-toolbar">
           <div><p className="eyebrow">Accepted attention</p><h2 id="inbox-heading">{attentionCount} items need attention from {role.name}</h2><p>{roleItems.length} total items are visible to this role, including resolved work.</p></div>

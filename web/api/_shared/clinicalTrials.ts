@@ -15,11 +15,16 @@ interface ClinicalTrialsStudy {
     descriptionModule?: { briefSummary?: string };
     conditionsModule?: { conditions?: string[] };
     designModule?: {
+      studyType?: string;
+      designInfo?: { primaryPurpose?: string };
       phases?: string[];
       enrollmentInfo?: { count?: number; type?: string };
     };
+    sponsorCollaboratorsModule?: { leadSponsor?: { name?: string } };
+    armsInterventionsModule?: { interventions?: Array<{ type?: string; name?: string }> };
     eligibilityModule?: {
       eligibilityCriteria?: string;
+      healthyVolunteers?: boolean;
       sex?: string;
       minimumAge?: string;
       maximumAge?: string;
@@ -51,8 +56,14 @@ export interface OfficialTrialEvidence {
   conditions: string[];
   phases: string[];
   enrollment: { count: number | null; type: string };
+  studyType: string;
+  primaryPurpose: string;
+  leadSponsor: string;
+  interventions: Array<{ type: string; name: string }>;
+  locations: Array<{ facility: string; status: string; city: string; state: string; country: string }>;
   eligibility: {
     criteria: string;
+    healthyVolunteers: boolean | null;
     sex: string;
     minimumAge: string;
     maximumAge: string;
@@ -108,12 +119,24 @@ export async function fetchOfficialTrialEvidence(trialIdInput: unknown): Promise
     briefSummary: protocol?.descriptionModule?.briefSummary ?? "",
     conditions: protocol?.conditionsModule?.conditions ?? [],
     phases: design?.phases ?? [],
+    studyType: design?.studyType ?? "",
+    primaryPurpose: design?.designInfo?.primaryPurpose ?? "",
+    leadSponsor: protocol?.sponsorCollaboratorsModule?.leadSponsor?.name ?? "",
+    interventions: (protocol?.armsInterventionsModule?.interventions ?? []).map(item => ({ type: item.type ?? "", name: item.name ?? "" })),
+    locations: (protocol?.contactsLocationsModule?.locations ?? []).map(location => ({
+      facility: location.facility ?? "Facility not reported",
+      status: location.status ?? "UNKNOWN",
+      city: location.city ?? "",
+      state: location.state ?? "",
+      country: location.country ?? "",
+    })),
     enrollment: {
       count: design?.enrollmentInfo?.count ?? null,
       type: design?.enrollmentInfo?.type ?? "UNKNOWN",
     },
     eligibility: {
       criteria: eligibility?.eligibilityCriteria ?? "",
+      healthyVolunteers: eligibility?.healthyVolunteers ?? null,
       sex: eligibility?.sex ?? "UNKNOWN",
       minimumAge: eligibility?.minimumAge ?? "",
       maximumAge: eligibility?.maximumAge ?? "",

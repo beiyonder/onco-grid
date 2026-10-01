@@ -7,7 +7,6 @@ import {
 } from "react";
 import {
   initialCorrections,
-  initialHandoffs,
   initialPatients,
   initialReviews,
   initialRoomMessages,
@@ -17,7 +16,6 @@ import {
 import { createApprovedResearchWorkspace, type ApprovedResearchRecord } from "../data/researchImport";
 import type {
   CorrectionTicket,
-  HandoffRecord,
   PatientWorkspace,
   ReviewRecord,
   ReviewState,
@@ -41,14 +39,12 @@ interface AppStateValue {
   roleId: RoleId;
   setRoleId: (roleId: RoleId) => void;
   patients: PatientWorkspace[];
-  createSyntheticWorkspace: (context: string, owner: string) => string;
   importApprovedResearchWorkspace: (record: ApprovedResearchRecord) => string;
   startPatientTrialReview: (patientId: string, trialId: string) => void;
   followedTrialIds: string[];
   toggleFollowTrial: (trialId: string) => void;
   workItems: WorkItem[];
   resolveWorkItem: (workItemId: string) => void;
-  addMissingInformationTask: (patientId: string, trialId: string, criterionId: string) => string;
   roomMessages: RoomMessage[];
   postRoomMessage: (trialId: string, body: string, sourceUrl?: string, replyToId?: string) => void;
   resolveRoomMessage: (messageId: string) => void;
@@ -56,13 +52,10 @@ interface AppStateValue {
   updateCriterion: (update: CriterionUpdate) => void;
   corrections: CorrectionTicket[];
   createCorrection: (trialId: string, title: string, evidenceLabel: string, evidenceUrl: string) => string;
-  handoffs: HandoffRecord[];
-  advanceSimulatedHandoff: (handoffId: string) => void;
 }
 
 const AppStateContext = createContext<AppStateValue | null>(null);
 
-const syntheticCodenames = ["Cobalt", "Marigold", "Rain", "Saffron", "Willow"];
 
 export function AppStateProvider({ children }: { children: ReactNode }) {
   const [roleId, setRoleId] = useState<RoleId>("coordinator");
@@ -72,7 +65,6 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   const [roomMessages, setRoomMessages] = useState(initialRoomMessages);
   const [reviews, setReviews] = useState(initialReviews);
   const [corrections, setCorrections] = useState(initialCorrections);
-  const [handoffs, setHandoffs] = useState(initialHandoffs);
 
   const role = roles.find((candidate) => candidate.id === roleId) ?? roles[0]!;
 
@@ -81,34 +73,8 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     roleId,
     setRoleId,
     patients,
-    createSyntheticWorkspace(context, owner) {
-      const sequence = patients.length + 1;
-      const id = `SYN-DEMO-${String(sequence).padStart(3, "0")}`;
-      const codename = syntheticCodenames[(sequence - 1) % syntheticCodenames.length];
-      const workspace: PatientWorkspace = {
-        id,
-        label: `Synthetic ${codename} workspace`,
-        context,
-        owner,
-        institution: "Validation workspace",
-        dataBoundary: "Synthetic demo",
-        lastActivity: new Date().toISOString(),
-        reviewTrialIds: [],
-        facts: [
-          {
-            id: "fact-context",
-            label: "Synthetic context",
-            value: context,
-            sourceType: "Manual synthetic entry",
-            sourceLabel: `Created in browser session by ${role.name}`,
-            recordedAt: new Date().toISOString().slice(0, 10),
-          },
-        ],
-      };
-      setPatients((current) => [...current, workspace]);
-      return id;
-    },
     importApprovedResearchWorkspace(record) {
+      if (roleId === "auditor") throw new Error("Auditor is read-only.");
       const sequence = patients.filter((patient) => patient.dataBoundary === "Approved de-identified research").length + 1;
       const workspace = createApprovedResearchWorkspace(record, sequence);
       setPatients((current) => [...current, workspace]);
@@ -127,31 +93,14 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     },
     workItems,
     resolveWorkItem(workItemId) {
+      if (roleId === "auditor") return;
       setWorkItems((current) => current.map((item) => item.id === workItemId
         ? { ...item, status: "resolved" }
         : item));
     },
-    addMissingInformationTask(patientId, trialId, criterionId) {
-      const existing = workItems.find((item) => item.route.includes(patientId) && item.id.includes(criterionId));
-      if (existing) return existing.id;
-      const id = `TASK-${patientId}-${criterionId}`;
-      const item: WorkItem = {
-        id,
-        kind: "task",
-        title: "Retrieve source information for criterion",
-        summary: "Explicitly created from a human-reviewed unknown. No value was inferred.",
-        sourceLabel: `${patientId} · ${trialId}`,
-        owner: role.name,
-        occurredAt: new Date().toISOString(),
-        status: "open",
-        route: `/patients/${patientId}/reviews/${trialId}?criterion=${criterionId}`,
-        roleIds: ["coordinator", "oncologist"],
-      };
-      setWorkItems((current) => [item, ...current]);
-      return id;
-    },
     roomMessages,
     postRoomMessage(trialId, body, sourceUrl, replyToId) {
+      if (roleId === "auditor") return;
       const message: RoomMessage = {
         id: `ROOM-${roomMessages.length + 1}`,
         trialId,
@@ -166,11 +115,13 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       setRoomMessages((current) => [...current, message]);
     },
     resolveRoomMessage(messageId) {
+      if (roleId === "auditor") return;
       setRoomMessages((current) => current.map((message) => message.id === messageId ? { ...message, resolved: true } : message));
       setWorkItems((current) => current.map((item) => item.route.includes(`message=${messageId}`) ? { ...item, status: "resolved" } : item));
     },
     reviews,
     updateCriterion(update) {
+      if (roleId !== "oncologist" && roleId !== "site") return;
       setReviews((current) => {
         const existing = current.find((review) => review.patientId === update.patientId && review.trialId === update.trialId);
         const nextCriterion = {
@@ -194,6 +145,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     },
     corrections,
     createCorrection(trialId, title, evidenceLabel, evidenceUrl) {
+      if (roleId === "auditor") throw new Error("Auditor is read-only.");
       const id = `COR-${String(corrections.length + 1).padStart(3, "0")}`;
       const ticket: CorrectionTicket = {
         id,
@@ -220,24 +172,9 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       }, ...current]);
       return id;
     },
-    handoffs,
-    advanceSimulatedHandoff(handoffId) {
-      const currentHandoff = handoffs.find((handoff) => handoff.id === handoffId);
-      if (!currentHandoff || currentHandoff.state === "Simulated acknowledgement") return;
-      const state: HandoffRecord["state"] = currentHandoff.state === "Draft"
-        ? "Ready for simulation"
-        : "Simulated acknowledgement";
-      setHandoffs((current) => current.map((handoff) => handoff.id === handoffId
-        ? { ...handoff, state, updatedAt: new Date().toISOString() }
-        : handoff));
-      if (state === "Simulated acknowledgement") {
-        setWorkItems((current) => current.map((item) => item.id === handoffId ? { ...item, status: "resolved" } : item));
-      }
-    },
   }), [
     corrections,
     followedTrialIds,
-    handoffs,
     patients,
     reviews,
     role,

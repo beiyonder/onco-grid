@@ -16,6 +16,7 @@ const navigation: Array<{ to: string; label: string; orb: OrbState }> = [
   { to: "/", label: "Home", orb: "breathing" },
   { to: "/trials", label: "Trials", orb: "searching" },
   { to: "/patients", label: "Patients", orb: "connecting" },
+  { to: "/studies", label: "My studies", orb: "solving" },
   { to: "/inbox", label: "Inbox", orb: "weaving" },
 ];
 
@@ -28,7 +29,7 @@ export function AppShell() {
 
   useEffect(() => {
     const navigationState = location.state as { libraryFocusId?: string } | null;
-    if ((location.pathname === "/trials" && navigationState?.libraryFocusId) || location.search.includes("message=") || location.search.includes("criterion=")) return;
+    if (location.search.includes("source=") || location.search.includes("run=") || location.search.includes("matchFilter=") || location.search.includes("preview=") || (location.pathname === "/trials" && navigationState?.libraryFocusId) || location.search.includes("message=") || location.search.includes("criterion=")) return;
     const timeout = window.setTimeout(() => {
       document.querySelector<HTMLElement>("main h1")?.focus({ preventScroll: true });
       window.scrollTo({ top: 0, behavior: "auto" });
