@@ -1,84 +1,149 @@
-import { type FormEvent, useMemo, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Icon } from "../components/Icon";
-import { EmptyState, PageHeader, SafetyNote, StatusChip } from "../components/Primitives";
+import {
+  EmptyState,
+  PageHeader,
+  SafetyNote,
+  StatusChip,
+} from "../components/Primitives";
+import { useWorkflow } from "../state/WorkflowState";
 import { useAppState } from "../state/AppState";
-
-const syntheticContexts = [
-  "NSCLC · source collation",
-  "Breast cancer · source collation",
-  "Colorectal cancer · missing records",
-  "General oncology · workflow demonstration",
-];
-
+import { matchingExamples } from "../domain/matchingExamples";
 export function PatientsPage() {
+  const { state, command, error } = useWorkflow();
+  const { roleId, patients: researchPatients } = useAppState();
   const navigate = useNavigate();
-  const { createSyntheticWorkspace, patients, role } = useAppState();
   const [query, setQuery] = useState("");
-  const [ownerFilter, setOwnerFilter] = useState("all");
-  const [sort, setSort] = useState("recent");
-  const [creating, setCreating] = useState(false);
-  const [context, setContext] = useState(syntheticContexts[0]!);
-  const [owner, setOwner] = useState(role.id === "oncologist" ? role.name : "A. Rao");
-
-  const owners = useMemo(() => Array.from(new Set(patients.map((patient) => patient.owner))).sort(), [patients]);
-  const filteredPatients = useMemo(() => {
-    const term = query.trim().toLocaleLowerCase();
-    return patients
-      .filter((patient) => ownerFilter === "all" || patient.owner === ownerFilter)
-      .filter((patient) => !term || [patient.id, patient.label, patient.context, patient.owner, patient.institution].join(" ").toLocaleLowerCase().includes(term))
-      .sort((left, right) => {
-        if (sort === "label") return left.label.localeCompare(right.label);
-        if (sort === "owner") return left.owner.localeCompare(right.owner) || left.label.localeCompare(right.label);
-        return right.lastActivity.localeCompare(left.lastActivity);
-      });
-  }, [ownerFilter, patients, query, sort]);
-
-  const createWorkspace = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const id = createSyntheticWorkspace(context, owner);
-    navigate(`/patients/${id}`);
-  };
-
+  const [scenario, setScenario] = useState(10);
+  const [sort, setSort] = useState("number");
+  const patients = state.patients
+    .filter((p) =>
+      `${p.label} ${p.id} ${p.condition} ${p.scenario} ${p.owner}`
+        .toLowerCase()
+        .includes(query.toLowerCase()),
+    )
+    .sort((a, b) =>
+      sort === "condition"
+        ? a.condition.localeCompare(b.condition)
+        : a.label.localeCompare(b.label, undefined, { numeric: true }),
+    );
   return (
     <div className="page">
       <PageHeader
-        eyebrow="Browser-only workspace index"
-        title="Patient Workspaces"
-        description="Find, sort, and open source-labelled synthetic or institutionally approved de-identified research workspaces. No matching, ranking, or durable storage is supported."
-        actions={<button className="button primary" type="button" onClick={() => setCreating(true)}><Icon name="plus" /> Create synthetic workspace</button>}
+        eyebrow="Synthetic patient repository"
+        title="Patients"
+        description="Recorded facts, original sources and reviewable pre-screening. Every example is synthetic; changes reset on reload."
       />
-      <SafetyNote><p><strong>No identifiable patient data.</strong> Synthetic creation stays controlled. Approved de-identified research records can enter only through the strict JSON import on a selected Trial Detail and remain in browser memory; identity fields and files are rejected.</p></SafetyNote>
-
-      {creating ? <section className="surface create-workspace" role="dialog" aria-modal="false" aria-labelledby="create-workspace-heading">
-        <div className="section-heading"><div><p className="eyebrow">Controlled demonstration</p><h2 id="create-workspace-heading">Create a synthetic workspace</h2><p>Choose only predefined synthetic context. There is no free-text patient identity or file upload.</p></div><button className="preview-close" type="button" onClick={() => setCreating(false)} aria-label="Close synthetic workspace creation"><Icon name="close" /></button></div>
-        <form onSubmit={createWorkspace}>
-          <label><span>Synthetic oncology context</span><select value={context} onChange={(event) => setContext(event.target.value)}>{syntheticContexts.map((candidate) => <option key={candidate}>{candidate}</option>)}</select></label>
-          <label><span>Demonstration owner</span><select value={owner} onChange={(event) => setOwner(event.target.value)}>{["A. Rao", "Dr M. Shah"].map((candidate) => <option key={candidate}>{candidate}</option>)}</select></label>
-          <div className="creation-boundary"><Icon name="shield" /><span><strong>Browser-memory only</strong>No person is created, no record is uploaded, and nothing persists after reload.</span></div>
-          <button className="button primary" type="submit">Create synthetic fixture</button>
-        </form>
-      </section> : null}
-
-      <section className="surface patient-index" aria-labelledby="workspace-count">
+      <SafetyNote>
+        <p>
+          <strong>Demonstration only.</strong> No real patient input or clinical
+          validation. Fixture date: 20 September 2026. Ingestion origin and
+          reviewer authority are separate.
+        </p>
+      </SafetyNote>
+      <section className="worked-examples" aria-labelledby="worked-examples-title">
+        <h2 id="worked-examples-title">Start with a worked case</h2>
+        <p>Expected outcomes use the reference snapshot. Live registry checks can change whether a model is usable.</p>
+        <div>{matchingExamples.map((example) => <Link
+          key={example.patientId}
+          to={`/patients/${example.patientId}?section=matches&scope=selected&trial=${example.trialId}`}
+          className={`worked-case outcome-${example.expected}`}
+        ><strong>{example.title}</strong><span>{example.detail}</span></Link>)}</div>
+      </section>
+      {error && <p role="alert">{error}</p>}
+      <section className="surface patient-index">
         <div className="patient-index-toolbar">
-          <div className="search-field"><label htmlFor="patient-search">Search browser workspaces</label><span className="input-with-icon"><Icon name="search" /><input id="patient-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Workspace label, context, owner, or local ID" /></span></div>
-          <label><span>Owner</span><select value={ownerFilter} onChange={(event) => setOwnerFilter(event.target.value)}><option value="all">All owners</option>{owners.map((candidate) => <option key={candidate}>{candidate}</option>)}</select></label>
-          <label><span>Sort</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="recent">Recent activity</option><option value="label">Workspace label</option><option value="owner">Owner</option></select></label>
+          <label>
+            Search patients
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Patient number, diagnosis, scenario or owner"
+            />
+          </label>
+          <label>
+            Sort
+            <select value={sort} onChange={(e) => setSort(e.target.value)}>
+              <option value="number">Patient number</option>
+              <option value="condition">Diagnosis context</option>
+            </select>
+          </label>
         </div>
-        <div className="result-count patient-count"><strong id="workspace-count">{filteredPatients.length} of {patients.length} workspaces</strong><span>Synthetic or approved de-identified research · browser session only</span></div>
-        {filteredPatients.length ? <div className="patient-list">
-          {filteredPatients.map((patient) => (
-            <Link className="patient-row" to={`/patients/${patient.id}`} key={patient.id}>
-              <span className="patient-monogram" aria-hidden="true">{patient.label.split(" ")[1]?.slice(0, 2).toUpperCase() ?? "SY"}</span>
-              <span className="patient-row-main"><small>{patient.id}</small><strong>{patient.label}</strong><span>{patient.context}</span></span>
-              <span className="patient-row-meta"><span><small>Owner</small><strong>{patient.owner}</strong></span><span><small>Trials under review</small><strong>{patient.reviewTrialIds.length}</strong></span></span>
-              <StatusChip tone={patient.dataBoundary === "Synthetic demo" ? "human" : "source"}>{patient.dataBoundary}</StatusChip>
-              <Icon name="arrow" />
+        <details className="create-workspace">
+          <summary>New demo patient</summary>
+          <label>
+            Supplied scenario
+            <select
+              value={scenario}
+              onChange={(e) => setScenario(Number(e.target.value))}
+            >
+              {state.patients.slice(0, 12).map((p, i) => (
+                <option key={p.id} value={i}>
+                  {p.scenario}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button
+            className="button primary"
+            disabled={roleId === "auditor"}
+            onClick={() => {
+              const id = `SYN-${String(state.patients.length + 1).padStart(3, "0")}`;
+              if (command({ type: "create-patient", scenario }))
+                navigate(`/patients/${id}`);
+            }}
+          >
+            Create demo patient
+          </button>
+        </details>
+        <p>
+          {patients.length} of {state.patients.length} synthetic patients ·
+          browser session only
+        </p>
+        <div className="patient-list">
+          {patients.map((p) => (
+            <Link className="patient-row" to={`/patients/${p.id}`} key={p.id}>
+              <span className="patient-monogram">{p.label.split(" ")[1]}</span>
+              <span className="patient-row-main">
+                <small>
+                  {p.id} · record v{p.version}
+                </small>
+                <strong>{p.label}</strong>
+                <span>{p.context}</span>
+              </span>
+              <span>
+                <strong>{p.scenario}</strong>
+                <small className="block">
+                  {p.artifacts.length} originals · {p.assertions.length}{" "}
+                  assertions · {p.owner}
+                </small>
+              </span>
+              <StatusChip tone="human">Synthetic</StatusChip>
             </Link>
           ))}
-        </div> : <EmptyState icon="search" title="No workspaces match">Reset the search or owner filter. No broader patient search runs automatically.</EmptyState>}
+        </div>
+        {!patients.length && (
+          <EmptyState icon="search" title="No matching patients">
+            Change the search. No external patient search is performed.
+          </EmptyState>
+        )}
       </section>
+      {researchPatients.some(
+        (p) => p.dataBoundary === "Approved de-identified research",
+      ) && (
+        <section className="surface reading-surface">
+          <h2>Approved research workspaces</h2>
+          <p>Separate source review only; excluded from synthetic matching.</p>
+          {researchPatients
+            .filter((p) => p.dataBoundary === "Approved de-identified research")
+            .map((p) => (
+              <p key={p.id}>
+                <Link to={`/patients/${p.id}`}>{p.label}</Link>
+              </p>
+            ))}
+        </section>
+      )}
     </div>
   );
 }

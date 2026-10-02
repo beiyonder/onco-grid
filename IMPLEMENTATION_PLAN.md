@@ -1,5 +1,25 @@
 # Trial Relay implementation plan
 
+## 2026-10-01 renovation proposal
+
+**FACT:** The owner requested a complete workflow/UI audit and implementation plan for richer synthetic patients, original-source viewing and gap completion, automated patient-to-trial and trial-to-patient matching, PI workflows, progressive review, trial presentation fixes, and global drug/topic/spatial discovery.
+
+The complete proposed implementation plan is [`architecture/trial-relay-renovation-plan.html`](architecture/trial-relay-renovation-plan.html). It contains the source-backed audit, target journeys, matching semantics, role/data/state contracts, eleven dependency-ordered slices, and fifteen acceptance scenarios.
+
+**OWNER IMPLEMENTATION DIRECTION — 2026-10-01:** implement the renovation end to end with GPT-5.6 Sol/Luna orchestration. The dated governance decision now permits the bounded synthetic-demo implementation. Clinical qualification, real-patient use, treatment recommendations, autonomous final eligibility, and product lock remain excluded or gated; demonstration models must not be represented as clinically validated.
+
+**FACT — revised execution direction:** the owner subsequently requested direct implementation without parallel orchestration; no worker sign-in is required for that execution method.
+
+**OBSERVED — local implementation complete:** the bounded synthetic renovation is implemented and exercised end to end. The [implementation acceptance report](.harness/reports/20261001T151302Z-P5-workflow-renovation-implementation.md) records R01–R15, 28 passing tests, production-build smoke, scoped security scan, source/privacy checks, and retained visual evidence. This does not claim production deployment, clinical qualification, or closure of `P5`.
+
+**Planning evidence:** [P5 C5 workflow-renovation report](.harness/reports/20261001T123356Z-P5-workflow-renovation-plan.md). The HTML was exercised at desktop/mobile widths, with keyboard navigation, JavaScript disabled and print media; these checks validate the planning artifact, not the proposed product.
+
+**OWNER SCOPE DECISION — 2026-10-02:** “Working engine, live registry, synthetic patients.” Matching now checks current public registry eligibility against supplied source-linked models before evaluating synthetic records locally. This is not authority for real-patient use or a clinically validated Trial Opportunity Index. PI workflows require authenticated, trial-scoped grants; the prototype persona is not an access credential.
+
+**OBSERVED — outcome-first refinement:** aligned outcome rows, progressive reasons/source traces, five ready-to-run worked examples, live-source refusal/recovery, and authenticated PI UI boundaries were exercised locally. See the [2026-10-02 addendum](.harness/reports/20261001T151302Z-P5-workflow-renovation-implementation.md#2026-10-02-outcome-first-live-registry-refinement). Genuine Supabase login/RLS qualification remains gated by service configuration.
+
+**OBSERVED — review/referral renovation:** the review desk now leads directly into a version-bound synthetic referral and a two-way referring-team / authenticated study-team conversation. Acknowledgement, assignment, information request/return, updated reviewed packets, screening-readiness, closure and withdrawal were exercised locally. See the [review/referral acceptance report](.harness/reports/20261002T182420Z-P5-review-referral-workflow.md): 34 passing tests, built-artifact queue with no network transmission, route denial and responsive evidence. These browser-memory referrals reset on reload; real cross-user delivery and patient-data handling are not authorised or claimed.
+
 ## Status and authority
 
 - **OWNER DECISION — 2026-09-19:** begin implementation from [`product/TRIAL_RELAY_EXPERIENCE_BLUEPRINT.md`](product/TRIAL_RELAY_EXPERIENCE_BLUEPRINT.md) and [`product/TRIAL_RELAY_VISUAL_DESIGN_LANGUAGE.md`](product/TRIAL_RELAY_VISUAL_DESIGN_LANGUAGE.md).
@@ -16,7 +36,7 @@
 ## Current frontend architecture decision
 
 - **FACT — 2026-09-20 review:** [`product/TRIAL_RELAY_EVIDENCE_LED_REVIEW.md`](product/TRIAL_RELAY_EVIDENCE_LED_REVIEW.md) found a 4,433-line browser-native frontend with duplicated global state and render logic, no stable routes, and poor testability. It also observed materially unreadable typography, composite views, and delivery friction across the core journeys.
-- **DECISION:** the documented typed-component-stack trigger is met. Use React, TypeScript, and Vite with static-host-safe hash routes. Retain the dated `web/data/india-oncology-trials.json` artifact, four global destinations, source/site authority separation, browser-memory patient facts (synthetic or approved de-identified research), and fail-closed optional pilot services.
+- **DECISION:** the documented typed-component-stack trigger is met. Use React, TypeScript, and Vite with static-host-safe hash routes. Retain the dated `web/data/india-oncology-trials.json` artifact, five destinations including My studies, source/site authority separation, browser-memory patient facts, and fail-closed optional pilot services. Approved research remains manual/unscored and separate from synthetic assessment.
 - **RATIONALE:** routing, typed domain models, component boundaries, explicit loading/error states, and independently reviewable pages solve demonstrated product and maintenance failures. The owner has now separately approved a named Supabase/Vercel pilot boundary for authenticated no-PHI communication, official-source APIs, and a source-only assistant; all other backend, identity, data, and clinical uses remain prohibited.
 - **RUNTIME CONTRACT:** `npm run dev` serves the validation surface; `npm run build` performs strict TypeScript validation and produces static output. The registry snapshot is emitted as a separate static asset rather than copied into the application bundle.
 - **REASSESSMENT TRIGGER:** revisit this stack only if direct Phase 6 evidence or an approved production boundary introduces a requirement it cannot meet. Dependency novelty alone is not a reason to migrate again.
@@ -24,6 +44,8 @@
 ## Product boundary
 
 The implementation may support general trial discovery, source and status comparison, human-authored questions, owned operational tasks, synthetic patient workspaces, institutionally approved de-identified browser-only research workspaces, explicit human criterion review, deterministic unranked cohort filters, official-source evidence, authenticated no-PHI collaboration, audited no-PHI referral-state handoff, and approximate registry geography.
+
+**Dated synthetic-only exception:** the 2026-10-01 authority permits deterministic demonstration pre-screening and transparent criteria-support review ordering for supplied synthetic records. The prohibitions below continue to apply to real patients and approved research; no close-match policy, autonomous eligibility, treatment recommendation, or clinically validated model is authorised by this exception.
 
 It must not:
 
@@ -224,12 +246,12 @@ Implementation completion does not close `P5`. The validation app remains a priv
 
 ## Phase 6 validation-ready protocol
 
-Use only synthetic case `SYN-2047` and the dated public ClinicalTrials.gov snapshot. Do not enter, paste, photograph, record, or retain identifiable patient or participant information.
+Use only supplied synthetic cases `SYN-001`–`SYN-012` (or subsequent controlled demo intake) and the dated public ClinicalTrials.gov snapshot. Do not enter, paste, photograph, record, or retain identifiable patient or participant information.
 
 Run two unprompted scenarios with treating oncologists and operational coordinators or trial navigators:
 
 1. **Trial-first:** find an India-located oncology trial for a condition/location chosen by the participant; distinguish registry status from independent site confirmation; inspect the exact source/date; follow the trial; ask one general operational question; find the resulting state in Inbox.
-2. **Patient-to-handoff:** open the synthetic patient workspace; choose a trial manually from the general library; link one source and record one human criterion state; create a missing-information task; prepare a versioned draft packet; identify the packet owner, approval state, and next action without sending it.
+2. **Patient-to-handoff:** inspect a supplied synthetic patient's original evidence; have the demo reviewer inspect and publish a source-linked demonstration model; run contextual pre-screening; inspect exact criterion traces; accept and resolve an information task without inferring facts; record human criterion review and a separate PI disposition; prepare a version-bound packet and explicitly simulate its lifecycle. Nothing is sent. Publication is not clinical qualification.
 
 For each de-identified session, retain only:
 

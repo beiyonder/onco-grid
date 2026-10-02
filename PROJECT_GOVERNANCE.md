@@ -143,6 +143,14 @@ On 2026-09-22 the owner explicitly authorised the next evidence-coverage impleme
 
 On 2026-09-22 the owner directed a retrospective rhetorical audit of `/trials/evidence`, correction of boundary spacing/alignment/overflow, and replacement of repeated explanatory copy with a tasteful progressive-disclosure pattern before production deployment. Critical source and WIP states must remain visible; supporting methodology may move behind accessible information controls.
 
+On 2026-10-01 the owner directed end-to-end implementation of `architecture/trial-relay-renovation-plan.html`, orchestrated with GPT-5.6 Sol/Luna. This authorises the plan's browser-only synthetic-demo renovation, including deterministic bidirectional pre-screening, transparent criteria-support scoring/review ordering, richer synthetic source records, PI workflows, and global discovery. It does not authorise real-patient matching, treatment recommendations, autonomous final eligibility, patient-data egress, new production services, or a claim of clinical validation. Model fixtures and policy examples must be labelled demonstration material unless independently reviewed; agents must never fabricate clinical approval. Clinical qualification, close-match policy approval for real use, and P5/product lock remain open.
+
+The owner subsequently directed normal direct implementation without parallel orchestration. This supersedes the Sol/Luna execution-method request only; the synthetic-demo scope and all clinical, privacy, qualification, and publication gates remain unchanged.
+
+**OBSERVED — 2026-10-01 local implementation:** the bounded synthetic renovation is implemented with passing browser/built-artifact journeys and executable checks in `.harness/reports/20261001T151302Z-P5-workflow-renovation-implementation.md`. Implementation does not close `P5`, qualify the demonstration predicates clinically, enable real-patient assessment, or update the remote deployment.
+
+On 2026-10-02, after the scope distinction was presented, the owner selected “Working engine, live registry, synthetic patients.” This authorises current public-registry checks with local deterministic evaluation, outcome-first progressive UI, ready-to-run synthetic benchmarks, and PI access restricted to authenticated trial-scoped grants. It does not authorise clinical prioritisation under a Trial Opportunity Index label, real-patient evaluation, patient-data transmission, or fabricated clinical validity. Existing service-configuration and live authentication/RLS qualification gates remain open.
+
 ## Gap register
 
 | Gap | Status | Evidence | Owner | Next action |
@@ -158,6 +166,7 @@ On 2026-09-22 the owner directed a retrospective rhetorical audit of `/trials/ev
 | `GAP-V2-PROVENANCE` | Open | The expanded source mixes duplicate synthesis, proposed questionnaires, author assumptions, three sensitive caregiver accounts, and an uncited primer | Internal analyst and repository owner | Clarify authorship, sample, method, whether questionnaires were administered, and whether de-identified answer notes exist. |
 | `GAP-CTRI-BULK-ACCESS` | Open; research mirror measured | Direct CTRI search is CAPTCHA/CSRF gated with no documented bulk API or open/commercial reuse terms found; the permitted WHO mirror was 4,611 primary records behind the CTRI homepage count and prohibits commercial/marketing/promotional use | Repository owner and source authority | Obtain written CTRI access/reuse terms and a supported current bulk/API path before any product or demo dependency; preserve the private WHO snapshot only for approved non-commercial research. |
 | `GAP-TRIAL-COVERAGE-AND-EVIDENCE-SCOPE` | Prototype implemented; clinician task validation remains open | The evidence workspace now separates the 285-record India-actionable layer from bounded global ClinicalTrials.gov search, exposes cancer and exact Drug/Biological coverage, reformats deterministic abstracts, links PubMed metadata under `EV-0079`, renders a descriptive population/time map, and labels all institution cards WIP/not connected | Repository owner and agent | Run structured clinician search tasks; measure useful-result rate, source-opening, trust, time, and missing-result reasons. Keep institution outreach, full-text rights, and outcome interpretation separately gated. |
+| `GAP-SYNTHETIC-MODEL-QUALIFICATION` | Open | Six source-linked models and deterministic support scoring are labelled demonstration interpretations; local tests and demo persona publication are not independent clinical qualification | Repository owner and authorised clinical reviewers | Independently review source interpretations and benchmark boundaries before any clinical claim or real-data extension; close-match policy remains disabled. |
 
 ## Report index
 
@@ -212,6 +221,9 @@ On 2026-09-22 the owner directed a retrospective rhetorical audit of `/trials/ev
 | `C2` | `P5` | `.harness/reports/20260922T150041Z-P5-clinician-portal-feedback.md` | Complete; sound removed and de-identified clinician evidence merged and deployed through pull request `#40` |
 | `C2` | `P5` | `.harness/reports/20260922T160812Z-P5-evidence-coverage-expansion.md` | Complete; merged and deployed through pull requests `#42` and `#43` |
 | `C2` | `P5` | `.harness/reports/20260922T192230Z-P5-evidence-page-rhetorical-refinement.md` | Complete; merged and deployed through pull requests `#45` and `#46` |
+| `C5` | `P5` | `.harness/reports/20261001T123356Z-P5-workflow-renovation-plan.md` | Complete planning artifact; bidirectional synthetic matching and workflow renovation proposed, not implemented; revised clinical scope and owner/clinical sign-off remain open |
+| `C5` | `P5` | `.harness/reports/20261001T151302Z-P5-workflow-renovation-implementation.md` | Direct synthetic renovation implemented; R01–R15 local evidence, 28 passing tests, scoped security scan, built smoke and visual artifacts; clinical qualification, live-service activation and P5 remain open |
+| `C5` | `P5` | `.harness/reports/20261002T182420Z-P5-review-referral-workflow.md` | Local review/referral cutover exercised: two-way synthetic-auth thread, version/role guards, built queue without transmission, mobile proof and 34 passing tests; genuine cross-user/RLS, patient-data handling, clinical qualification and P5 remain open |
 
 ## References
 

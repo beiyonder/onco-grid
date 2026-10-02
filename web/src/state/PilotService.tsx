@@ -9,6 +9,7 @@ interface PilotServiceValue {
   session: Session | null;
   profile: PilotProfile | null;
   staffDirectory: PilotProfile[];
+  piTrialIds: string[];
   accessToken?: string;
   error: string | null;
   notice: string | null;
@@ -23,6 +24,7 @@ export function PilotServiceProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<PilotProfile | null>(null);
   const [staffDirectory, setStaffDirectory] = useState<PilotProfile[]>([]);
+  const [piTrialIds, setPiTrialIds] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -50,6 +52,8 @@ export function PilotServiceProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    setProfile(null);
+    setPiTrialIds([]);
     if (!supabase || !session?.user.id) {
       setProfile(null);
       setStaffDirectory([]);
@@ -59,14 +63,16 @@ export function PilotServiceProvider({ children }: { children: ReactNode }) {
     Promise.all([
       supabase.from("pilot_profiles").select("*").eq("user_id", session.user.id).single(),
       supabase.from("pilot_profiles").select("*").order("display_name"),
-    ]).then(([profileResult, directoryResult]) => {
+      supabase.from("pilot_pi_grants").select("trial_id").eq("user_id", session.user.id),
+    ]).then(([profileResult, directoryResult, grantsResult]) => {
       if (!active) return;
       setProfile(profileResult.data ?? null);
       setStaffDirectory(directoryResult.data ?? []);
+      setPiTrialIds(grantsResult.error ? [] : (grantsResult.data ?? []).map((grant) => grant.trial_id));
       setError(profileResult.error?.message ?? directoryResult.error?.message ?? null);
     });
     return () => { active = false; };
-  }, [session?.user.id]);
+  }, [session?.user.id, session?.access_token]);
 
   const value = useMemo<PilotServiceValue>(() => ({
     configured: pilotServiceConfigured,
@@ -74,6 +80,7 @@ export function PilotServiceProvider({ children }: { children: ReactNode }) {
     session,
     profile,
     staffDirectory,
+    piTrialIds,
     accessToken: session?.access_token,
     error,
     notice,
@@ -105,7 +112,7 @@ export function PilotServiceProvider({ children }: { children: ReactNode }) {
       setError(signOutError?.message ?? null);
       setNotice(null);
     },
-  }), [error, loading, notice, profile, session, staffDirectory]);
+  }), [error, loading, notice, profile, session, staffDirectory, piTrialIds]);
 
   return <PilotServiceContext.Provider value={value}>{children}</PilotServiceContext.Provider>;
 }

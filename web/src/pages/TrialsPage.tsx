@@ -1,6 +1,6 @@
 import { Glass } from "@samasante/liquid-glass";
 import { ThinkingOrb } from "thinking-orbs";
-import { type FormEvent, useEffect, useMemo, useState } from "react";
+import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { IndiaSpatialLens } from "../components/IndiaSpatialLens";
 import { Icon } from "../components/Icon";
@@ -31,6 +31,7 @@ export function TrialsPage() {
   const city = searchParams.get("city") ?? "all";
   const viewMode = searchParams.get("view") === "map" ? "map" : "list";
   const previewId = searchParams.get("preview");
+  const previewDialog = useRef<HTMLDialogElement>(null);
   const reviewFor = searchParams.get("reviewFor");
   const reviewPatient = patients.find((patient) => patient.id === reviewFor);
   const requestedPage = Number(searchParams.get("page") ?? "1");
@@ -51,9 +52,16 @@ export function TrialsPage() {
   }, [location.state, status]);
 
   useEffect(() => {
-    if (!previewId || status !== "ready") return;
-    const timeout = window.setTimeout(() => document.getElementById("trial-preview-heading")?.focus({ preventScroll: true }), 0);
-    return () => window.clearTimeout(timeout);
+    const dialog = previewDialog.current;
+    if (!previewId || !dialog || status !== "ready") return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    dialog.showModal();
+    return () => {
+      dialog.close();
+      document.body.style.overflow = previousOverflow;
+      requestAnimationFrame(() => document.getElementById(`preview-${previewId}`)?.focus({ preventScroll: true }));
+    };
   }, [previewId, status]);
 
   const conditionOptions = useMemo(() => {
@@ -155,7 +163,7 @@ export function TrialsPage() {
   const startReview = (trial: TrialRecord) => {
     if (!reviewPatient) return;
     startPatientTrialReview(reviewPatient.id, trial.id);
-    navigate(`/patients/${reviewPatient.id}/reviews/${trial.id}`);
+    navigate(`/research/${reviewPatient.id}/reviews/${trial.id}`);
   };
 
   if (status === "loading") {
@@ -219,8 +227,8 @@ export function TrialsPage() {
               {visibleTrials.length === 0 ? <EmptyState icon="search" title="No trials match these filters">Reset one or more filters. No broader or patient-specific search is performed automatically.</EmptyState> : null}
             </div>
 
-            {previewTrial ? <aside className="trial-preview" id="trial-preview" aria-labelledby="trial-preview-heading">
-              <button className="preview-close" type="button" onClick={closePreview} aria-label="Close trial preview"><Icon name="close" /></button>
+            {previewTrial ? <dialog ref={previewDialog} className="trial-preview" id="trial-preview" aria-labelledby="trial-preview-heading" onCancel={(event) => { event.preventDefault(); closePreview(); }}>
+              <button className="preview-close" type="button" onClick={closePreview} aria-label="Close trial preview"><Icon name="close" /> Close</button>
               <p className="eyebrow">Accessible preview</p>
               <h2 id="trial-preview-heading" tabIndex={-1}>{previewTrial.briefTitle}</h2>
               <code>{previewTrial.id}</code>
@@ -228,7 +236,7 @@ export function TrialsPage() {
               <SourceAbstract value={deterministicTrialAbstract(previewTrial)} compact />
               <dl><div><dt>Displayed condition</dt><dd>{displayConditions(previewTrial).slice(0, 3).join(", ")}</dd></div><div><dt>India sites</dt><dd>{previewTrial.indiaLocations.length} registry-listed</dd></div><div><dt>Source</dt><dd>{previewTrial.source} · updated {previewTrial.lastUpdatePostedDate}</dd></div></dl>
               <div className="preview-actions">{reviewPatient ? <button className="button primary" type="button" onClick={() => startReview(previewTrial)}>Start human review for {reviewPatient.label}</button> : null}<button className={reviewPatient ? "button secondary" : "button primary"} type="button" onClick={() => openTrial(previewTrial)}>Open full Trial Detail</button><a className="button secondary" href={previewTrial.sourceUrl} target="_blank" rel="noreferrer">Open source <Icon name="external" /></a></div>
-            </aside> : null}
+            </dialog> : null}
           </div>
 
           <nav className="pagination" aria-label="Trial result pages">

@@ -6,6 +6,8 @@ import { formatSourceDate } from "../data/trials";
 import { useAppState } from "../state/AppState";
 import { useTrialData } from "../state/TrialData";
 import type { RoleId } from "../types";
+import { useWorkflow } from "../state/WorkflowState";
+import { usePiAccess } from "../state/usePiAccess";
 
 const roleHomeCopy: Record<RoleId, { title: string; description: string }> = {
   coordinator: {
@@ -27,8 +29,10 @@ const roleHomeCopy: Record<RoleId, { title: string; description: string }> = {
 };
 
 export function HomePage() {
-  const { patients, role, roleId, workItems } = useAppState();
+  const { role, roleId, workItems } = useAppState();
+  const { state: workflow } = useWorkflow();
   const { error, retry, snapshot, status } = useTrialData();
+  const pi = usePiAccess();
   const sourceDate = snapshot ? formatSourceDate(snapshot.source.dataTimestamp) : null;
   const ownedAttention = workItems.filter((item) => item.status !== "resolved" && item.roleIds.includes(roleId));
   const roleCopy = roleHomeCopy[roleId];
@@ -61,10 +65,12 @@ export function HomePage() {
           <span className="journey-icon" aria-hidden="true"><ThinkingOrb state="connecting" size={64} theme="light" /><Icon name="patients" /></span>
           <span className="eyebrow">Patient-first</span>
           <h2>Work with a synthetic patient</h2>
-          <p>Open one of {patients.length} source-labelled workspaces, choose a trial manually, and record a criterion-level human review.</p>
+          <p>Open one of {workflow.patients.length} synthetic records, inspect original evidence, run transparent pre-screening and resolve criterion gaps.</p>
           <span className="journey-foot"><span>Browser-memory only</span><strong>Open Patients <Icon name="arrow" /></strong></span>
         </Link>
       </section>
+      {pi.canAccess() && <Link className="button secondary" to="/studies">Open my study candidate queues</Link>}
+      <p>{workflow.gaps.filter(g=>!["reassessed","unable-to-obtain","cancelled"].includes(g.state)).length} active information tasks · {workflow.shortlist.length} version-bound shortlist entries · {workflow.referrals.length} patient referrals. <Link to="/inbox">Open referral and evidence work</Link></p>
 
       <div className="home-grid">
         <section className="surface activity-preview iso-panel" aria-labelledby="attention-heading">
@@ -94,8 +100,9 @@ export function HomePage() {
           </dl>
         </aside>
       </div>
+      <details className="surface reading-surface"><summary>Session audit — {workflow.audit.length} recorded transitions</summary><p>Browser-only immutable event history; reload starts a new demonstration session. Persona names are simulated authority, not authenticated identities.</p>{workflow.audit.map(event=><article key={event.id}><strong>{event.action} · {event.actor}</strong><p>{event.at} · {event.target}</p><p>{event.reason}</p></article>)}</details>
 
-      <SafetyNote><p><strong>General discovery and synthetic workflow validation only.</strong> Registry status is not proof that a site can enrol today. Trial Relay does not determine eligibility, rank patients, recommend treatment, or transmit a referral.</p></SafetyNote>
+      <SafetyNote><p><strong>Synthetic pre-screening is not clinical qualification.</strong> Review ordering uses declared criteria support, not eligibility probability. Registry status is not proof of site capacity. No treatment recommendation or referral transmission is performed.</p></SafetyNote>
     </div>
   );
 }

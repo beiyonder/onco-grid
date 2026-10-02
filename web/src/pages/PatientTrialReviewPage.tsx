@@ -1,121 +1,101 @@
-import { type FormEvent, useEffect, useState } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
-import { Icon } from "../components/Icon";
-import { EmptyState, PageHeader, SafetyNote, SourceBadge, StatusChip } from "../components/Primitives";
-import { criterionExcerpts } from "../data/trials";
+import { useEffect, useState } from "react";
+import { Link, useBlocker, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { EmptyState } from "../components/Primitives";
+import { AssessmentVector } from "../components/MatchingResults";
+import { SupportedReview } from "../components/SupportedReview";
+import { useWorkflow } from "../state/WorkflowState";
 import { useAppState } from "../state/AppState";
 import { useTrialData } from "../state/TrialData";
-import type { CriterionReviewState, PatientWorkspace, ReviewState, TrialRecord } from "../types";
-
-const reviewStates: ReviewState[] = [
-  "Not reviewed",
-  "Confirmed from source",
-  "Needs clarification",
-  "Does not appear met",
-];
-
-function reviewTone(state: ReviewState | undefined): "neutral" | "good" | "attention" | "danger" {
-  if (state === "Confirmed from source") return "good";
-  if (state === "Needs clarification") return "attention";
-  if (state === "Does not appear met") return "danger";
-  return "neutral";
-}
-
-function CriterionRow({
-  criterion,
-  current,
-  patient,
-  trial,
-}: {
-  criterion: { id: string; section: string; text: string };
-  current: CriterionReviewState | undefined;
-  patient: PatientWorkspace;
-  trial: TrialRecord;
-}) {
-  const { addMissingInformationTask, updateCriterion } = useAppState();
-  const [state, setState] = useState<ReviewState>(current?.state ?? "Not reviewed");
-  const [evidence, setEvidence] = useState(current?.evidence ?? "");
-  const [note, setNote] = useState(current?.note ?? "");
-  const [dirty, setDirty] = useState(false);
-  const [taskId, setTaskId] = useState<string | null>(null);
-  const evidenceRequired = state !== "Not reviewed";
-
-  const save = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (evidenceRequired && !evidence) return;
-    updateCriterion({ patientId: patient.id, trialId: trial.id, criterionId: criterion.id, state, evidence, note });
-    setDirty(false);
-  };
-
-  return (
-    <article className="criterion-card" id={criterion.id} tabIndex={-1}>
-      <header>
-        <span className="criterion-number">{criterion.id.replace("criterion-", "")}</span>
-        <span><small>{criterion.section} criterion · exact registry excerpt</small><p>{criterion.text}</p></span>
-        <StatusChip tone={reviewTone(current?.state)}>{current?.state ?? "Not reviewed"}</StatusChip>
-      </header>
-      <form onSubmit={save}>
-        <label><span>Human review state</span><select value={state} onChange={(event) => { setState(event.target.value as ReviewState); setDirty(true); }}>{reviewStates.map((candidate) => <option key={candidate}>{candidate}</option>)}</select></label>
-        <label><span>Evidence used {evidenceRequired ? "(required)" : ""}</span><select value={evidence} required={evidenceRequired} onChange={(event) => { setEvidence(event.target.value); setDirty(true); }}><option value="">No evidence selected</option><option value="No source available in current synthetic workspace">No source available in current synthetic workspace</option>{patient.facts.map((fact) => <option key={fact.id} value={`${fact.sourceLabel}: ${fact.value}`}>{fact.label} · {fact.sourceType}</option>)}</select></label>
-        <label className="wide"><span>Reviewer note</span><input value={note} onChange={(event) => { setNote(event.target.value); setDirty(true); }} placeholder="Record what the human reviewer checked; do not infer missing values" /></label>
-        <div className="criterion-actions"><button className="button primary" type="submit" disabled={(evidenceRequired && !evidence) || !dirty}>Save human review</button>{state === "Needs clarification" && !dirty ? <button className="button secondary" type="button" onClick={() => setTaskId(addMissingInformationTask(patient.id, trial.id, criterion.id))}>Create missing-information task</button> : null}</div>
-      </form>
-      <footer>
-        {dirty ? <span><strong>Unsaved change</strong> · reviewer/date/evidence unchanged</span> : current ? <><span><strong>{current.reviewer}</strong> · {current.reviewedAt}</span><span>Evidence: {current.evidence ?? "None recorded"}</span></> : <span><strong>Not reviewed</strong> · no reviewer, date, or evidence</span>}
-        {taskId ? <StatusChip tone="attention">Task {taskId} created explicitly by a person</StatusChip> : null}
-      </footer>
-    </article>
-  );
-}
+import { usePiAccess } from "../state/usePiAccess";
+import { isAssessmentCurrent } from "../domain/workflow";
+import { criterionInformationNeeds } from "../domain/informationNeeds";
+import { demoFields } from "../domain/patients";
+import type { HumanReview } from "../domain/model";
 
 export function PatientTrialReviewPage() {
   const { patientId, trialId } = useParams();
-  const [searchParams] = useSearchParams();
-  const { patients, reviews } = useAppState();
-  const { findTrial, status } = useTrialData();
-  const patient = patients.find((candidate) => candidate.id === patientId);
+  const [params, setParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { state, command, error } = useWorkflow();
+  const { roleId, setRoleId } = useAppState();
+  const { findTrial } = useTrialData();
+  const pi = usePiAccess();
+  const patient = state.patients.find((p) => p.id === patientId);
   const trial = findTrial(trialId);
-  const requestedCriterion = searchParams.get("criterion");
-
+  const assessment = state.runs.flatMap((r) => r.assessments).find((a) => a.id === params.get("assessment"));
+  const model = assessment?.modelSnapshot;
+  const [filter, setFilter] = useState("auto");
+  const [reason, setReason] = useState("");
+  const [evidence, setEvidence] = useState("");
+  const [decision, setDecision] = useState<HumanReview["decision"]>("accept");
+  const [dirty, setDirty] = useState(false);
+  const blocker = useBlocker(dirty);
+  const attention = assessment?.findings.filter((f) => f.state !== "supported").length ?? 0;
+  const activeFilter = filter === "auto" ? attention ? "attention" : "all" : filter;
+  const findings = assessment?.findings.filter((f) => activeFilter === "all" || (activeFilter === "attention" && f.state !== "supported") || (activeFilter === "supported" && f.state === "supported")) ?? [];
+  const selected = findings.find((f) => f.criterionId === params.get("criterion")) ?? findings[0];
+  const criterion = model?.criteria.find((c) => c.id === selected?.criterionId);
   useEffect(() => {
-    if (!requestedCriterion || status !== "ready") return;
-    const timeout = window.setTimeout(() => document.getElementById(requestedCriterion)?.focus({ preventScroll: false }), 0);
-    return () => window.clearTimeout(timeout);
-  }, [requestedCriterion, status]);
-
-  if (status === "loading") {
-    return <div className="page"><EmptyState icon="source" title="Loading review source">Retrieving the complete registry criteria.</EmptyState></div>;
-  }
-
-  if (!patient || !trial) {
-    return <div className="page"><EmptyState icon="warning" title="Review context not found">Both a browser-only patient workspace and a public trial record are required.</EmptyState></div>;
-  }
-
-  const criteria = criterionExcerpts(trial);
-  const review = reviews.find((candidate) => candidate.patientId === patient.id && candidate.trialId === trial.id);
-  const reviewedCount = criteria.filter((criterion) => review?.criteria[criterion.id]?.state && review.criteria[criterion.id]?.state !== "Not reviewed").length;
-  const notReviewedCount = criteria.length - reviewedCount;
-  const approvedResearch = patient.dataBoundary === "Approved de-identified research";
-
-  return (
-    <div className="page review-page">
-      <Link className="back-link" to={`/patients/${patient.id}?section=reviews`}>← Back to {patient.label}</Link>
-      <PageHeader eyebrow={`${patient.id} × ${trial.id}`} title="Patient–Trial Review" description="A clinician records criterion-level observations from named source-labelled facts. Trial Relay provides no aggregate score, fit label, ranking, recommendation, or eligibility conclusion." actions={<a className="button secondary" href={trial.sourceUrl} target="_blank" rel="noreferrer">Open complete source <Icon name="external" /></a>} />
-      <SafetyNote><p><strong>Clinician-led review, not matching.</strong> This trial was selected explicitly. {approvedResearch ? <>The workspace contains institutionally approved de-identified research facts held only in this browser and excluded from the AI assistant.</> : <>The workspace contains synthetic demonstration facts.</>} Every unknown remains unknown until a human reviewer records a sourced state; no criterion or overall conclusion is inferred.</p></SafetyNote>
-
-      <section className="review-completeness" aria-labelledby="completeness-heading">
-        <div><p className="eyebrow">Completeness</p><h2 id="completeness-heading">{reviewedCount} of {criteria.length} retained registry criteria reviewed</h2><p><strong>{notReviewedCount} remain Not reviewed.</strong> A partial review is never presented as a complete protocol assessment.</p></div>
-        <div className="completion-meter" aria-label={`${reviewedCount} of ${criteria.length} criteria reviewed`}><span style={{ width: `${criteria.length ? (reviewedCount / criteria.length) * 100 : 0}%` }} /></div>
-        <StatusChip tone={notReviewedCount === 0 ? "good" : "attention"}>{notReviewedCount === 0 ? "All displayed excerpts reviewed" : "Incomplete review"}</StatusChip>
-      </section>
-
-      <div className="review-layout">
-        <section className="criteria-column" aria-labelledby="criteria-heading">
-          <div className="section-heading"><div><p className="eyebrow">Complete retained registry criteria</p><h2 id="criteria-heading">Exact source excerpts</h2><p>Text is segmented at registry bullets for review but is not rewritten or interpreted.</p></div><StatusChip tone="source">{criteria.length} source excerpts</StatusChip></div>
-          {criteria.map((criterion) => <CriterionRow key={criterion.id} criterion={criterion} current={review?.criteria[criterion.id]} patient={patient} trial={trial} />)}
-        </section>
-        <aside className="review-source-panel" aria-labelledby="patient-evidence-heading"><p className="eyebrow">Synthetic patient evidence</p><h2 id="patient-evidence-heading">Available facts</h2>{patient.facts.map((fact) => <article key={fact.id}><span>{fact.label}</span><strong>{fact.value}</strong><SourceBadge source={fact.sourceType} /><small>{fact.sourceLabel}</small></article>)}</aside>
-      </div>
+    if (!dirty) return;
+    const guard = (event: BeforeUnloadEvent) => { event.preventDefault(); event.returnValue = ""; };
+    window.addEventListener("beforeunload", guard);
+    return () => window.removeEventListener("beforeunload", guard);
+  }, [dirty]);
+  useEffect(() => {
+    setReason(""); setEvidence(""); setDecision("accept");
+    document.getElementById("selected-criterion-heading")?.focus({ preventScroll: true });
+  }, [selected?.criterionId, assessment?.id]);
+  if (!patient || !trial || !assessment || assessment.patientId !== patient.id || assessment.trialId !== trial.id || !model)
+    return <div className="page"><EmptyState icon="warning" title="Assessment not available" action={<Link to={`/patients/${patientId}?section=matches`}>Return to patient matching</Link>}>Run patient matching first. Browser-only assessments reset on reload.</EmptyState></div>;
+  const current = isAssessmentCurrent(state, assessment);
+  const editable = current && (roleId === "oncologist" || roleId === "site");
+  const reviewed = new Set(state.reviews.filter((r) => r.assessmentId === assessment.id).map((r) => r.criterionId));
+  const remaining = assessment.findings.filter((f) => !reviewed.has(f.criterionId)).length;
+  const returnParams = new URLSearchParams();
+  for (const key of ["run", "matchFilter", "scope", "trial"]) if (params.has(key)) returnParams.set(key, params.get(key)!);
+  const returnQuery = returnParams.toString();
+  const teamView = params.get("from") === "studies" && pi.canAccess(trial.id);
+  const existingReferral = state.referrals.find((r) => r.patientId === patient.id && r.trialId === trial.id && !["Closed", "Withdrawn"].includes(r.state));
+  const selectCriterion = (id: string) => { const next = new URLSearchParams(params); next.set("criterion", id); setParams(next, { replace: true }); };
+  const reviewHistory = state.reviews.filter((r) => r.assessmentId === assessment.id && r.criterionId === criterion?.id);
+  const openReferral = () => {
+    if (existingReferral || command({ type: "create-referral", assessmentId: assessment.id })) {
+      const target = new URLSearchParams(params);
+      if (existingReferral) target.set("referral", existingReferral.id); else target.delete("from");
+      navigate(`/patients/${patient.id}/referrals/${trial.id}?${target.toString()}`);
+    }
+  };
+  return <div className="page review-page review-desk">
+    <Link className="back-link" to={teamView ? `/studies?trial=${trial.id}&${returnQuery}` : `/patients/${patient.id}?section=matches&${returnQuery}`}>Back to {teamView ? "PI candidates" : `${patient.label} matches`}</Link>
+    <header className="review-heading"><div><p>{patient.label} / {trial.id} · {patient.condition}</p><h1>Review for referral</h1></div><div><AssessmentVector assessment={assessment} /><small>Synthetic evidence · Nothing transmitted</small></div></header>
+    <ol className="referral-steps" aria-label="Referral workflow"><li aria-current="step">Review evidence</li><li>Prepare referral</li><li>Team conversation</li></ol>
+    <div className="review-progress"><div><strong>{reviewed.size} of {assessment.findings.length} reviewed</strong><span>{remaining ? `${remaining} decisions left before referral preparation` : "Review complete. The study team reviews your referral next."}</span></div><button className="button primary" disabled={dirty || (!existingReferral && (!editable || remaining > 0))} onClick={openReferral}>{existingReferral ? "Open referral conversation" : "Prepare referral"}</button></div>
+    {!current && <p className="stale-label" role="status">This assessment is historical or its source check expired. <Link to={`/patients/${patient.id}?section=matches&scope=selected&trial=${trial.id}`}>Rerun matching</Link> before recording decisions or preparing a referral.</p>}
+    {current && !editable && <div className="review-role-notice"><p>You are viewing as {roleId === "auditor" ? "an auditor" : "a coordinator"}. An oncologist records the clinical review.</p>{roleId !== "auditor" && <button className="button secondary" onClick={() => setRoleId("oncologist")}>Use oncologist demo role</button>}<small>Demo role only; this does not grant PI access.</small></div>}
+    {error && <p className="form-error" role="alert">{error}</p>}
+    {blocker.state === "blocked" && <div className="surface reading-surface" role="alertdialog" aria-label="Unsaved review"><p>Discard the unsaved decision and leave?</p><button className="button secondary" onClick={() => { setDirty(false); blocker.proceed(); }}>Discard and leave</button><button className="button primary" onClick={() => blocker.reset()}>Keep editing</button></div>}
+    <div className="review-tools"><div className="segmented-control" aria-label="Criterion filter">{([["all", "All criteria"], ["attention", `Needs attention (${attention})`], ["supported", "Supported"]] as const).map(([value, label]) => <button key={value} aria-pressed={activeFilter === value} className={activeFilter === value ? "active" : ""} disabled={dirty} onClick={() => setFilter(value)}>{label}</button>)}</div><span role="status">{dirty ? "Unsaved decision" : "Decisions saved in this session"}</span></div>
+    <SupportedReview key={assessment.id} assessment={assessment} disabled={!editable || dirty} />
+    <div className="criterion-workbench">
+      <nav aria-label="Assessment criteria">{findings.map((finding, index) => <button key={finding.criterionId} className={selected?.criterionId === finding.criterionId ? "active" : ""} aria-current={selected?.criterionId === finding.criterionId ? "true" : undefined} disabled={dirty} onClick={() => selectCriterion(finding.criterionId)}><span className="criterion-number">{index + 1}</span><span><strong>{model.criteria.find((c) => c.id === finding.criterionId)?.wording}</strong><small>{finding.state} · {reviewed.has(finding.criterionId) ? "Reviewed" : "Review needed"}</small></span></button>)}</nav>
+      {selected && criterion ? <article className="criterion-inspector">
+        <header><span className={`finding-state ${selected.state}`}>{selected.state === "supported" ? "Evidence supports this requirement" : selected.state === "violated" ? "Conflict to review" : selected.state === "unresolved" ? "Evidence needs clarification" : "Not applicable"}</span><h2 id="selected-criterion-heading" tabIndex={-1}>{criterion.wording}</h2></header>
+        <section className="review-evidence"><h3>Patient evidence</h3>{selected.trace.assertionIds.length ? selected.trace.assertionIds.map((id) => { const assertion = assessment.assertionSnapshot.find((a) => a.id === id); return assertion ? <div className="review-evidence-row" key={id}><div><strong>{assertion.raw}</strong><small>{assertion.authority} at evaluation · {assertion.observedAt}</small></div><Link to={`/patients/${patient.id}?section=sources&source=${encodeURIComponent(assertion.artifactId)}&locator=${encodeURIComponent(assertion.locator)}&returnAssessment=${encodeURIComponent(assessment.id)}&returnCriterion=${encodeURIComponent(criterion.id)}&from=${params.get("from") ?? "patient"}&${returnQuery}`}>View original</Link></div> : <p key={id}>Historical assertion unavailable.</p>; }) : <p>No patient evidence supports this finding. Review the source and request the missing information.</p>}</section>
+        {selected.state === "unresolved" && <details className="review-information"><summary>Request missing information</summary>{criterionInformationNeeds(criterion, patient, assessment.evaluatedAt).filter((need) => demoFields.some((field) => field.concept === need.concept)).map(({ concept, timeWindow }, index) => <button className="button secondary" key={`${concept}:${index}`} disabled={!current || roleId === "auditor"} onClick={() => command({ type: "accept-gap", assessmentId: assessment.id, criterionId: criterion.id, concept, timeWindow, owner: "A. Rao" })}>Clarify {demoFields.find((field) => field.concept === concept)?.label}</button>)}<Link to={`/patients/${patient.id}?section=tasks`}>Open patient tasks</Link></details>}
+        <form className="review-decision" onSubmit={(event) => { event.preventDefault(); if (command({ type: "review", review: { assessmentId: assessment.id, criterionId: criterion.id, decision, reason, evidence } })) { setDirty(false); setReason(""); setEvidence(""); const next = findings.find((f) => f.criterionId !== criterion.id && !reviewed.has(f.criterionId)); if (next) selectCriterion(next.criterionId); } }}>
+          <h3>{reviewed.has(criterion.id) ? "Update your review" : "Your review"}</h3>
+          <label>Decision<select disabled={!editable} value={decision} onChange={(event) => { setDecision(event.target.value as HumanReview["decision"]); setDirty(true); }}><option value="accept">Acknowledge finding</option><option value="override">Record a differing view</option><option value="defer">Request clarification</option></select></label>
+          <details className="review-notes" open={decision === "override"}><summary>Add a review note or evidence reference</summary>
+          <div className="review-reason-fields"><label>{decision === "override" ? "Reason (required)" : "Review note (optional)"}<textarea rows={2} disabled={!editable} required={decision === "override"} value={reason} maxLength={500} onChange={(event) => { setReason(event.target.value); setDirty(true); }} /></label><label>Evidence reference{decision !== "override" && " (optional)"}<input disabled={!editable} required={decision === "override"} value={evidence} maxLength={240} onChange={(event) => { setEvidence(event.target.value); setDirty(true); }} /></label></div>
+          </details>
+          <div className="review-decision-actions"><button className="button primary" disabled={!editable}>Save review & continue</button>{dirty && <button className="button quiet" type="button" onClick={() => { setDirty(false); setReason(""); setEvidence(""); setDecision("accept"); }}>Discard changes</button>}{reviewHistory.length > 0 && <small>Last decision: {reviewHistory.at(-1)?.decision}</small>}</div>
+        </form>
+        <details className="review-technical"><summary>Registry source, logic & review history</summary><a href={model.sourceUrl} target="_blank" rel="noreferrer">Open official registry source</a><p>Record v{assessment.patientVersion} · model v{assessment.modelVersion} · evaluated {assessment.evaluatedAt}. Source characters {criterion.sourceStart}–{criterion.sourceEnd} · {assessment.sourceVersion}.</p><p>{selected.trace.explanation}</p><pre>{JSON.stringify({ predicate: criterion.predicate, trace: selected.trace }, null, 2)}</pre>{reviewHistory.map((review, index) => <p key={index}>{review.decision} · {review.author} · {review.recordedAt} · {review.reason} · {review.evidence}</p>)}</details>
+      </article> : <div className="review-filter-empty"><h2>No criteria need attention in this view</h2><p>Review supported findings before preparing a referral.</p><button className="button secondary" onClick={() => setFilter("all")}>Show all criteria</button></div>}
     </div>
-  );
+    <footer className="review-next">
+      <div><strong>{existingReferral ? "A referral is already in progress" : remaining ? "Finish the evidence review" : "Ready to prepare your referral"}</strong><p>{existingReferral ? `${existingReferral.state} · ${existingReferral.teamOwner}` : remaining ? "Each finding needs a recorded human decision. Supported findings can be reviewed together." : "The PI team reviews the referral after you queue it—not before."}</p></div>
+      <button className="button quiet" disabled={!editable || dirty} onClick={() => command({ type: "shortlist", assessmentId: assessment.id })}>{state.shortlist.includes(assessment.id) ? "Remove from shortlist" : "Save to shortlist"}</button>
+    </footer>
+  </div>;
 }

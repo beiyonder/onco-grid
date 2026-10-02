@@ -4,6 +4,7 @@ import { RouterProvider } from "react-router-dom";
 import { AppStateProvider } from "./state/AppState";
 import { TrialDataProvider } from "./state/TrialData";
 import { PilotServiceProvider } from "./state/PilotService";
+import { WorkflowProvider } from "./state/WorkflowState";
 import { router } from "./router";
 import "./styles.css";
 
@@ -15,7 +16,7 @@ createRoot(root).render(
     <TrialDataProvider>
       <PilotServiceProvider>
         <AppStateProvider>
-          <RouterProvider router={router} />
+          <WorkflowProvider><RouterProvider router={router} /></WorkflowProvider>
         </AppStateProvider>
       </PilotServiceProvider>
     </TrialDataProvider>
