@@ -69,14 +69,14 @@ export function TrialDetailPage() {
           </section>
 
           <section className="surface protocol-source" aria-labelledby="criteria-source-heading">
-            <div className="section-heading"><div><p className="eyebrow">Complete retained source</p><h2 id="criteria-source-heading">Eligibility criteria</h2><p>Original registry text for human review; not interpreted by Trial Relay.</p></div><StatusChip tone="source">{trial.eligibilityCriteriaTruncated ? "Source excerpt" : "Complete retained text"}</StatusChip></div>
+            <div className="section-heading"><div><p className="eyebrow">Complete retained source</p><h2 id="criteria-source-heading">Eligibility criteria</h2><p>Original registry text for human review; not interpreted by Trial Loop.</p></div><StatusChip tone="source">{trial.eligibilityCriteriaTruncated ? "Source excerpt" : "Complete retained text"}</StatusChip></div>
             <details className="criteria-disclosure">
               <summary>
                 <span><strong>Read registry criteria</strong><small>Exact source text, structured for careful reading</small></span>
                 <span className="criteria-summary-count">{totalCriteria} criteria</span>
               </summary>
               <div className="criteria-document">
-                <div className="criteria-document-note" role="note"><Icon name="source" /><p><strong>Source text, not interpretation.</strong> Trial Relay separates the registry wording into sections and numbered rows without deciding whether any person meets a criterion.</p></div>
+                <div className="criteria-document-note" role="note"><Icon name="source" /><p><strong>Source text, not interpretation.</strong> Trial Loop separates the registry wording into sections and numbered rows without deciding whether any person meets a criterion.</p></div>
                 {criteriaSections.map((section) => (
                   <section className={`criteria-group ${section.title.toLocaleLowerCase()}`} aria-labelledby={`criteria-${section.title.toLocaleLowerCase()}`} key={section.title}>
                     <header><div><p className="eyebrow">{section.title === "Protocol" ? "Registry wording" : `${section.title} criteria`}</p><h3 id={`criteria-${section.title.toLocaleLowerCase()}`}>{section.title === "Protocol" ? "Protocol criteria" : section.title}</h3></div><span>{section.items.length} {section.items.length === 1 ? "item" : "items"}</span></header>
