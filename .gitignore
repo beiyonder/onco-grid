@@ -31,3 +31,31 @@ output/playwright/
 # Frontend dependencies and generated output
 web/node_modules/
 web/dist/
+
+# Public repository boundary: keep private documentation and research local.
+# Ignore rules do not remove tracked files or erase earlier Git history.
+*.md
+*.txt
+!web/public/robots.txt
+*.doc
+*.docx
+*.pdf
+*.rtf
+*.odt
+*.pages
+*.ppt
+*.pptx
+*.xls
+*.xlsx
+
+# Internal plans, evidence reports, screenshots, scripts for demos and tool state
+/.harness/
+/.serena/
+/.omp/
+/architecture/
+/product/
+/output/
+/notes/
+/personal/
+/recordings/
+/research/evidence.jsonl
