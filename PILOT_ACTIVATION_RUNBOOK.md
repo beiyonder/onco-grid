@@ -1,4 +1,4 @@
-# Trial Relay production and pilot activation runbook
+# Trial Loop production and pilot activation runbook
 
 ## Production target
 

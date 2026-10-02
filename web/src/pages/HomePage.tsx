@@ -16,7 +16,7 @@ const roleHomeCopy: Record<RoleId, { title: string; description: string }> = {
   },
   oncologist: {
     title: "Review evidence and human responses",
-    description: "Open source-linked criterion work and authorised trial-side replies. Trial Relay records your review but never determines fit or eligibility.",
+    description: "Open source-linked criterion work and authorised trial-side replies. Trial Loop records your review but never determines fit or eligibility.",
   },
   site: {
     title: "Answer within the trial-side authority boundary",
@@ -46,7 +46,7 @@ export function HomePage() {
       />
       {status === "error" ? <div className="source-error" role="alert"><Icon name="warning" /><span><strong>Public trial records could not be loaded.</strong><small>{error}</small></span><button className="button secondary" type="button" onClick={retry}>Retry source</button></div> : null}
 
-      <section className="journey-grid" aria-label="Primary Trial Relay journeys">
+      <section className="journey-grid" aria-label="Primary Trial Loop journeys">
         <div className="relay-field" aria-hidden="true">
           <span />
           <span />

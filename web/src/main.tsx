@@ -9,7 +9,7 @@ import { router } from "./router";
 import "./styles.css";
 
 const root = document.getElementById("root");
-if (!root) throw new Error("Trial Relay root element is missing");
+if (!root) throw new Error("Trial Loop root element is missing");
 
 createRoot(root).render(
   <StrictMode>

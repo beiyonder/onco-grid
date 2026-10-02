@@ -53,9 +53,9 @@ export function AppShell() {
     <div className="app-shell">
       <a className="skip-link" href="#main-content">Skip to main content</a>
       <aside className="sidebar" aria-label="Primary navigation">
-        <Link className="brand" to="/" aria-label="Trial Relay home">
-          <span className="brand-mark" aria-hidden="true">TR</span>
-          <span><strong>Trial Relay</strong><small>OncoGrid validation</small></span>
+        <Link className="brand" to="/" aria-label="Trial Loop home">
+          <span className="brand-mark" aria-hidden="true">TL</span>
+          <span><strong>Trial Loop</strong><small>OncoGrid validation</small></span>
         </Link>
         <Glass
           className="nav-glass"
@@ -89,7 +89,7 @@ export function AppShell() {
 
       <div className="workspace-shell">
         <header className="topbar">
-          <div className="mobile-brand"><span className="brand-mark">TR</span><strong>Trial Relay</strong></div>
+          <div className="mobile-brand"><span className="brand-mark">TL</span><strong>Trial Loop</strong></div>
           <Glass
             className="source-glass"
             optics={compactGlassOptics}
