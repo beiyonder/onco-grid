@@ -35,6 +35,8 @@ web/dist/
 # Public repository boundary: keep private documentation and research local.
 # Ignore rules do not remove tracked files or erase earlier Git history.
 *.md
+# Explicitly approved public project documentation; other Markdown stays private.
+!/README.md
 *.txt
 !web/public/robots.txt
 *.doc
