@@ -8,6 +8,7 @@ import {
 } from "../components/Primitives";
 import { useWorkflow } from "../state/WorkflowState";
 import { useAppState } from "../state/AppState";
+import { matchingExamples } from "../domain/matchingExamples";
 export function PatientsPage() {
   const { state, command, error } = useWorkflow();
   const { roleId, patients: researchPatients } = useAppState();
@@ -40,6 +41,15 @@ export function PatientsPage() {
           reviewer authority are separate.
         </p>
       </SafetyNote>
+      <section className="worked-examples" aria-labelledby="worked-examples-title">
+        <h2 id="worked-examples-title">Start with a worked case</h2>
+        <p>Expected outcomes use the reference snapshot. Live registry checks can change whether a model is usable.</p>
+        <div>{matchingExamples.map((example) => <Link
+          key={example.patientId}
+          to={`/patients/${example.patientId}?section=matches&scope=selected&trial=${example.trialId}`}
+          className={`worked-case outcome-${example.expected}`}
+        ><strong>{example.title}</strong><span>{example.detail}</span></Link>)}</div>
+      </section>
       {error && <p role="alert">{error}</p>}
       <section className="surface patient-index">
         <div className="patient-index-toolbar">

@@ -325,3 +325,11 @@ export function createCriterionModels(trials: TrialRecord[]): CriterionModel[] {
     ];
   });
 }
+
+// Supplied reference interpretations are executable without impersonating a clinical publisher.
+export function createReferenceModels(trials: TrialRecord[]): CriterionModel[] {
+  return createCriterionModels(trials).map((model) => ({
+    ...model,
+    status: model.complete ? "reference" : "draft",
+  }));
+}

@@ -10,9 +10,10 @@ import {
   type HumanReview,
   type MatchRun,
   type ScreeningDisposition,
-  type SyntheticPacket,
+  type SyntheticReferral,
   type SyntheticPatient,
   type Value,
+  type RegistryCheck,
 } from "./model";
 import {
   initialSyntheticPatients,
@@ -28,9 +29,10 @@ export interface WorkflowState {
   reviews: HumanReview[];
   gaps: GapTask[];
   dispositions: ScreeningDisposition[];
-  packets: SyntheticPacket[];
+  referrals: SyntheticReferral[];
   shortlist: string[];
   audit: AuditEvent[];
+  registryChecks: Record<string, RegistryCheck>;
 }
 export const initialWorkflow: WorkflowState = {
   patients: initialSyntheticPatients,
@@ -39,12 +41,14 @@ export const initialWorkflow: WorkflowState = {
   reviews: [],
   gaps: [],
   dispositions: [],
-  packets: [],
+  referrals: [],
   shortlist: [],
   audit: [],
+  registryChecks: {},
 };
 export type WorkflowCommand =
   | { type: "initialize"; models: CriterionModel[] }
+  | { type: "registry-checks"; checks: RegistryCheck[] }
   | { type: "create-patient"; scenario: number }
   | {
       type: "provide";
@@ -82,14 +86,23 @@ export type WorkflowCommand =
       value: Omit<ScreeningDisposition, "author" | "role" | "recordedAt">;
     }
   | { type: "shortlist"; assessmentId: string }
-  | { type: "packet"; assessmentId: string }
-  | { type: "advance-packet"; id: string };
+  | { type: "create-referral"; assessmentId: string }
+  | { type: "refresh-referral"; id: string; assessmentId: string }
+  | { type: "referral-message"; id: string; side: "referrer" | "team"; body: string }
+  | { type: "referral-action"; id: string; action: "queue" | "acknowledge" | "request-information" | "ready" | "close" | "withdraw" | "assign"; body: string; owner?: SyntheticReferral["teamOwner"]; confirmed?: boolean };
 export function isAssessmentCurrent(
   state: WorkflowState,
   assessment: Assessment,
 ): boolean {
   const patient = state.patients.find((p) => p.id === assessment.patientId);
   const model = state.models.find((m) => m.id === assessment.modelId);
+  const check = assessment.registryCheck;
+  const latest = state.registryChecks[assessment.trialId];
+  if (check && (
+    check.state !== "verified" || latest?.state !== "verified" ||
+    check.registryVersion !== latest.registryVersion ||
+    !check.fetchedAt || Date.now() - Date.parse(check.fetchedAt) > 15 * 60_000
+  )) return false;
   return (
     patient?.version === assessment.patientVersion &&
     model?.version === assessment.modelVersion &&
@@ -106,6 +119,12 @@ function currentAssessment(state: WorkflowState, id: string): Assessment {
     );
   return assessment;
 }
+export function latestAssessmentReviews(state: WorkflowState, assessment: Assessment): HumanReview[] {
+  const latest = new Map(state.reviews.filter((r) => r.assessmentId === assessment.id).map((r) => [r.criterionId, r]));
+  if (assessment.findings.some((f) => !latest.has(f.criterionId)))
+    throw new Error("Record every criterion review before preparing a referral.");
+  return assessment.findings.map((f) => latest.get(f.criterionId)!);
+}
 export function transitionWorkflow(
   state: WorkflowState,
   command: WorkflowCommand,
@@ -116,6 +135,11 @@ export function transitionWorkflow(
 ): WorkflowState {
   if (command.type === "initialize")
     return state.models.length ? state : { ...state, models: command.models };
+  if (command.type === "registry-checks") {
+    const registryChecks = { ...state.registryChecks };
+    for (const check of command.checks) registryChecks[check.trialId] = check;
+    return { ...state, registryChecks };
+  }
   if (role === "auditor") throw new Error("The auditor persona is read-only.");
   let next = state;
   let reason = "reason" in command ? command.reason : "";
@@ -272,7 +296,11 @@ export function transitionWorkflow(
     case "complete-run": {
       const running = state.runs.find((r) => r.id === command.run.id);
       if (!running || running.status !== "running") return state;
-      if (command.run.assessments.some((a) => !isAssessmentCurrent(state, a)))
+      if (command.run.assessments.some((a) => {
+        const patient = state.patients.find((p) => p.id === a.patientId);
+        const model = state.models.find((m) => m.id === a.modelId);
+        return patient?.version !== a.patientVersion || model?.version !== a.modelVersion || model.sourceVersion !== a.sourceVersion;
+      }))
         return {
           ...state,
           runs: state.runs.map((r) =>
@@ -496,60 +524,84 @@ export function transitionWorkflow(
           : [...state.shortlist, command.assessmentId],
       };
       break;
-    case "packet": {
-      requireDemoAuthority(role, "simulate-handoff");
+    case "create-referral": {
+      requireDemoAuthority(role, "review-criterion");
       const assessment = currentAssessment(state, command.assessmentId);
-      if (!state.shortlist.includes(assessment.id))
-        throw new Error("Shortlist this assessment before preparing a packet.");
-      if (
-        assessment.findings.some(
-          (f) =>
-            !state.reviews.some(
-              (r) =>
-                r.assessmentId === assessment.id &&
-                r.criterionId === f.criterionId,
-            ),
-        )
-      )
-        throw new Error(
-          "Record every criterion review before preparing a packet.",
-        );
-      if (!state.dispositions.some((d) => d.assessmentId === assessment.id))
-        throw new Error("A trial-side human disposition is required.");
-      next = {
-        ...state,
-        packets: [
-          ...state.packets,
-          {
-            id: eventId,
-            assessmentId: assessment.id,
-            author: actor,
-            createdAt: at,
-            state: "Draft",
-          },
-        ],
-      };
+      const reviews = latestAssessmentReviews(state, assessment);
+      if (state.referrals.some((r) => r.patientId === assessment.patientId && r.trialId === assessment.trialId && !["Closed", "Withdrawn"].includes(r.state)))
+        throw new Error("Continue the existing referral for this patient and study.");
+      next = { ...state, referrals: [...state.referrals, {
+        id: eventId, patientId: assessment.patientId, trialId: assessment.trialId,
+        assessmentId: assessment.id, reviews, author: actor, createdAt: at, updatedAt: at,
+        state: "Draft", teamOwner: "Study coordinator", events: [],
+      }] };
       break;
     }
-    case "advance-packet": {
-      requireDemoAuthority(role, "simulate-handoff");
-      const packet = state.packets.find((p) => p.id === command.id);
-      if (!packet) throw new Error("Packet not found.");
-      currentAssessment(state, packet.assessmentId);
-      next = {
-        ...state,
-        packets: state.packets.map((p) =>
-          p !== packet
-            ? p
-            : {
-                ...p,
-                state:
-                  p.state === "Draft"
-                    ? "Ready for simulation"
-                    : "Simulated acknowledgement",
-              },
-        ),
-      };
+    case "refresh-referral":
+    case "referral-message":
+    case "referral-action": {
+      const referral = state.referrals.find((r) => r.id === command.id);
+      if (!referral) throw new Error("Referral not found.");
+      if (["Closed", "Withdrawn"].includes(referral.state)) throw new Error("This referral is closed.");
+      const team = command.type === "referral-message" ? command.side === "team"
+        : command.type === "referral-action" && !["queue", "withdraw"].includes(command.action);
+      requireDemoAuthority(role, team ? "screening-disposition" : "simulate-handoff");
+      let updated = { ...referral, updatedAt: at };
+      let body = "body" in command ? command.body.trim() : "";
+      let kind: string = command.type;
+      if (command.type === "refresh-referral") {
+        if (!["Draft", "Needs information"].includes(referral.state)) throw new Error("Attach an updated assessment while drafting or answering an information request.");
+        const assessment = currentAssessment(state, command.assessmentId);
+        if (assessment.patientId !== referral.patientId || assessment.trialId !== referral.trialId) throw new Error("The assessment must belong to the same patient and study.");
+        updated = { ...updated, assessmentId: assessment.id, reviews: latestAssessmentReviews(state, assessment) };
+        kind = "Packet updated";
+        body = `Attached reviewed record v${assessment.patientVersion}, model v${assessment.modelVersion}.`;
+      } else {
+        if (!body || body.length > 1000) throw new Error("Enter a synthetic message or reason of 1–1000 characters.");
+        if (command.type === "referral-message") {
+          if (referral.state === "Draft") throw new Error("Queue the referral before starting the conversation.");
+          kind = "Message";
+        } else {
+          const action = command.action;
+          kind = action;
+          if (action === "queue") {
+            if (!["Draft", "Needs information"].includes(referral.state)) throw new Error("This referral is already with the team.");
+            if (!command.confirmed) throw new Error("Confirm the local-only referral packet before queueing.");
+            const assessment = currentAssessment(state, referral.assessmentId);
+            updated.reviews = latestAssessmentReviews(state, assessment);
+            updated.state = "Awaiting team";
+            kind = referral.state === "Draft" ? "Referral queued locally" : "Information returned";
+          } else if (action === "withdraw") {
+            updated.state = "Withdrawn";
+            kind = "Referral withdrawn";
+          } else {
+            if (referral.state === "Draft") throw new Error("The referring team has not queued this referral.");
+            if (action === "acknowledge") {
+              if (referral.state !== "Awaiting team") throw new Error("Only an awaiting referral can be acknowledged.");
+              updated.state = "In review";
+              kind = "Team acknowledged";
+            } else if (action === "request-information") {
+              if (!["In review", "Ready for site screening"].includes(referral.state)) throw new Error("Acknowledge the referral before requesting information.");
+              updated.state = "Needs information";
+              kind = "Information requested";
+            } else if (action === "ready") {
+              if (referral.state !== "In review") throw new Error("Review the referral before recording readiness.");
+              currentAssessment(state, referral.assessmentId);
+              updated.state = "Ready for site screening";
+              kind = "Ready for site screening — not eligibility";
+            } else if (action === "close") {
+              updated.state = "Closed";
+              kind = "Referral closed";
+            } else if (action === "assign") {
+              if (!command.owner || !["Study coordinator", "Principal investigator"].includes(command.owner)) throw new Error("Choose a study-team owner.");
+              updated.teamOwner = command.owner;
+              kind = `Assigned to ${command.owner}`;
+            }
+          }
+        }
+      }
+      updated.events = [...referral.events, { id: eventId, at, author: actor, side: team ? "team" : "referrer", kind, body }];
+      next = { ...state, referrals: state.referrals.map((r) => r.id === referral.id ? updated : r) };
       break;
     }
   }

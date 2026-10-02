@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useWorkflow } from "../state/WorkflowState";
-import { useAppState } from "../state/AppState";
+import { usePiAccess } from "../state/usePiAccess";
 import type { CriterionModel } from "../domain/model";
 import { reviseModel } from "../domain/modelRevision";
 export function CriterionWorkbench({ model }: { model: CriterionModel }) {
   const { command } = useWorkflow();
-  const { roleId } = useAppState();
+  const pi = usePiAccess();
   const [json, setJson] = useState(() =>
     JSON.stringify(
       model.criteria.map(({ id, predicate, applicability }) => ({
@@ -67,7 +67,7 @@ export function CriterionWorkbench({ model }: { model: CriterionModel }) {
               setJson(e.target.value);
               setReviewed(false);
             }}
-            disabled={roleId !== "site" && roleId !== "oncologist"}
+            disabled={!pi.canAccess(model.trialId)}
             spellCheck={false}
           />
         </label>
@@ -94,7 +94,7 @@ export function CriterionWorkbench({ model }: { model: CriterionModel }) {
           disabled={
             !reviewed ||
             !reason.trim() ||
-            !["oncologist", "site"].includes(roleId)
+            !pi.canAccess(model.trialId)
           }
         >
           Publish demonstration revision

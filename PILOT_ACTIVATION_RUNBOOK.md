@@ -4,8 +4,8 @@
 
 - Vercel account: `beiyonder`
 - Vercel team: `sids-projects-d248cdf7`
-- Vercel project: `onco-grid-trial-relay-validation`
-- Production alias: <https://onco-grid-trial-relay-validation.vercel.app>
+- Vercel project: `onco-grid-trial-loop-validation`
+- Production alias: <https://onco-grid-trial-loop-validation.vercel.app>
 - Project root for deploy commands: `web/`
 
 The core application, explicit coverage workflows, ClinicalTrials.gov evidence feed, formatted criteria, and approximate Three.js spatial lens work without Supabase or OpenAI configuration. Authenticated Trial Room communication, no-PHI handoff, and generated assistant output fail closed until the pilot services below are configured.
@@ -27,7 +27,7 @@ From the repository root:
 
 ```bash
 cd web
-npx --yes vercel@latest link --yes --project onco-grid-trial-relay-validation
+npx --yes vercel@latest link --yes --project onco-grid-trial-loop-validation
 npx --yes vercel@latest --prod --yes
 ```
 
@@ -76,7 +76,7 @@ Review the migration before applying it. It creates staff profiles, RLS-protecte
 
 In Supabase Auth URL configuration:
 
-- Site URL: `https://onco-grid-trial-relay-validation.vercel.app`
+- Site URL: `https://onco-grid-trial-loop-validation.vercel.app`
 - Add the same production origin to allowed redirect URLs.
 - Add preview URLs only when separately approved.
 - Restrict sign-in to approved staff accounts/domains where supported.
@@ -198,13 +198,39 @@ Do not treat deployment, a successful API call, or synthetic demonstrations as e
 From `web/`, run `npm run dev` for the app and its narrow public-source development API bridge. Run `npm run build` and `npm test` for strict compilation and the behavioral suite. `npm run preview` serves the built static artifact; it is not a substitute for the Vercel Functions runtime. `npm run generate:world` regenerates the bundled Natural Earth geometry from the existing `world-atlas` dependency.
 
 1. Open Patients: confirm Patient 1–12, original artifacts, missing/conflicting assertions, and the synthetic/reload boundary. Create a thin-intake example only from the supplied controls.
-2. Open My studies as the demo PI or oncologist. Inspect exact source spans and predicate JSON, enter a publication reason, and explicitly publish the demonstration revision. Other studies remain unmodeled; publication is not clinical approval.
-3. Run patient-first or trial-first pre-screening. Inspect support denominator, violations, unresolved requirements, source/model versions and exact predicate traces.
+2. Choose a worked case in Patients. Supplied reference models run immediately; publication is not a prerequisite. “Run reference case” evaluates the dated synthetic benchmark. “Check live registry & match” fetches public registry detail and refuses a current support score if eligibility changed, detail is unavailable, or the source response is stale.
+3. Inspect the outcome first, expand “Why this outcome,” then open criterion review for exact predicate traces. Support and registry recruitment status are separate: a fully supported record may correspond to a non-recruiting study. Five worked cases cover complete lung/breast records, a criterion conflict, missing evidence and conflicting evidence.
 4. Accept an unresolved information task. Attach a supplied value as coordinator; observe evidence-received, not confirmation. Confirm/reconcile as demo oncologist with a reason, then rerun affected studies. Unable-to-obtain closes effort, not the fact gap.
-5. Record individual reviews or explicitly select supported findings only. Add the version-bound assessment to the shortlist, record a separate PI site/owner disposition, prepare the packet, and use only the labelled simulation transitions.
-6. Revise an input or publish a new model version. Old assessments/packets must become stale and reject new decisions/release. Reload must reset the browser-only demonstration.
+5. Review each criterion or explicitly select supported findings to acknowledge together. Prepare referral directly from the progress row; neither a shortlist nor an earlier PI disposition is required. Confirm the synthetic-only packet and queue it locally.
+6. Revise an input or publish a new model version. Old assessments/referrals must become stale and reject queueing or screening readiness. Conversation and withdrawal remain available. Review a new assessment, then attach it to a draft or information-requested referral. Reload resets the browser-only demonstration.
 7. Search a public intervention/topic in the evidence workspace. Inspect complete global detail, append results, switch to the country map, select countries/unplaced studies, and return to the same query. Counts describe the loaded set, not exhaustive site coverage or access.
 
 **OBSERVED:** The implementation report and synthetic-only screenshots are in [the C5 acceptance report](.harness/reports/20261001T151302Z-P5-workflow-renovation-implementation.md). It records 28 passing tests, zero dependency-audit vulnerabilities, a zero-finding scoped native security scan, source/privacy checks and exercised browser journeys.
 
 **OPEN:** Do not represent this as clinically qualified matching, real-patient support, or live referral delivery. The existing live-service configuration/rotation requirements above remain in force. Production publication still requires the repository review-branch/PR and privacy process.
+
+### 2026-10-02 PI access and live matching
+
+**FACT:** My studies is hidden for anonymous users and users without qualifying PI grants. Direct routes, model changes, trial-first runs and trial-side dispositions use the same permission boundary. Choosing a prototype role cannot unlock them. Patient-first evaluation remains available without PI sign-in.
+
+1. Through the approved Supabase migration process, apply `web/supabase/migrations/20261002090000_trial_relay_pi_grants.sql` after the existing pilot schema. It creates administrator-provisioned `(user_id, trial_id)` grants; authenticated users can read only their own rows and cannot grant themselves access.
+2. An administrator assigns the approved staff account explicit study IDs. The existing profile must have an `oncologist` or `site` role. Do not equate every site account with a PI, or add a grant from the browser.
+3. Sign in through Staff sign in. Confirm My studies appears only for the granted studies. Inspect/publish a demonstration model with a reason; run the candidate queue and record the separate disposition. A publication action is not independent clinical qualification.
+4. Qualify two real accounts against RLS: an approved PI and an ungranted account; attempt foreign-study access and self-grant insertion, then sign out and confirm route closure. These live-service checks remain **OPEN**; isolated synthetic-auth browser responses prove UI behavior only.
+
+**FACT:** Matching sends public study IDs, not patient assertions, to the existing public registry endpoint. Synthetic facts and evaluation stay in browser memory. Registry checks expire after 15 minutes; changed eligibility requires model reconciliation, not an automatic reinterpretation. Whitespace is normalized only because the retained snapshot collapses it; non-whitespace changes remain significant.
+
+**DECISION:** No Trial Opportunity Index is presented. The proposed mixture of education, biomarker testing, pre-screening, referral and site activation has no approved target outcome, weighting or clinical benchmark. Current support fractions do not measure clinical opportunity or recommend patient action. The owner selected live-registry computation with synthetic patients, not clinical prioritisation.
+
+### 2026-10-02 review-to-referral demonstration
+
+**FACT:** Patient Referrals, Inbox and the granted study's referral queue open one shared-in-session thread. Referrals are synthetic browser-memory records, not cross-user delivery. They reset on reload; the existing no-PHI pilot service does not transport these packets.
+
+1. From a worked case, open Review evidence. All criteria are initially visible. If the coordinator persona is selected, use the explicit oncologist-role action; this controls the local demo review and grants no PI access.
+2. Save review & continue advances to the next unreviewed criterion. Optional notes, original source, registry interpretation and review history remain available without dominating the decision.
+3. Finish all criterion reviews, choose Prepare referral, inspect the attached findings/decisions, write the referring message, confirm the synthetic-only boundary and queue locally.
+4. With an approved authenticated grant for that study, open My studies → Referrals from oncologists. Acknowledge, assign the next team owner, or request information with a reason. Prototype role selection alone cannot unlock this view.
+5. Open the referring-side thread from the patient's Referrals tab. Answer the request and return the referral. If the assessment changed, rerun and review first, then attach the updated reviewed assessment before returning.
+6. The team can record Ready for site screening or close with a reason. Screening readiness is operational, never eligibility or confirmation of recruitment capacity. The referring side may withdraw with a reason.
+
+**OBSERVED:** The [review/referral acceptance report](.harness/reports/20261002T182420Z-P5-review-referral-workflow.md) records the two-way synthetic-auth UI journey, final built-artifact queue with zero network requests, anonymous team-route denial, mobile evidence and 34 passing tests. Genuine authenticated cross-user/RLS qualification remains **OPEN**; isolated response fixtures are not live-service proof.

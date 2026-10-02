@@ -269,8 +269,8 @@ export function assessPair(
   const denominator = supported + violated + unresolved;
   const limitation = !patient.synthetic
     ? "Only synthetic records may be assessed."
-    : model.status !== "published" || !model.complete
-      ? "A complete published demonstration model is required."
+    : model.status === "draft" || !model.complete
+      ? "A complete reference or published model is required."
       : !denominator
         ? "No applicable requirements."
         : undefined;

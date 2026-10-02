@@ -65,3 +65,44 @@ All images contain only supplied synthetic fixtures or public registry geography
 - **OPEN:** Owner-approved close-match thresholds, real-data handling, any production clinical use, direct workflow effectiveness evidence, and product lock.
 - **OPEN:** Approved Supabase configuration and rotated server-side OpenAI credential; live authentication/RLS/realtime/two-user handoff/assistant qualification remain unavailable.
 - **FACT:** No new production dependency or service was introduced. No public push, merge, production deployment, external contact, or patient transmission is claimed by this report. The existing remote deployment is unchanged by local verification.
+
+## 2026-10-02 outcome-first live-registry refinement
+
+### Authority and implementation
+
+- **FACT:** The owner selected “Working engine, live registry, synthetic patients.” This iteration does not implement clinical prioritisation, real-patient evaluation or a Trial Opportunity Index.
+- **FACT:** The engine remains deterministic, not an AI matcher. Six supplied reference models are immediately executable. Each applicable root produces supported, violated or unresolved; missing, conflicting, unreviewed, stale and unsupported evidence remains unresolved. Support is `supported / (supported + violated + unresolved)`, not eligibility probability. Known violations take precedence over support-fraction ordering. Other library studies remain visibly unmodeled.
+- **FACT:** Live runs fetch full public registry detail through the existing endpoint and compare the entire eligibility text with the model source, including added requirements. Only whitespace is normalized because the retained snapshot already collapses it. Changed, incomplete, unavailable, future-dated or stale responses fail closed. Successful source checks expire after 15 minutes. Synthetic evidence is evaluated locally at its disclosed fixture date, 2026-09-20.
+- **FACT:** The queue leads with study/patient identity, one outcome, criterion coverage and a review action. Reasons, full study title, provenance and exact traces are progressively disclosed. Long trial titles no longer dominate compact result rows; source-backed intervention names identify the row alongside its registry ID. Run controls collapse after completion.
+- **FACT:** My studies navigation, direct routes, model mutation, trial-first runs and trial-side disposition require a qualifying authenticated profile and an explicit study grant. The prototype persona does not establish PI authority. Migration: `web/supabase/migrations/20261002090000_trial_relay_pi_grants.sql`.
+- **DECISION:** No composite Trial Opportunity Index was invented. Education, biomarker testing, referral and site activation are different targets; the proposed clinical prioritisation claim has no approved label definition, weighting, independent benchmark or real-data authority here.
+
+### Observed acceptance
+
+| Scenario | Observed result | Scope / limitation |
+|---|---|---|
+| Patient 1 / NCT06348199 | Requirements supported; 6/6 encoded requirements | Live registry separately reported active-not recruiting; support is not recruitment availability or final eligibility |
+| Patient 4 / NCT02161900 | Requirements supported; 6/6 | Supplied reference benchmark |
+| Patient 6 / NCT02161900 | Criterion conflict; 5/6 supported, one conflict | Supplied reference benchmark |
+| Patient 11 / NCT06348199 | Evidence needed; 0/6 supported, six unresolved | Thin-intake benchmark |
+| Patient 3 / NCT03390686 | Evidence needed; 3/9 supported, six unresolved | Conflicting molecular evidence remains unresolved |
+| Live source change and outage | Changed eligibility and injected HTTP 503 both produced Not evaluated / no current score; subsequent real-source retry recovered | Failure responses injected in the local browser, not upstream |
+| Bidirectional evaluation | Identical six-criterion findings and exact predicate traces for Patient 1 / NCT06348199 in patient-first and PI-first live runs | PI identity/grants supplied by isolated synthetic-auth responses |
+| Anonymous PI access | No My studies navigation; `/studies` displayed PI sign-in required | Actual unconfigured local application |
+| Scoped PI access | Granted queue accessible; foreign study rejected; logout removed navigation and closed direct route | UI fixture only, not genuine Supabase login or RLS evidence |
+| Responsive layout | At 390px, document width remained 390px; outcome and review action visible in compact card; section tabs ended before content began | Desktop and narrow screenshots retained below |
+| Progressive disclosure | Completed run controls and reasons initially collapsed; Enter expanded the focused reasons summary | Native keyboard-accessible details |
+| Production artifact | Built preview computed the Patient 1 reference outcome as 6/6, with compact identity and no browser errors | Static preview does not provide live Vercel Functions |
+
+### Checks and evidence
+
+- **OBSERVED:** Final `npm run build` passed frontend/API TypeScript and production generation.
+- **OBSERVED:** Final `npm test`: 32 passed, zero failed. Added boundary regressions cover source freshness/change/formatting, no-score refusal and trial-scoped PI permission.
+- **OBSERVED:** Final `npm audit`: zero reported vulnerabilities.
+- **OBSERVED:** Live registry checks were exercised through the development API bridge. Browser request inspection showed public trial-ID requests, not synthetic patient assertions.
+- **OBSERVED:** [Desktop live outcome](../evidence/20261002-matching/desktop-outcome.jpg), [390px live outcome](../evidence/20261002-matching/mobile-outcome.jpg), and [PI queue with synthetic authentication](../evidence/20261002-matching/pi-queue-synthetic-auth.jpg).
+- **OPEN:** The PI migration has not been applied to an approved live service in this session. Genuine authentication, RLS isolation/self-grant rejection and two-user qualification remain blocked by the existing service-configuration gap. Synthetic-auth browser checks do not close it.
+- **OPEN:** Independent clinical model qualification, real-data handling, close-match policy, clinical prioritisation and P5 workflow validation remain unchanged.
+- **FACT:** Local implementation only. No public push, merge, production deployment, external communication or patient transmission occurred in this refinement.
+- **FACT:** `GAP-SERENA` was recorded for this session; repository memories were read directly because Serena tools were unavailable.
+- **OBSERVED:** Service-log inspection caught nested paragraph markup in the new PI denial state. The caller now uses `EmptyState.action`; the final rebuilt browser journey opened the denied route, followed Open patients, ran the first worked case to 6/6 support, and reported zero browser errors. The isolated synthetic-auth service and managed verification tabs were closed afterward; the normal local development surface remains available.

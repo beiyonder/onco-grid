@@ -89,7 +89,7 @@ export interface CriterionModel {
   sourceUrl: string;
   criteria: Criterion[];
   complete: boolean;
-  status: "draft" | "published";
+  status: "draft" | "reference" | "published";
   qualification: "Synthetic demonstration interpretation — not clinically validated";
   publishedBy?: string;
   publishedAt?: string;
@@ -106,6 +106,19 @@ export interface Finding {
   criterionId: string;
   state: "supported" | "violated" | "unresolved" | "not-applicable";
   trace: Trace;
+}
+export interface RegistryCheck {
+  trialId: string;
+  state: "verified" | "changed" | "unavailable";
+  checkedAt: string;
+  fetchedAt?: string;
+  registryVersion?: string;
+  eligibilityVersion?: string;
+  overallStatus?: string;
+  lastUpdatePostedDate?: string;
+  sourceUrl: string;
+  locations?: Array<{ facility: string; city: string; country: string; status: string }>;
+  reason?: string;
 }
 export interface Assessment {
   id: string;
@@ -131,6 +144,7 @@ export interface Assessment {
   score: number | null;
   assessability: number | null;
   limitation?: string;
+  registryCheck?: RegistryCheck;
 }
 export interface MatchRun {
   id: string;
@@ -142,6 +156,7 @@ export interface MatchRun {
   retrieved: number;
   excluded: number;
   unmodeled: string[];
+  basis?: "registry" | "benchmark";
 }
 export interface HumanReview {
   assessmentId: string;
@@ -195,12 +210,27 @@ export interface ScreeningDisposition {
   evidence: string;
   recordedAt: string;
 }
-export interface SyntheticPacket {
+export type ReferralStatus = "Draft" | "Awaiting team" | "In review" | "Needs information" | "Ready for site screening" | "Closed" | "Withdrawn";
+export interface ReferralEvent {
   id: string;
+  at: string;
+  author: string;
+  side: "referrer" | "team";
+  kind: string;
+  body: string;
+}
+export interface SyntheticReferral {
+  id: string;
+  patientId: string;
+  trialId: string;
   assessmentId: string;
+  reviews: HumanReview[];
   author: string;
   createdAt: string;
-  state: "Draft" | "Ready for simulation" | "Simulated acknowledgement";
+  updatedAt: string;
+  state: ReferralStatus;
+  teamOwner: "Study coordinator" | "Principal investigator";
+  events: ReferralEvent[];
 }
 export interface AuditEvent {
   id: string;

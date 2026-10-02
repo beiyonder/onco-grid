@@ -1,6 +1,12 @@
 export interface Database {
   public: {
     Tables: {
+      pilot_pi_grants: {
+        Row: { user_id: string; trial_id: string; granted_at: string };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
       pilot_profiles: {
         Row: {
           user_id: string;

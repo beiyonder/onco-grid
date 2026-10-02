@@ -1,3 +1,4 @@
+import { ReferralList } from "./ReferralPage";
 import { PilotHandoffPanel } from "../components/PilotHandoffPanel";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { PageHeader, SafetyNote, EmptyState } from "../components/Primitives";
@@ -8,13 +9,13 @@ import { useWorkflow } from "../state/WorkflowState";
 import { useAppState } from "../state/AppState";
 import { demoFields } from "../domain/patients";
 import { isAssessmentCurrent } from "../domain/workflow";
-const sections = ["Overview", "Sources", "Trial matches", "Tasks", "Handoffs"];
+const sections = ["Overview", "Sources", "Trial matches", "Tasks", "Referrals"];
 const sectionIds = ["overview", "sources", "matches", "tasks", "handoffs"];
 export function PatientWorkspacePage() {
   const { patientId } = useParams();
   const [params, setParams] = useSearchParams();
-  const { state, command, error } = useWorkflow();
-  const { patients: researchPatients, roleId } = useAppState();
+  const { state, error } = useWorkflow();
+  const { patients: researchPatients } = useAppState();
   const patient = state.patients.find((p) => p.id === patientId);
   const research = researchPatients.find(
     (p) =>
@@ -180,76 +181,11 @@ export function PatientWorkspacePage() {
         {section === "tasks" && <GapTasks patientId={patient.id} />}
         {section === "handoffs" && (
           <>
-            <PilotHandoffPanel trialIds={[...new Set(assessments.filter(a=>state.shortlist.includes(a.id)&&isAssessmentCurrent(state,a)).map(a=>a.trialId))]}/>
-            <h2>Reviewed packets and simulated handoffs</h2>
-            <p>
-              Browser-only state. Nothing is sent, no site is contacted, and
-              acknowledgement is simulated.
-            </p>
-            {state.packets
-              .filter((p) => assessments.some((a) => a.id === p.assessmentId))
-              .map((packet) => {
-                const assessment = assessments.find(
-                  (a) => a.id === packet.assessmentId,
-                )!;
-                const current = isAssessmentCurrent(state, assessment);
-                return (
-                  <article className="handoff-card" key={packet.id}>
-                    <h3>
-                      {assessment.trialId} · {packet.state}
-                    </h3>
-                    <p>
-                      {packet.author} · {packet.createdAt} ·{" "}
-                      {current
-                        ? "Current input versions"
-                        : "Stale — prepare a new reviewed packet"}
-                    </p>
-                    <details>
-                      <summary>Preview version-bound packet</summary>
-                      <pre>
-                        {JSON.stringify(
-                          {
-                            patient: patient.id,
-                            assessment,
-                            review: state.reviews.filter(
-                              (r) => r.assessmentId === assessment.id,
-                            ),
-                            disposition: state.dispositions.filter(
-                              (d) => d.assessmentId === assessment.id,
-                            ),
-                          },
-                          null,
-                          2,
-                        )}
-                      </pre>
-                    </details>
-                    <button
-                      className="button secondary"
-                      disabled={
-                        !current ||
-                        roleId === "auditor" ||
-                        packet.state === "Simulated acknowledgement"
-                      }
-                      onClick={() =>
-                        command({ type: "advance-packet", id: packet.id })
-                      }
-                    >
-                      {packet.state === "Draft"
-                        ? "Simulate ready state"
-                        : "Simulate acknowledgement"}
-                    </button>
-                  </article>
-                );
-              })}
-            {!state.packets.some((p) =>
-              assessments.some((a) => a.id === p.assessmentId),
-            ) && (
-              <p>
-                No packet yet. Shortlist an assessment, record every criterion
-                review and a trial-side disposition, then prepare the packet
-                from the review screen.
-              </p>
-            )}
+            <ReferralList patientId={patient.id} />
+            <details className="separate-pilot-handoff">
+              <summary>Separate authenticated staff coordination (no patient link)</summary>
+              <PilotHandoffPanel trialIds={[...new Set(assessments.filter(a => (state.shortlist.includes(a.id) || state.referrals.some(r => r.assessmentId === a.id)) && isAssessmentCurrent(state, a)).map(a => a.trialId))]} />
+            </details>
           </>
         )}
       </section>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useWorkflow } from "../state/WorkflowState";
-import { useAppState } from "../state/AppState";
+import { usePiAccess } from "../state/usePiAccess";
 import { isAssessmentCurrent } from "../domain/workflow";
 import type { TrialRecord } from "../types";
 import type { Assessment, ScreeningDisposition } from "../domain/model";
@@ -13,7 +13,7 @@ export function CandidateDisposition({
   assessment?: Assessment;
 }) {
   const { state, command } = useWorkflow();
-  const { roleId } = useAppState();
+  const pi = usePiAccess();
   const [site, setSite] = useState("");
   const [owner, setOwner] = useState("Demo PI");
   const [outcome, setOutcome] =
@@ -126,7 +126,7 @@ export function CandidateDisposition({
             <button
               className="button primary"
               disabled={
-                roleId !== "site" || !isAssessmentCurrent(state, assessment)
+                !pi.canAccess(trial.id) || !isAssessmentCurrent(state, assessment)
               }
             >
               Record human trial-side disposition

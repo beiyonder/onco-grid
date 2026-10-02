@@ -5,6 +5,8 @@ import { EmptyState, PageHeader, SafetyNote, StatusChip } from "../components/Pr
 import { useAppState } from "../state/AppState";
 import type { WorkItemKind } from "../types";
 import { GapTasks } from "../components/GapTasks";
+import { ReferralList } from "./ReferralPage";
+import { usePiAccess } from "../state/usePiAccess";
 
 const typeFilters: Array<{ id: "all" | WorkItemKind; label: string }> = [
   { id: "all", label: "All types" },
@@ -17,6 +19,7 @@ const typeFilters: Array<{ id: "all" | WorkItemKind; label: string }> = [
 type StateFilter = "attention" | "resolved" | "all";
 
 export function InboxPage() {
+  const pi = usePiAccess();
   const { resolveWorkItem, role, roleId, workItems } = useAppState();
   const [typeFilter, setTypeFilter] = useState<(typeof typeFilters)[number]["id"]>("all");
   const [stateFilter, setStateFilter] = useState<StateFilter>("attention");
@@ -31,6 +34,8 @@ export function InboxPage() {
     <div className="page inbox-page">
       <PageHeader eyebrow={`${role.title} queue`} title="Inbox" description="Only unread, owned, or explicitly accepted work for the selected prototype role appears here. Unknown registry and site states stay source states until a person creates work." />
       <SafetyNote><p><strong>Only accepted information work becomes a task.</strong> Evidence-bearing gaps use explicit evidence and review transitions, never a generic resolution checkbox.</p></SafetyNote>
+      <ReferralList />
+      {pi.canAccess() && <ReferralList team />}
       <section className="surface reading-surface"><GapTasks /></section>
       <section className="surface inbox-surface" aria-labelledby="inbox-heading">
         <div className="inbox-toolbar">

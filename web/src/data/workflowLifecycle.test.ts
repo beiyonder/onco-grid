@@ -179,67 +179,87 @@ test("unable-to-obtain cannot manufacture satisfaction or permit bulk acceptance
     /supported/,
   );
 });
-test("reviewed shortlist and PI disposition gate simulation; protocol revision invalidates release", () => {
+test("referral precedes PI disposition and preserves a two-way, role-owned conversation", () => {
   const patient = createDemoPatient(1, 0);
   const model = { ...models[0]!, status: "published" as const };
-  const a = assessPair(patient, model, "2026-09-20", "complete");
-  let state: WorkflowState = {
-    ...initialWorkflow,
-    patients: [patient],
-    models: [model],
-    runs: [completedRun([a])],
-  };
-  assert.throws(
-    () => apply(state, { type: "packet", assessmentId: a.id }),
-    /Shortlist/,
-  );
-  state = apply(state, { type: "shortlist", assessmentId: a.id });
-  assert.throws(
-    () => apply(state, { type: "packet", assessmentId: a.id }),
-    /every criterion/,
-  );
-  state = apply(state, {
-    type: "bulk-accept",
-    assessmentId: a.id,
-    criterionIds: a.findings.map((f) => f.criterionId),
-  });
-  assert.throws(
-    () => apply(state, { type: "packet", assessmentId: a.id }),
-    /trial-side/,
-  );
-  state = apply(state, {
-    type: "disposition",
-    value: {
-      assessmentId: a.id,
-      site: "Synthetic listed site",
-      assignedTo: "Demo PI",
-      state: "Ready for site screening",
-      reason: "Manual demo review",
-      evidence: "Source-linked criteria",
-    },
-  });
-  state = apply(state, { type: "packet", assessmentId: a.id });
-  const id = state.packets[0]!.id;
-  state = apply(state, { type: "advance-packet", id });
-  state = apply(state, { type: "advance-packet", id });
-  assert.equal(state.packets[0]!.state, "Simulated acknowledgement");
-  const rows = model.criteria.map((c) => ({
-    id: c.id,
-    predicate: c.predicate,
-  }));
-  rows[0]!.predicate = {
-    op: "unsupported",
-    reason: "Revised interpretation needs human review",
-  };
-  state = apply(state, {
-    type: "publish",
-    model: reviseModel(model, JSON.stringify(rows)),
-    reason: "Protocol interpretation changed",
-  });
-  assert.equal(isAssessmentCurrent(state, a), false);
-  assert.equal(a.modelSnapshot.criteria[0]!.predicate.op, "and");
-  assert.throws(() => apply(state, { type: "advance-packet", id }), /stale/);
+  const assessment = assessPair(patient, model, "2026-09-20", "complete");
+  let state: WorkflowState = { ...initialWorkflow, patients: [patient], models: [model], runs: [completedRun([assessment])] };
+  assert.throws(() => apply(state, { type: "create-referral", assessmentId: assessment.id }, "oncologist"));
+  state = apply(state, { type: "bulk-accept", assessmentId: assessment.id, criterionIds: assessment.findings.map((f) => f.criterionId) }, "oncologist");
+  state = apply(state, { type: "create-referral", assessmentId: assessment.id }, "oncologist");
+  const referral = state.referrals[0]!;
+  assert.equal(referral.state, "Draft");
+  assert.equal(state.dispositions.length, 0);
+  assert.equal(state.shortlist.length, 0);
+  assert.throws(() => apply(state, { type: "create-referral", assessmentId: assessment.id }, "oncologist"));
+  assert.throws(() => apply(state, { type: "referral-action", id: referral.id, action: "queue", body: "Please review the supplied synthetic packet." }, "oncologist"));
+  state = apply(state, { type: "referral-action", id: referral.id, action: "queue", body: "Please review the supplied synthetic packet.", confirmed: true }, "oncologist");
+  assert.equal(state.referrals[0]!.state, "Awaiting team");
+  assert.throws(() => apply(state, { type: "referral-action", id: referral.id, action: "acknowledge", body: "Received." }, "oncologist"));
+  state = apply(state, { type: "referral-action", id: referral.id, action: "acknowledge", body: "Study team received the packet." });
+  state = apply(state, { type: "referral-action", id: referral.id, action: "assign", owner: "Principal investigator", body: "PI owns the next review." });
+  assert.equal(state.referrals[0]!.teamOwner, "Principal investigator");
+  state = apply(state, { type: "referral-action", id: referral.id, action: "request-information", body: "Please clarify the supplied source date." });
+  assert.equal(state.referrals[0]!.state, "Needs information");
+  state = apply(state, { type: "referral-message", id: referral.id, side: "referrer", body: "The supplied source date is 2026-09-18." }, "coordinator");
+  state = apply(state, { type: "referral-action", id: referral.id, action: "queue", body: "Clarification attached in the conversation.", confirmed: true }, "oncologist");
+  state = apply(state, { type: "referral-action", id: referral.id, action: "acknowledge", body: "Review resumed." });
+  state = apply(state, { type: "referral-action", id: referral.id, action: "ready", body: "Operational screening review recorded; not eligibility." });
+  assert.equal(state.referrals[0]!.state, "Ready for site screening");
+  assert.deepEqual(state.referrals[0]!.events.filter((event) => event.kind === "Message").map((event) => [event.side, event.body]), [["referrer", "The supplied source date is 2026-09-18."]]);
+  assert.equal(referral.state, "Draft");
+  assert.equal(referral.events.length, 0);
+  state = apply(state, { type: "referral-action", id: referral.id, action: "close", body: "Operational discussion completed." });
+  assert.throws(() => apply(state, { type: "referral-message", id: referral.id, side: "team", body: "Cannot append after closure." }));
 });
+
+test("stale referral packets block release but preserve clarification and withdrawal", () => {
+  const patient = createDemoPatient(1, 0);
+  const model = { ...models[0]!, status: "published" as const };
+  const assessment = assessPair(patient, model, "2026-09-20", "complete");
+  let state: WorkflowState = { ...initialWorkflow, patients: [patient], models: [model], runs: [completedRun([assessment])] };
+  state = apply(state, { type: "bulk-accept", assessmentId: assessment.id, criterionIds: assessment.findings.map((f) => f.criterionId) });
+  state = apply(state, { type: "create-referral", assessmentId: assessment.id });
+  const id = state.referrals[0]!.id;
+  state = apply(state, { type: "referral-action", id, action: "queue", body: "Request review.", confirmed: true });
+  state = apply(state, { type: "referral-action", id, action: "acknowledge", body: "Received." });
+  const rows = model.criteria.map((criterion) => ({ id: criterion.id, predicate: criterion.predicate }));
+  rows[0]!.predicate = { op: "unsupported", reason: "Revised interpretation needs human review" };
+  state = apply(state, { type: "publish", model: reviseModel(model, JSON.stringify(rows)), reason: "Protocol interpretation changed" });
+  assert.equal(isAssessmentCurrent(state, assessment), false);
+  assert.equal(assessment.modelSnapshot.criteria[0]!.predicate.op, "and");
+  assert.throws(() => apply(state, { type: "referral-action", id, action: "ready", body: "Stale packet must not pass." }));
+  state = apply(state, { type: "referral-action", id, action: "request-information", body: "A new reviewed assessment is needed." });
+  assert.throws(() => apply(state, { type: "referral-action", id, action: "queue", body: "Still stale.", confirmed: true }));
+  state = apply(state, { type: "referral-message", id, side: "referrer", body: "We are reviewing the changed source." }, "oncologist");
+  state = apply(state, { type: "referral-action", id, action: "withdraw", body: "Withdraw pending renewed source review." }, "oncologist");
+  assert.equal(state.referrals[0]!.state, "Withdrawn");
+  assert.equal(state.referrals[0]!.reviews.length, assessment.findings.length);
+});
+test("replacement referral packets require the same patient and study and a fresh complete review", () => {
+  const patient = createDemoPatient(1, 0);
+  const model = { ...models[0]!, status: "published" as const };
+  const original = assessPair(patient, model, "2026-09-20", "original");
+  let state: WorkflowState = { ...initialWorkflow, patients: [patient], models: [model], runs: [completedRun([original])] };
+  state = apply(state, { type: "bulk-accept", assessmentId: original.id, criterionIds: original.findings.map((f) => f.criterionId) });
+  state = apply(state, { type: "create-referral", assessmentId: original.id });
+  const draft = state.referrals[0]!;
+  const revised = { ...patient, version: patient.version + 1 };
+  const replacement = assessPair(revised, model, "2026-09-20", "replacement");
+  const foreign = createDemoPatient(2, 0);
+  const foreignAssessment = assessPair(foreign, model, "2026-09-20", "foreign");
+  state = { ...state, patients: [revised, foreign], runs: [...state.runs, completedRun([replacement, foreignAssessment], "new-run")] };
+  assert.throws(() => apply(state, { type: "refresh-referral", id: draft.id, assessmentId: foreignAssessment.id }));
+  assert.throws(() => apply(state, { type: "refresh-referral", id: draft.id, assessmentId: replacement.id }));
+  state = apply(state, { type: "bulk-accept", assessmentId: replacement.id, criterionIds: replacement.findings.map((f) => f.criterionId) });
+  state = apply(state, { type: "refresh-referral", id: draft.id, assessmentId: replacement.id });
+  assert.equal(state.referrals[0]!.assessmentId, replacement.id);
+  assert.ok(state.referrals[0]!.reviews.every((review) => review.assessmentId === replacement.id));
+  assert.equal(draft.assessmentId, original.id);
+  state = apply(state, { type: "referral-action", id: draft.id, action: "queue", body: "Updated reviewed packet.", confirmed: true });
+  assert.equal(state.referrals[0]!.state, "Awaiting team");
+});
+
 test("cancelled and stale asynchronous completions cannot replace current results", () => {
   const patient = createDemoPatient(1, 0);
   const model = { ...models[0]!, status: "published" as const };

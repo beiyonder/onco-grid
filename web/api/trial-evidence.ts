@@ -15,7 +15,7 @@ export default async function handler(request: ApiRequest, response: ApiResponse
     validateQueryKeys(request.query, ["id"]);
     const trialId = Array.isArray(request.query.id) ? request.query.id[0] : request.query.id;
     const evidence = await fetchOfficialTrialEvidence(trialId);
-    response.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=3600");
+    response.setHeader("Cache-Control", "public, s-maxage=60, must-revalidate");
     response.status(200).json({ evidence });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Official evidence could not be loaded.";

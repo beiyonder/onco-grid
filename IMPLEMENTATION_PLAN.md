@@ -14,6 +14,12 @@ The complete proposed implementation plan is [`architecture/trial-relay-renovati
 
 **Planning evidence:** [P5 C5 workflow-renovation report](.harness/reports/20261001T123356Z-P5-workflow-renovation-plan.md). The HTML was exercised at desktop/mobile widths, with keyboard navigation, JavaScript disabled and print media; these checks validate the planning artifact, not the proposed product.
 
+**OWNER SCOPE DECISION — 2026-10-02:** “Working engine, live registry, synthetic patients.” Matching now checks current public registry eligibility against supplied source-linked models before evaluating synthetic records locally. This is not authority for real-patient use or a clinically validated Trial Opportunity Index. PI workflows require authenticated, trial-scoped grants; the prototype persona is not an access credential.
+
+**OBSERVED — outcome-first refinement:** aligned outcome rows, progressive reasons/source traces, five ready-to-run worked examples, live-source refusal/recovery, and authenticated PI UI boundaries were exercised locally. See the [2026-10-02 addendum](.harness/reports/20261001T151302Z-P5-workflow-renovation-implementation.md#2026-10-02-outcome-first-live-registry-refinement). Genuine Supabase login/RLS qualification remains gated by service configuration.
+
+**OBSERVED — review/referral renovation:** the review desk now leads directly into a version-bound synthetic referral and a two-way referring-team / authenticated study-team conversation. Acknowledgement, assignment, information request/return, updated reviewed packets, screening-readiness, closure and withdrawal were exercised locally. See the [review/referral acceptance report](.harness/reports/20261002T182420Z-P5-review-referral-workflow.md): 34 passing tests, built-artifact queue with no network transmission, route denial and responsive evidence. These browser-memory referrals reset on reload; real cross-user delivery and patient-data handling are not authorised or claimed.
+
 ## Status and authority
 
 - **OWNER DECISION — 2026-09-19:** begin implementation from [`product/TRIAL_RELAY_EXPERIENCE_BLUEPRINT.md`](product/TRIAL_RELAY_EXPERIENCE_BLUEPRINT.md) and [`product/TRIAL_RELAY_VISUAL_DESIGN_LANGUAGE.md`](product/TRIAL_RELAY_VISUAL_DESIGN_LANGUAGE.md).

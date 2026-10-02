@@ -10,6 +10,7 @@ import { useWorkflow } from "../state/WorkflowState";
 import type { PatientWorkspace, TrialRecord } from "../types";
 import { Icon } from "./Icon";
 import { StatusChip } from "./Primitives";
+import { usePiAccess } from "../state/usePiAccess";
 
 type Panel = "patient" | "cohort";
 type FilterOperator = "equals" | "contains" | "present" | "missing";
@@ -63,6 +64,7 @@ function workspaceMeetsFilters(workspace: PatientWorkspace, filters: CohortFilte
 
 export function TrialCoverageTools({ trial }: { trial: TrialRecord }) {
   const navigate = useNavigate();
+  const pi = usePiAccess();
   const {state:workflow}=useWorkflow();
   const syntheticPatients=workflow.patients;
   const {
@@ -165,7 +167,7 @@ export function TrialCoverageTools({ trial }: { trial: TrialRecord }) {
   return <>
     <button className="button primary" type="button" onClick={() => setPanel("patient")}><Icon name="patients" /> Review with patient</button>
     <button className="button secondary" type="button" onClick={() => setPanel("cohort")}><Icon name="filter" /> Approved research cohort filters</button>
-    <Link className="button secondary" to={`/studies?trial=${trial.id}`}>Open synthetic PI candidate queue</Link>
+    {pi.canAccess(trial.id) && <Link className="button secondary" to={`/studies?trial=${trial.id}`}>Open PI candidate queue</Link>}
     {panel ? createPortal(
       <div className="coverage-dialog-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) close(); }}>
         <section className="coverage-dialog" role="dialog" aria-modal="true" aria-labelledby="coverage-dialog-heading">

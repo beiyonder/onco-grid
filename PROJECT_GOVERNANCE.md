@@ -149,6 +149,8 @@ The owner subsequently directed normal direct implementation without parallel or
 
 **OBSERVED — 2026-10-01 local implementation:** the bounded synthetic renovation is implemented with passing browser/built-artifact journeys and executable checks in `.harness/reports/20261001T151302Z-P5-workflow-renovation-implementation.md`. Implementation does not close `P5`, qualify the demonstration predicates clinically, enable real-patient assessment, or update the remote deployment.
 
+On 2026-10-02, after the scope distinction was presented, the owner selected “Working engine, live registry, synthetic patients.” This authorises current public-registry checks with local deterministic evaluation, outcome-first progressive UI, ready-to-run synthetic benchmarks, and PI access restricted to authenticated trial-scoped grants. It does not authorise clinical prioritisation under a Trial Opportunity Index label, real-patient evaluation, patient-data transmission, or fabricated clinical validity. Existing service-configuration and live authentication/RLS qualification gates remain open.
+
 ## Gap register
 
 | Gap | Status | Evidence | Owner | Next action |
@@ -221,6 +223,7 @@ The owner subsequently directed normal direct implementation without parallel or
 | `C2` | `P5` | `.harness/reports/20260922T192230Z-P5-evidence-page-rhetorical-refinement.md` | Complete; merged and deployed through pull requests `#45` and `#46` |
 | `C5` | `P5` | `.harness/reports/20261001T123356Z-P5-workflow-renovation-plan.md` | Complete planning artifact; bidirectional synthetic matching and workflow renovation proposed, not implemented; revised clinical scope and owner/clinical sign-off remain open |
 | `C5` | `P5` | `.harness/reports/20261001T151302Z-P5-workflow-renovation-implementation.md` | Direct synthetic renovation implemented; R01–R15 local evidence, 28 passing tests, scoped security scan, built smoke and visual artifacts; clinical qualification, live-service activation and P5 remain open |
+| `C5` | `P5` | `.harness/reports/20261002T182420Z-P5-review-referral-workflow.md` | Local review/referral cutover exercised: two-way synthetic-auth thread, version/role guards, built queue without transmission, mobile proof and 34 passing tests; genuine cross-user/RLS, patient-data handling, clinical qualification and P5 remain open |
 
 ## References
 

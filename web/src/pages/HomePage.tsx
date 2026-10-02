@@ -7,6 +7,7 @@ import { useAppState } from "../state/AppState";
 import { useTrialData } from "../state/TrialData";
 import type { RoleId } from "../types";
 import { useWorkflow } from "../state/WorkflowState";
+import { usePiAccess } from "../state/usePiAccess";
 
 const roleHomeCopy: Record<RoleId, { title: string; description: string }> = {
   coordinator: {
@@ -31,6 +32,7 @@ export function HomePage() {
   const { role, roleId, workItems } = useAppState();
   const { state: workflow } = useWorkflow();
   const { error, retry, snapshot, status } = useTrialData();
+  const pi = usePiAccess();
   const sourceDate = snapshot ? formatSourceDate(snapshot.source.dataTimestamp) : null;
   const ownedAttention = workItems.filter((item) => item.status !== "resolved" && item.roleIds.includes(roleId));
   const roleCopy = roleHomeCopy[roleId];
@@ -67,8 +69,8 @@ export function HomePage() {
           <span className="journey-foot"><span>Browser-memory only</span><strong>Open Patients <Icon name="arrow" /></strong></span>
         </Link>
       </section>
-      <Link className="button secondary" to="/studies">PI workspace: publish demo models and screen candidates</Link>
-      <p>{workflow.gaps.filter(g=>!["reassessed","unable-to-obtain","cancelled"].includes(g.state)).length} active information tasks · {workflow.shortlist.length} version-bound shortlist entries · {workflow.packets.length} synthetic packets. <Link to="/inbox">Open evidence work</Link></p>
+      {pi.canAccess() && <Link className="button secondary" to="/studies">Open my study candidate queues</Link>}
+      <p>{workflow.gaps.filter(g=>!["reassessed","unable-to-obtain","cancelled"].includes(g.state)).length} active information tasks · {workflow.shortlist.length} version-bound shortlist entries · {workflow.referrals.length} patient referrals. <Link to="/inbox">Open referral and evidence work</Link></p>
 
       <div className="home-grid">
         <section className="surface activity-preview iso-panel" aria-labelledby="attention-heading">
